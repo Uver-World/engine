@@ -18,4 +18,13 @@ pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
     commands.insert_resource(ui_assets);
 }
 
-pub fn spawn_icon(mut commands: EntityCommands, assets: &Assets) {}
+pub fn spawn_icon(mut commands: EntityCommands, assets: &Assets) {
+    commands.insert_bundle(ImageBundle {
+        style: Style {
+            align_self: AlignSelf::Center,
+            ..default()
+        },
+        image: assets.icon.clone().into(),
+        ..default()
+    });
+}
