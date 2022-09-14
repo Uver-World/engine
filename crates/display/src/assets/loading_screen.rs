@@ -18,6 +18,21 @@ pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
     commands.insert_resource(ui_assets);
 }
 
+pub fn spawn_loading_bar(mut commands: EntityCommands, assets: &Assets) {
+    commands
+        .insert_bundle(NodeBundle {
+            style: Style {
+                size: Size::new(Val::Percent(50.0), Val::Percent(4.0)),
+                align_self: AlignSelf::Center,
+                ..default()
+            },
+            visibility: Visibility { is_visible: true },
+            color: Color::rgb(91., 91., 91.).into(),
+            ..default()
+        })
+        .insert(LoadingBar);
+}
+
 pub fn spawn_icon(mut commands: EntityCommands, assets: &Assets) {
     commands.insert_bundle(ImageBundle {
         style: Style {
