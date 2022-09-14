@@ -1,7 +1,5 @@
-use bevy::prelude::*;
+use client_display::*;
 
-fn main(){
-  App::new()
-    .add_plugins(DefaultPlugins)
-    .run();
+fn main() {
+    run_display();
 }
