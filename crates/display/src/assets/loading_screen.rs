@@ -31,6 +31,25 @@ pub fn spawn_loading_bar(mut commands: EntityCommands, _assets: &Assets) {
             background_color: Color::rgb(91., 91., 91.).into(),
             ..default()
         })
+        .with_children(|parent| {
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        size: Size::new(Val::Percent(50.0), Val::Percent(94.0)),
+                        align_self: AlignSelf::Center,
+                        margin: UiRect {
+                            left: Val::Px(3.0),
+                            right: Val::Px(3.0),
+                            top: Val::Px(3.0),
+                            bottom: Val::Px(3.0)
+                        },
+                        ..default()
+                    },
+                    visibility: Visibility { is_visible: true },
+                    background_color: Color::rgb(0., 0., 0.).into(),
+                    ..default()
+                });
+        })
         .insert(LoadingBar);
 }
 
@@ -40,6 +59,7 @@ pub fn spawn_icon(mut commands: EntityCommands, assets: &Assets) {
             align_self: AlignSelf::Center,
             ..default()
         },
+        transform: Transform::from_scale(Vec3::new(0.5, 0.5, 1.0)),
         image: assets.icon.clone().into(),
         ..default()
     });

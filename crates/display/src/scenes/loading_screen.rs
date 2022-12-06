@@ -22,11 +22,10 @@ fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
     node.insert(NodeBundle {
         style: Style {
             display: Display::Flex,
-            flex_direction: FlexDirection::ColumnReverse,
-            size: Size::new(Val::Percent(100.0), Val::Percent(90.0)),
+            flex_direction: FlexDirection::Column,
+            size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
             align_items: AlignItems::Center,
             align_content: AlignContent::Center,
-            justify_content: JustifyContent::Center,
             ..default()
         },
         background_color: Color::rgba(0., 0., 0., 0.).into(),
