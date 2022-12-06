@@ -15,11 +15,11 @@ impl Plugin for LoadingScreenPlugin {
     }
 }
 
-fn update_status(query: Query<Entity, With<loading_screen::LoadingBar>>) {}
+fn update_status(_query: Query<Entity, With<loading_screen::LoadingBar>>) {}
 
 fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
-    let mut node = commands.spawn();
-    node.insert_bundle(NodeBundle {
+    let mut node = commands.spawn_empty();
+    node.insert(NodeBundle {
         style: Style {
             display: Display::Flex,
             flex_direction: FlexDirection::ColumnReverse,
@@ -29,11 +29,11 @@ fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
             justify_content: JustifyContent::Center,
             ..default()
         },
-        color: Color::rgba(0., 0., 0., 0.).into(),
+        background_color: Color::rgba(0., 0., 0., 0.).into(),
         ..default()
     });
-    node.with_children(|parent| loading_screen::spawn_icon(parent.spawn(), &assets));
-    node.with_children(|parent| loading_screen::spawn_loading_bar(parent.spawn(), &assets));
+    node.with_children(|parent| loading_screen::spawn_icon(parent.spawn_empty(), &assets));
+    node.with_children(|parent| loading_screen::spawn_loading_bar(parent.spawn_empty(), &assets));
 }
 
 fn destroy(mut commands: Commands, query: Query<Entity, With<loading_screen::LoadingBar>>) {
