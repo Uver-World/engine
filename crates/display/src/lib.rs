@@ -24,8 +24,8 @@ pub fn run_display() {
         }))
         .add_startup_system(cameras::spawn_camera)
         .add_startup_system(assets::loading_screen::load_assets)
-        .add_plugin(scenes::loading_screen::LoadingScreenPlugin)
-        .add_plugin(scenes::simulate_screen::SimulateScreenPlugin)
+        .add_plugin(scenes::loading_screen::LoadingScreen)
+        .add_plugin(scenes::simulate_screen::SimulateScreen)
         .add_state(states::DisplayState::LoadingScreen)
         .run()
 }
