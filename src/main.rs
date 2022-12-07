@@ -1,18 +1,24 @@
+use std::env::args;
+
 use client_display::*;
 use client_profile::*;
 
-fn main() {
-    let profile = Profile::load("new_project".to_string());
-
-    match profile {
-        Ok(profile) => {
-            ClientDisplay { profile }.run_display();
-        }
-        Err(err) => {
-            println!("Error whilst loading new_project: {}", err);
-            let profile = Profile::default();
-            profile.save();
-            ClientDisplay { profile }.run_display();
-        }
+fn get_profile() -> Profile {
+    match args().nth(1) {
+        Some(file_path) => match Profile::load(file_path.clone()) {
+            Ok(profile) => profile,
+            Err(err) => {
+                println!("Error whilst loading {}: {}", file_path, err);
+                Profile::new(file_path)
+            }
+        },
+        None => Profile::new("new_project".to_string()),
     }
+}
+
+fn main() {
+    let profile = get_profile();
+    profile.save();
+
+    ClientDisplay { profile }.run_display();
 }

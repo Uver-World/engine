@@ -22,19 +22,17 @@ pub struct Profile {
     surfaces: Vec<Surface>,
 }
 
-impl Default for Profile {
-    fn default() -> Self {
+impl Profile {
+    pub fn new(project_name: String) -> Self {
         Self {
-            project_name: "new_project".to_string(),
+            project_name: project_name,
             entity_groups: Vec::new(),
             entities: Vec::new(),
             surface_groups: Vec::new(),
             surfaces: Vec::new(),
         }
     }
-}
 
-impl Profile {
     pub fn load(project_name: String) -> Result<Self, String> {
         let file_path = format!("{}.json", project_name);
         let file = File::open(&file_path);

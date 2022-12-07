@@ -1,7 +1,9 @@
 {
   "project_name": "new_project",
   "entity_groups": [
-    {"group": "test"}
+    {
+      "group": "test"
+    }
   ],
   "entities": [
     {
