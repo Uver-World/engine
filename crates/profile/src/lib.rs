@@ -1,18 +1,19 @@
 mod models;
 
-use std::fmt;
+use std::{fmt, fs::File};
 
 use serde::{
     de::{self, Deserializer, MapAccess, SeqAccess, Visitor},
-    ser::{Serialize, SerializeStruct, Serializer},
-    Deserialize,
+    Deserialize, Serialize,
 };
+use serde_json::Value;
 
 use crate::models::{
     entity::{Entity, EntityGroup},
     surface::{Surface, SurfaceGroup},
 };
 
+#[derive(Serialize)]
 pub struct Profile {
     project_name: String,
     entity_groups: Vec<EntityGroup>,
@@ -21,8 +22,8 @@ pub struct Profile {
     surfaces: Vec<Surface>,
 }
 
-impl Profile {
-    pub fn load() -> Self {
+impl Default for Profile {
+    fn default() -> Self {
         Self {
             project_name: "new_project".to_string(),
             entity_groups: Vec::new(),
@@ -31,22 +32,32 @@ impl Profile {
             surfaces: Vec::new(),
         }
     }
-
-    pub fn save(&self) {}
 }
 
-impl Serialize for Profile {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut state = serializer.serialize_struct("Profile", 2)?;
-        state.serialize_field("project_name", &self.project_name)?;
-        state.serialize_field("entity_groups", &self.entity_groups)?;
-        state.serialize_field("entities", &self.entities)?;
-        state.serialize_field("surface_groups", &self.surface_groups)?;
-        state.serialize_field("surfaces", &self.surfaces)?;
-        state.end()
+impl Profile {
+    pub fn load(project_name: String) -> Result<Self, String> {
+        let file_path = format!("{}.json", project_name);
+        let file = File::open(&file_path);
+        if file.is_err() {
+            return Err(file.unwrap_err().to_string());
+        }
+        let file = file.unwrap();
+        let settings = serde_json::from_reader(&file);
+        if settings.is_err() {
+            if let Ok(content) = std::fs::read_to_string(&file_path) {
+                let _ = std::fs::write(format!("{}.old", &file_path), content);
+            }
+            return Err(format!("{:?}", settings.err().unwrap()));
+        }
+        Ok(settings.unwrap())
+    }
+
+    pub fn save(&self) {
+        std::fs::write(
+            format!("{}.json", self.project_name),
+            serde_json::to_string_pretty(self).unwrap(),
+        )
+        .unwrap();
     }
 }
 
@@ -56,7 +67,7 @@ impl<'de> de::Deserialize<'de> for Profile {
         D: Deserializer<'de>,
     {
         #[derive(Deserialize)]
-        #[serde(field_identifier, rename_all = "lowercase")]
+        #[serde(field_identifier, rename_all = "snake_case")]
         enum Field {
             ProjectName,
             EntityGroups,
@@ -101,9 +112,9 @@ impl<'de> de::Deserialize<'de> for Profile {
             {
                 let mut project_name = None;
                 let mut entity_groups = None;
-                let mut entities: Option<Vec<String>> = None;
+                let mut entities: Option<Vec<Value>> = None;
                 let mut surface_groups = None;
-                let mut surfaces: Option<Vec<String>> = None;
+                let mut surfaces: Option<Vec<Value>> = None;
 
                 while let Some(key) = map.next_key()? {
                     match key {
@@ -126,7 +137,7 @@ impl<'de> de::Deserialize<'de> for Profile {
                             entity_groups = Some(map.next_value()?);
                         }
                         Field::SurfaceGroups => {
-                            if entity_groups.is_some() {
+                            if surface_groups.is_some() {
                                 return Err(de::Error::duplicate_field("surface_groups"));
                             }
                             surface_groups = Some(map.next_value()?);
