@@ -3,9 +3,10 @@ use bevy::prelude::*;
 use crate::assets::loading_screen;
 use crate::states::DisplayState;
 
-pub struct LoadingScreenPlugin;
+#[derive(Component)]
+pub struct LoadingScreen;
 
-impl Plugin for LoadingScreenPlugin {
+impl Plugin for LoadingScreen {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(DisplayState::LoadingScreen).with_system(construct))
             .add_system_set(SystemSet::on_exit(DisplayState::LoadingScreen).with_system(destroy))
@@ -18,7 +19,7 @@ impl Plugin for LoadingScreenPlugin {
 fn update_status(mut query: Query<(&mut Style, &mut loading_screen::LoadingBar)>, mut app_state: ResMut<State<DisplayState>>) {
     for (mut style, mut loading_bar) in query.iter_mut() {
         if loading_bar.val < 100.0 {
-            let r = 0.1;
+            let r = 1.0;
             if loading_bar.val + r > 100.0 {
                 loading_bar.val = 100.0;
             } else {
@@ -32,7 +33,7 @@ fn update_status(mut query: Query<(&mut Style, &mut loading_screen::LoadingBar)>
 }
 
 fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
-    let mut node = commands.spawn_empty();
+    let mut node = commands.spawn(LoadingScreen);
     node.insert(NodeBundle {
         style: Style {
             display: Display::Flex,
@@ -49,7 +50,7 @@ fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
     node.with_children(|parent| loading_screen::spawn_loading_bar(parent.spawn_empty(), &assets));
 }
 
-fn destroy(mut commands: Commands, query: Query<Entity>) {
+fn destroy(mut commands: Commands, query: Query<Entity, With<LoadingScreen>>) {
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();
     }
