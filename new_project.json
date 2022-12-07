@@ -1,0 +1,24 @@
+{
+  "project_name": "new_project",
+  "entity_groups": [
+    {"group": "test"}
+  ],
+  "entities": [
+    {
+      "group": "test",
+      "location": {
+        "x": 20.0,
+        "y": 30.0
+      }
+    },
+    {
+      "group": "test",
+      "location": {
+        "x": 22.0,
+        "y": 30.0
+      }
+    }
+  ],
+  "surface_groups": [],
+  "surfaces": []
+}
