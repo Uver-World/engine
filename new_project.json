@@ -2,22 +2,34 @@
   "project_name": "new_project",
   "entity_groups": [
     {
-      "group": "test"
+      "group": "RedSquare",
+      "color": "RED"
+    },
+    {
+      "group": "GreenSquare",
+      "color": "GREEN"
     }
   ],
   "entities": [
     {
-      "group": "test",
+      "group": "RedSquare",
       "location": {
         "x": 20.0,
         "y": 30.0
       }
     },
     {
-      "group": "test",
+      "group": "RedSquare",
       "location": {
         "x": 22.0,
         "y": 30.0
+      }
+    },
+    {
+      "group": "GreenSquare",
+      "location": {
+        "x": 40.0,
+        "y": 10.0
       }
     }
   ],

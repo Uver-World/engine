@@ -8,6 +8,7 @@ pub mod entities;
 pub mod scenes;
 pub mod states;
 
+#[derive(Resource)]
 pub struct ClientDisplay {
     pub profile: Profile,
 }
@@ -22,7 +23,7 @@ impl ClientDisplay {
         }
     }
 
-    pub fn run_display(&self) {
+    pub fn run_display(self) {
         App::new()
             .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
             .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -34,6 +35,7 @@ impl ClientDisplay {
             .add_plugin(scenes::loading_screen::LoadingScreen)
             .add_plugin(scenes::simulate_screen::SimulateScreen)
             .add_state(states::DisplayState::LoadingScreen)
+            .insert_resource(self)
             .run()
     }
 }

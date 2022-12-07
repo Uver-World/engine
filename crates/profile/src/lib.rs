@@ -1,4 +1,4 @@
-mod models;
+pub mod models;
 
 use std::{fmt, fs::File};
 
@@ -56,6 +56,10 @@ impl Profile {
             serde_json::to_string_pretty(self).unwrap(),
         )
         .unwrap();
+    }
+
+    pub fn get_entities(&self) -> &Vec<Entity> {
+        &self.entities
     }
 }
 

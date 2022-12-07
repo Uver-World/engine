@@ -10,12 +10,12 @@ pub struct SurfaceGroup {
 }
 
 pub struct Surface {
-    group: String,
+    pub group: SurfaceGroup,
 }
 
 impl Surface {
     pub fn new(group: SurfaceGroup) -> Self {
-        Self { group: group.group }
+        Self { group: group }
     }
 
     pub fn deserialize(map: Option<Vec<Value>>, groups: Vec<SurfaceGroup>) -> Option<Vec<Self>> {
@@ -43,7 +43,7 @@ impl ser::Serialize for Surface {
         S: Serializer,
     {
         let mut state = serializer.serialize_struct("Surface", 2)?;
-        state.serialize_field("group", &self.group)?;
+        state.serialize_field("group", &self.group.group)?;
         state.end()
     }
 }
