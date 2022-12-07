@@ -2,4 +2,5 @@
 pub enum DisplayState {
     LoadingScreen,
     Menu,
+    Blueprint,
 }
