@@ -12,10 +12,11 @@ pub fn spawn_entity(mut commands: EntityCommands, id: i32) {
                 ..default()
             },
             visibility: Visibility { is_visible: true },
-            background_color: Color::rgb(91., 91., 91.).into(),
+            background_color: Color::rgb(255., 255., 255.).into(),
             ..default()
         })
         .insert(Entity {
             id: id,
+            ..default()
         });
 }
