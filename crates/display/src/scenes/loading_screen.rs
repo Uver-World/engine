@@ -15,7 +15,21 @@ impl Plugin for LoadingScreenPlugin {
     }
 }
 
-fn update_status(_query: Query<Entity, With<loading_screen::LoadingBar>>) {}
+fn update_status(mut query: Query<(&mut Style, &mut loading_screen::LoadingBar)>, mut app_state: ResMut<State<DisplayState>>) {
+    for (mut style, mut loading_bar) in query.iter_mut() {
+        if loading_bar.val < 100.0 {
+            let r = 0.1;
+            if loading_bar.val + r > 100.0 {
+                loading_bar.val = 100.0;
+            } else {
+                loading_bar.val += r;
+            }
+            style.size.width = Val::Percent(loading_bar.val);
+        } else {
+            app_state.set(DisplayState::SimulateScreen).unwrap();
+        }
+    }
+}
 
 fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
     let mut node = commands.spawn_empty();
@@ -35,7 +49,7 @@ fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
     node.with_children(|parent| loading_screen::spawn_loading_bar(parent.spawn_empty(), &assets));
 }
 
-fn destroy(mut commands: Commands, query: Query<Entity, With<loading_screen::LoadingBar>>) {
+fn destroy(mut commands: Commands, query: Query<Entity>) {
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();
     }
