@@ -1,0 +1,21 @@
+{
+    "project_name": "New project",
+    "entity_groups": {},
+    "entity": {},
+    "surface_groups": {
+        "color_id": "Green",
+        "speed": 1.0,
+        "is_reachable": true
+    },
+    "surface": {
+        "color_id": "Green",
+        "size": {
+            "x": 1000,
+            "y": 1000
+        },
+        "position": {
+            "x": 0,
+            "y": 0
+        }
+    }
+}
