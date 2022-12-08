@@ -22,8 +22,8 @@ pub fn run_display() {
             ..default()
         }))
         .add_startup_system(cameras::spawn_camera)
-        .add_startup_system(assets::loading_screen::load_assets)
-        .add_plugin(scenes::loading_screen::LoadingScreenPlugin)
-        .add_state(states::DisplayState::LoadingScreen)
+        .add_startup_system(assets::blueprint::load_assets)
+        .add_plugin(scenes::blueprint::Blueprint)
+        .add_state(states::DisplayState::Blueprint)
         .run()
 }
