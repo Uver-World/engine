@@ -45,8 +45,13 @@ pub fn update_status(_query: Query<Entity, With<blueprint::BlueprintBase>>) {}
 
 pub fn keyboard_input(keys: Res<Input<KeyCode>>, mut app_state: ResMut<State<DisplayState>>) {
     if keys.just_pressed(KeyCode::S) {
-        // if app_state.current() /= DisplayState::SimulateScreen {
-            app_state.set(DisplayState::SimulateScreen).unwrap();
-        // }
+        match app_state.current() {
+            DisplayState::Blueprint => {
+                app_state.set(DisplayState::SimulateScreen).unwrap();
+            }
+            DisplayState::SimulateScreen => {},
+            DisplayState::LoadingScreen => {},
+            DisplayState::Menu => {},
+        }
     }
 }
