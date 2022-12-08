@@ -28,17 +28,17 @@ fn update_status(mut query: Query<(&mut Style, &mut UiEntity)>) {
         let rand = Uniform::from(1..5).sample(&mut rand::thread_rng()); // TOP BOT, RIGHT, LEFT
         match rand {
             1 => {
-                if ui_entity.y > 20.0 {
+                if ui_entity.y > -100.0 {
                     ui_entity.y -= ui_entity.settings.group.speed;
                 }
             }
             2 => {
-                if ui_entity.y <= 150.0 {
+                if ui_entity.y <= 100.0 {
                     ui_entity.y += ui_entity.settings.group.speed;
                 }
             }
             3 => {
-                if ui_entity.x <= 485.0 {
+                if ui_entity.x <= 300.0 {
                     ui_entity.x += ui_entity.settings.group.speed;
                 }
             }

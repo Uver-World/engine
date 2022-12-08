@@ -30,7 +30,7 @@ pub fn spawn_entity(mut commands: EntityCommands, entity: &Entity, id: usize) {
                 ..default()
             },
             visibility: Visibility { is_visible: true },
-            background_color: Color::rgb(
+            background_color: Color::rgb_u8(
                 entity.group.color.red(),
                 entity.group.color.green(),
                 entity.group.color.blue(),
