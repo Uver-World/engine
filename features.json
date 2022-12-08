@@ -1,54 +1,28 @@
 {
-  "project_name": "new_project",
-<<<<<<< HEAD
-  "entity_groups": [],
-  "entities": [],
-=======
+  "project_name": "features",
   "entity_groups": [
     {
       "group": "RedSquare",
       "color": "RED",
-      "speed": 2.0,
+      "speed": 20.0,
       "direction": "Random"
     },
     {
       "group": "GreenSquare",
       "color": "GREEN",
-      "speed": 8.0,
+      "speed": 30.0,
       "direction": "Random"
-    },
-    {
-      "group": "LimeSquare",
-      "color": "LIME",
-      "speed": 1.2,
-      "direction": {
-        "Location": {
-          "x": 70.0,
-          "y": 80.0
-        }
-      }
     },
     {
       "group": "BlueSquare",
       "color": "BLUE",
-      "speed": 25.0,
+      "speed": 50.0,
       "direction": "Random"
-    },
-    {
-      "group": "CyanSquare",
-      "color": "CYAN",
-      "speed": 0.1,
-      "direction": {
-        "Location": {
-          "x": 12.0,
-          "y": 20.0
-        }
-      }
     },
     {
       "group": "PinkSquare",
       "color": "PINK",
-      "speed": 4.5,
+      "speed": 2.5,
       "direction": "Random"
     }
   ],
@@ -94,30 +68,8 @@
         "x": 120.0,
         "y": 150.0
       }
-    },
-    {
-      "group": "CyanSquare",
-      "location": {
-        "x": 20.0,
-        "y": -70.0
-      }
-    },
-    {
-      "group": "LimeSquare",
-      "location": {
-        "x": 40.0,
-        "y": -20.0
-      }
-    },
-    {
-      "group": "LimeSquare",
-      "location": {
-        "x": 90.0,
-        "y": 20.0
-      }
     }
   ],
->>>>>>> c9886da621c64ebb6a37f4bb60374544201837a9
   "surface_groups": [],
   "surfaces": []
 }

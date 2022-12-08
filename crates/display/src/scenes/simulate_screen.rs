@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use client_profile::models::direction::Direction;
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 
@@ -23,28 +24,50 @@ impl Plugin for SimulateScreen {
     }
 }
 
+fn random_pos(ui_entity: &mut UiEntity) {
+    let rand = Uniform::from(1..5).sample(&mut rand::thread_rng()); // TOP BOT, RIGHT, LEFT
+    match rand {
+        1 => {
+            if ui_entity.y > -100.0 {
+                ui_entity.y -= ui_entity.settings.group.speed;
+            }
+        }
+        2 => {
+            if ui_entity.y <= 100.0 {
+                ui_entity.y += ui_entity.settings.group.speed;
+            }
+        }
+        3 => {
+            if ui_entity.x <= 300.0 {
+                ui_entity.x += ui_entity.settings.group.speed;
+            }
+        }
+        _ => {
+            if ui_entity.x > 20.0 {
+                ui_entity.x -= ui_entity.settings.group.speed;
+            }
+        }
+    }
+}
+
 fn update_status(mut query: Query<(&mut Style, &mut UiEntity)>) {
     for (mut style, mut ui_entity) in &mut query {
-        let rand = Uniform::from(1..5).sample(&mut rand::thread_rng()); // TOP BOT, RIGHT, LEFT
-        match rand {
-            1 => {
-                if ui_entity.y > 20.0 {
-                    ui_entity.y -= ui_entity.settings.group.speed;
-                }
+        match ui_entity.settings.group.direction.clone() {
+            Direction::Random => {
+                random_pos(&mut ui_entity);
             }
-            2 => {
-                if ui_entity.y <= 150.0 {
-                    ui_entity.y += ui_entity.settings.group.speed;
-                }
-            }
-            3 => {
-                if ui_entity.x <= 485.0 {
+            Direction::Location(location) => {
+                if ui_entity.x < location.x {
                     ui_entity.x += ui_entity.settings.group.speed;
                 }
-            }
-            _ => {
-                if ui_entity.x > 20.0 {
+                if ui_entity.x > location.x {
                     ui_entity.x -= ui_entity.settings.group.speed;
+                }
+                if ui_entity.y < location.y {
+                    ui_entity.y += ui_entity.settings.group.speed;
+                }
+                if ui_entity.y > location.y {
+                    ui_entity.y -= ui_entity.settings.group.speed;
                 }
             }
         }

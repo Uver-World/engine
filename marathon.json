@@ -1,0 +1,63 @@
+{
+  "project_name": "marathon",
+  "entity_groups": [
+    {
+      "group": "MagentaSquare",
+      "color": "MAGENTA",
+      "speed": 0.7,
+      "direction": {
+        "Location": {
+          "x": 300.0,
+          "y": 100.0
+        }
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "color": "PINK",
+      "speed": 2.0,
+      "direction": {
+        "Location": {
+          "x": 300.0,
+          "y": 100.0
+        }
+      }
+    },
+    {
+      "group": "CyanSquare",
+      "color": "CYAN",
+      "speed": 1.0,
+      "direction": {
+        "Location": {
+          "x": 300.0,
+          "y": 100.0
+        }
+      }
+    }
+  ],
+  "entities": [
+    {
+      "group": "MagentaSquare",
+      "location": {
+        "x": 0.0,
+        "y": -20.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 0.0,
+        "y": 20.0
+      }
+    },
+    {
+      "group": "CyanSquare",
+      "location": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    }
+  ],
+  "surface_groups": [],
+  "surfaces": []
+}

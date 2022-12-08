@@ -1,0 +1,75 @@
+{
+  "project_name": "speedy",
+  "entity_groups": [
+    {
+      "group": "RedSquare",
+      "color": "RED",
+      "direction": "Random",
+      "speed": 20.0
+    },
+    {
+      "group": "GreenSquare",
+      "color": "GREEN",
+      "direction": "Random",
+      "speed": 30.0
+    },
+    {
+      "group": "BlueSquare",
+      "color": "BLUE",
+      "direction": "Random",
+      "speed": 50.0
+    },
+    {
+      "group": "PinkSquare",
+      "color": "PINK",
+      "direction": "Random",
+      "speed": 2.5
+    }
+  ],
+  "entities": [
+    {
+      "group": "RedSquare",
+      "location": {
+        "x": 20.0,
+        "y": 30.0
+      }
+    },
+    {
+      "group": "RedSquare",
+      "location": {
+        "x": 22.0,
+        "y": 10.0
+      }
+    },
+    {
+      "group": "GreenSquare",
+      "location": {
+        "x": 20.0,
+        "y": 70.0
+      }
+      },
+    {
+      "group": "BlueSquare",
+      "location": {
+        "x": 20.0,
+        "y": 150.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 100.0,
+        "y": 150.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 120.0,
+        "y": 150.0
+      }
+    }
+  ],
+  "surface_groups": [],
+  "surfaces": []
+}
