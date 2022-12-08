@@ -1,75 +1,7 @@
 {
-  "project_name": "features",
-  "entity_groups": [
-    {
-      "group": "RedSquare",
-      "color": "RED",
-      "speed": 20.0,
-      "direction": "Random"
-    },
-    {
-      "group": "GreenSquare",
-      "color": "GREEN",
-      "speed": 30.0,
-      "direction": "Random"
-    },
-    {
-      "group": "BlueSquare",
-      "color": "BLUE",
-      "speed": 50.0,
-      "direction": "Random"
-    },
-    {
-      "group": "PinkSquare",
-      "color": "PINK",
-      "speed": 2.5,
-      "direction": "Random"
-    }
-  ],
-  "entities": [
-    {
-      "group": "RedSquare",
-      "location": {
-        "x": 20.0,
-        "y": 30.0
-      }
-    },
-    {
-      "group": "RedSquare",
-      "location": {
-        "x": 22.0,
-        "y": 10.0
-      }
-    },
-    {
-      "group": "GreenSquare",
-      "location": {
-        "x": 20.0,
-        "y": 70.0
-      }
-    },
-    {
-      "group": "BlueSquare",
-      "location": {
-        "x": 20.0,
-        "y": 150.0
-      }
-    },
-    {
-      "group": "PinkSquare",
-      "location": {
-        "x": 100.0,
-        "y": 150.0
-      }
-    },
-    {
-      "group": "PinkSquare",
-      "location": {
-        "x": 120.0,
-        "y": 150.0
-      }
-    }
-  ],
+  "project_name": "new_project",
+  "entity_groups": [],
+  "entities": [],
   "surface_groups": [],
   "surfaces": []
 }
