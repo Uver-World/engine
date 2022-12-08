@@ -10,8 +10,10 @@ use crate::models::{color::Color, location::Location};
 pub struct EntityGroup {
     pub group: String,
     pub color: Color,
+    pub speed: f32,
 }
 
+#[derive(Clone)]
 pub struct Entity {
     pub group: EntityGroup,
     pub location: Location,
@@ -55,7 +57,6 @@ impl ser::Serialize for Entity {
 fn retrieve_group(target: &str, groups: &Vec<EntityGroup>) -> Option<EntityGroup> {
     for group in groups {
         if target == group.group {
-            println!("group_name = {}", group.group);
             return Some(group.to_owned());
         }
     }

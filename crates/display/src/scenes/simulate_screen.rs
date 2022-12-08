@@ -1,7 +1,9 @@
 use bevy::prelude::*;
+use rand::distributions::Uniform;
+use rand::prelude::Distribution;
 
 use crate::assets::simulate_screen::spawn_entities;
-use crate::entities::entity;
+use crate::entities::ui_entity::UiEntity;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
 
@@ -20,10 +22,33 @@ impl Plugin for SimulateScreen {
     }
 }
 
-fn update_status(mut query: Query<(&mut Style, &mut entity::Entity)>) {
-    for (mut style, mut entity) in &mut query {
-        entity.left += 10.0;
-        style.position = entity.get_rect();
+fn update_status(mut query: Query<(&mut Style, &mut UiEntity)>) {
+    for (mut style, mut ui_entity) in &mut query {
+        let rand = Uniform::from(1..5).sample(&mut rand::thread_rng()); // TOP BOT, RIGHT, LEFT
+        match rand {
+            1 => {
+                if ui_entity.y > 20.0 {
+                    ui_entity.y -= ui_entity.settings.group.speed;
+                }
+            }
+            2 => {
+                if ui_entity.y <= 150.0 {
+                    ui_entity.y += ui_entity.settings.group.speed;
+                }
+            }
+            3 => {
+                if ui_entity.x <= 485.0 {
+                    ui_entity.x += ui_entity.settings.group.speed;
+                }
+            }
+            _ => {
+                if ui_entity.x > 20.0 {
+                    ui_entity.x -= ui_entity.settings.group.speed;
+                }
+            }
+        }
+
+        style.position = ui_entity.get_rect();
     }
 }
 

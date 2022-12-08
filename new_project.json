@@ -3,11 +3,13 @@
   "entity_groups": [
     {
       "group": "RedSquare",
-      "color": "RED"
+      "color": "RED",
+      "speed": 2.0
     },
     {
       "group": "GreenSquare",
-      "color": "GREEN"
+      "color": "GREEN",
+      "speed": 8.0
     }
   ],
   "entities": [
@@ -22,14 +24,14 @@
       "group": "RedSquare",
       "location": {
         "x": 22.0,
-        "y": 30.0
+        "y": 10.0
       }
     },
     {
       "group": "GreenSquare",
       "location": {
-        "x": 40.0,
-        "y": 10.0
+        "x": 20.0,
+        "y": 70.0
       }
     }
   ],
