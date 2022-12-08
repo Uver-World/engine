@@ -46,7 +46,7 @@ pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, windows: Res<Wi
             size: Size::new(Val::Px(window.width() * 0.15), Val::Px(window.height())),
             ..default()
         },
-        background_color: Color::rgb(1., 1., 1.).into(),
+        background_color: Color::rgba(1., 1., 1., 0.6).into(),
         ..default()
     });
 }
