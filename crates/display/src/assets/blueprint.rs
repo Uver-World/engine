@@ -10,6 +10,63 @@ pub struct Assets {
     pub icon: Handle<Image>,
 }
 
+#[derive(Component)]
+struct Object {
+    pub asset: &Assets,
+    pub name: String,
+    pub description: String,
+    pub is_dragable: bool,
+}
+
+impl Object {
+    pub fn new(asset: &Assets, name: String, description: String, is_dragable: bool) -> Self {
+        Self {
+            asset,
+            name,
+            description,
+            is_dragable,
+        }
+    }
+
+    pub fn spawn(&self, mut commands: EntityCommands) {
+        commands.insert(ImageBundle {
+            style: Style {
+                align_self: AlignSelf::Center,
+                ..default()
+            },
+            transform: Transform::from_scale(Vec3::new(1., 1., 1.)),
+            image: self.asset.icon.clone().into(),
+            ..default()
+        });
+        self.spawn_text(commands, self.asset);
+    }
+
+    pub fn spawn_text(&self, mut commands: EntityCommands, assets: &Assets) {
+        commands.insert((
+            TextBundle::from_sections([
+                TextSection::new(
+                    self.name.clone(),
+                    TextStyle {
+                        font: self.asset.font.clone(),
+                        font_size: 60.0,
+                        color: Color::BLACK,
+                    },
+                ),
+            ]),
+            TextBundle::from_sections([
+                TextSection::new(
+                    self.description.clone(),
+                    TextStyle {
+                        font: self.asset.font.clone(),
+                        font_size: 60.0,
+                        color: Color::GREEN,
+                    },
+                ),
+            ]),
+        ));
+    }
+}
+
 pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
     let ui_assets = Assets {
         font: assets.load("FiraCode-Regular.ttf"),
