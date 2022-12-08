@@ -18,7 +18,8 @@ impl Plugin for SimulateScreen {
         .add_system_set(SystemSet::on_exit(DisplayState::SimulateScreen).with_system(destroy))
         .add_system_set(
             SystemSet::on_update(DisplayState::SimulateScreen).with_system(update_status),
-        );
+        )
+        .add_system(keyboard_input);
     }
 }
 
@@ -80,5 +81,11 @@ fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
 fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();
+    }
+}
+
+pub fn keyboard_input(keys: Res<Input<KeyCode>>, mut app_state: ResMut<State<DisplayState>>) {
+    if keys.just_pressed(KeyCode::B) {
+        app_state.set(DisplayState::Blueprint).unwrap();
     }
 }
