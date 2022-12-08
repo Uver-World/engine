@@ -315,3 +315,9 @@ fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {
         commands.entity(entity).despawn_recursive();
     }
 }
+
+pub fn keyboard_input(keys: Res<Input<KeyCode>>, mut app_state: ResMut<State<DisplayState>>) {
+    if keys.just_pressed(KeyCode::B) {
+        app_state.set(DisplayState::Blueprint).unwrap();
+    }
+}

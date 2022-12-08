@@ -23,6 +23,7 @@ pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets) {
     commands.insert(ImageBundle {
         style: Style {
             align_self: AlignSelf::Center,
+            position_type: PositionType::Absolute,
             ..default()
         },
         transform: Transform::from_scale(Vec3::new(2.5, 2.5, 2.5)),
@@ -31,13 +32,21 @@ pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets) {
     });
 }
 
-pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets) {
+pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, windows: Res<Windows>) {
+    let window = windows.get_primary().unwrap();
     commands.insert(NodeBundle {
-        sprite: Sprite {
-            color: Color::rgb(0.25, 0.25, 0.75),
-            custom_size: Some(Vec2::new(50.0, 100.0)),
+        // sprite: Sprite {
+        //     color: Color::rgb(0.25, 0.25, 0.75),
+        //     custom_size: Some(Vec2::new(50.0, 100.0)),
+        //     ..default()
+        // },
+        style: Style {
+            position: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Px(0.), Val::Px(0.)),
+            position_type: PositionType::Absolute,
+            size: Size::new(Val::Px(window.width() * 0.15), Val::Px(window.height())),
             ..default()
         },
+        background_color: Color::rgb(1., 1., 1.).into(),
         ..default()
     });
 }
