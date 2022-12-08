@@ -2,7 +2,9 @@ use bevy::ecs::system::EntityCommands;
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct LoadingBar;
+pub struct LoadingBar {
+    pub val: f32
+}
 
 #[derive(Resource)]
 pub struct Assets {
@@ -35,7 +37,7 @@ pub fn spawn_loading_bar(mut commands: EntityCommands, _assets: &Assets) {
             parent
                 .spawn(NodeBundle {
                     style: Style {
-                        size: Size::new(Val::Percent(50.0), Val::Percent(94.0)),
+                        size: Size::new(Val::Percent(0.0), Val::Percent(94.0)),
                         align_self: AlignSelf::Center,
                         margin: UiRect {
                             left: Val::Px(3.0),
@@ -48,9 +50,10 @@ pub fn spawn_loading_bar(mut commands: EntityCommands, _assets: &Assets) {
                     visibility: Visibility { is_visible: true },
                     background_color: Color::rgb(0., 0., 0.).into(),
                     ..default()
+                }).insert(LoadingBar {
+                    val: 0.0,
                 });
-        })
-        .insert(LoadingBar);
+        });
 }
 
 pub fn spawn_icon(mut commands: EntityCommands, assets: &Assets) {
