@@ -3,7 +3,7 @@ use client_profile::models::direction::Direction;
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 
-use crate::assets::simulate_screen::spawn_entities;
+use crate::assets::simulate_screen::retrieve_entities;
 use crate::entities::ui_entity::UiEntity;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
@@ -49,7 +49,7 @@ fn random_pos(ui_entity: &mut UiEntity) {
     }
 }
 
-fn update_status(mut query: Query<(&mut Style, &mut UiEntity)>) {
+fn update_status(mut query: Query<(&mut Transform, &mut UiEntity)>) {
     for (mut style, mut ui_entity) in &mut query {
         match ui_entity.settings.group.direction.clone() {
             Direction::Random => {
@@ -70,34 +70,20 @@ fn update_status(mut query: Query<(&mut Style, &mut UiEntity)>) {
                 }
             }
         }
-
-        style.position = ui_entity.get_rect();
+        style.translation = Vec3::new(ui_entity.x, ui_entity.y, 1.);
     }
 }
 
 fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
-    let mut node = commands.spawn(SimulateScreen);
-    node.insert(NodeBundle {
-        style: Style {
-            size: Size::new(Val::Percent(50.0), Val::Percent(50.0)),
-            ..default()
-        },
-        background_color: Color::rgb(255., 255., 255.).into(),
-        ..default()
-    })
-    .with_children(|parent| {
-        spawn_entities(
-            parent.spawn(NodeBundle {
-                style: Style {
-                    size: Size::new(Val::Percent(99.0), Val::Percent(99.0)),
-                    ..default()
-                },
-                background_color: Color::rgb(0., 0., 0.).into(),
-                ..default()
-            }),
-            client.profile.get_entities(),
-        );
-    });
+    let entities = retrieve_entities(client.profile.get_entities());
+    let mut id = 0;
+
+    for (entity, shape) in entities {
+        commands
+            .spawn(shape)
+            .insert(UiEntity::from_entity(entity, id));
+        id += 1;
+    }
 }
 
 fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {

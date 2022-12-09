@@ -17,4 +17,13 @@ impl UiEntity {
             ..default()
         }
     }
+
+    pub fn from_entity(entity: Entity, id: usize) -> Self {
+        Self {
+            id,
+            x: entity.location.x,
+            y: entity.location.y,
+            settings: entity,
+        }
+    }
 }

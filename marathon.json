@@ -10,7 +10,8 @@
           "x": 300.0,
           "y": 100.0
         }
-      }
+      },
+      "shape": "RECTANGLE"
     },
     {
       "group": "PinkSquare",
@@ -21,7 +22,8 @@
           "x": 300.0,
           "y": 100.0
         }
-      }
+      },
+      "shape": "TRIANGLE"
     },
     {
       "group": "CyanSquare",
@@ -32,7 +34,8 @@
           "x": 300.0,
           "y": 100.0
         }
-      }
+      },
+      "shape": "CIRCLE"
     }
   ],
   "entities": [
