@@ -4,7 +4,7 @@ use serde::{
 };
 use serde_json::{from_value, Value};
 
-use crate::models::{color::Color, direction::Direction, location::Location};
+use crate::models::{color::Color, direction::Direction, location::Location, shape::Shape};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct EntityGroup {
@@ -12,6 +12,7 @@ pub struct EntityGroup {
     pub color: Color,
     pub speed: f32,
     pub direction: Direction,
+    pub shape: Shape,
 }
 
 #[derive(Clone)]

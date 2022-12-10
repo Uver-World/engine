@@ -9,3 +9,4 @@ edition = "2021"
 bevy = "0.9.1"
 client-profile = { path = "../profile/" }
 rand = "0.8.5"
+bevy_prototype_lyon = "0.7.2"

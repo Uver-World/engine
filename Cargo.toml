@@ -11,6 +11,5 @@ members = [
 ]
 
 [dependencies]
-bevy = "0.9.1"
 client-display = { path = "crates/display/" }
 client-profile = { path  = "crates/profile/" }
