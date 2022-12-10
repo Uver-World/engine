@@ -36,11 +36,8 @@ impl ClientDisplay {
             .add_startup_system(assets::blueprint::load_assets)
             .add_plugin(scenes::loading_screen::LoadingScreen)
             .add_plugin(scenes::simulate_screen::SimulateScreen)
-<<<<<<< HEAD
             .add_plugin(scenes::blueprint::Blueprint)
-=======
             .add_plugin(ShapePlugin)
->>>>>>> 35dfb185d3bcffe127f1f4a532ff8cc76c76b151
             .add_state(states::DisplayState::LoadingScreen)
             .insert_resource(self)
             .run()
