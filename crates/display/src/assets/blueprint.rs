@@ -35,14 +35,9 @@ impl Object {
                 style: Style {
                     align_self: AlignSelf::Center,
                     position_type: PositionType::Absolute,
-                    position: UiRect {
-                        left: Val::Px(pos.x),
-                        top: Val::Px(pos.y),
-                        ..default()
-                    },
                     ..default()
                 },
-                transform: Transform::from_scale(Vec3::new(1., 1., 1.)),
+                transform: Transform::from_translation(Vec3::new(pos.x, pos.y, 0.)),
                 image: asset.icon.clone().into(),
                 ..default()
             }
@@ -74,6 +69,33 @@ impl Object {
             );
         });
     }
+
+    pub fn clone_at(&self, pos: Vec2) -> Self {
+        Self {
+            asset: self.asset.clone(),
+            name: self.name.clone(),
+            description: self.description.clone(),
+            is_dragable: self.is_dragable,
+            is_pressed: self.is_pressed,
+            pos,
+            bund: ButtonBundle {
+                style: Style {
+                    align_self: AlignSelf::Center,
+                    position_type: PositionType::Absolute,
+                    position: UiRect {
+                        left: Val::Px(pos.x),
+                        bottom: Val::Px(pos.y),
+                        ..Default::default()
+                    },
+                    ..default()
+                },
+                transform: Transform::from_scale(Vec3::new(1., 1., 1.)),
+                // transform: Transform::from_translation(Vec3::new(pos.x,pos.y,0.)),
+                image: self.asset.icon.clone().into(),
+                ..default()
+            }
+        }
+    }
 }
 
 pub fn drag(
@@ -87,6 +109,7 @@ pub fn drag(
     for (mut _entity, _, mut _object) in &mut query {
         if buttons.pressed(MouseButton::Left) {
             if _object.is_dragable {
+                _object.is_pressed = true;
                 let mut transform = query2.single_mut();
                 let (camera, camera_transform) = q_camera.single();
                 let wnd = if let RenderTarget::Window(id) = camera.target {
@@ -101,9 +124,15 @@ pub fn drag(
                     let world_pos = ndc_to_world.project_point3(ndc.extend(-1.0));
                     let world_pos: Vec2 = world_pos.truncate();
                     _object.pos = Vec2::new(world_pos.x, world_pos.y);
-                    println!("transform base = {:?}", transform.translation);
-                    transform.translation.x = _object.pos.x;
-                    transform.translation.y = _object.pos.y;
+                    // println!("transform base = {:?}", transform.translation);
+                    // _object.bund.style.position.left = Val::Px(_object.pos.x);
+                    // _object.bund.style.position.bottom = Val::Px(_object.pos.y);
+                    // _object.bund.transform = Transform::from_translation(Vec3::new(_object.pos.x, _object.pos.y, 0.));
+                    // transform = Transform::from_translation(Vec3::new(screen_pos.x, screen_pos.y, 0.));
+                    let cpy = _object.clone_at(world_pos);
+                    // _commands.entity(_entity).despawn_recursive();
+                    _commands.entity(_entity).with_children(|parent| cpy.spawn(parent.spawn_empty()));
+                    _commands.entity(_entity).insert(cpy);
                     println!("Drag to {:?}", _object.pos);
                 }
             }
