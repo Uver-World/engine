@@ -11,7 +11,7 @@ pub struct EntityGroup {
     pub group: String,
     pub color: Color,
     pub speed: f32,
-    pub direction: Direction,
+    pub directions: Vec<Direction>,
     pub shape: Shape,
 }
 

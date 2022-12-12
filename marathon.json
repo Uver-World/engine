@@ -5,36 +5,42 @@
       "group": "MagentaSquare",
       "color": "MAGENTA",
       "speed": 0.7,
-      "direction": {
-        "Location": {
-          "x": 300.0,
-          "y": 100.0
+      "directions": [
+        {
+          "Location": {
+            "x": 300.0,
+            "y": 100.0
+          }
         }
-      },
+      ],
       "shape": "RECTANGLE"
     },
     {
       "group": "PinkSquare",
       "color": "PINK",
       "speed": 2.0,
-      "direction": {
-        "Location": {
-          "x": 300.0,
-          "y": 100.0
+      "directions": [
+        {
+          "Location": {
+            "x": 300.0,
+            "y": 100.0
+          }
         }
-      },
+      ],
       "shape": "TRIANGLE"
     },
     {
       "group": "CyanSquare",
       "color": "CYAN",
       "speed": 1.0,
-      "direction": {
-        "Location": {
-          "x": 300.0,
-          "y": 100.0
+      "directions": [
+        {
+          "Location": {
+            "x": 300.0,
+            "y": 100.0
+          }
         }
-      },
+      ],
       "shape": "CIRCLE"
     }
   ],

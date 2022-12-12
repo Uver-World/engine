@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use client_profile::models::direction::Direction;
-use client_profile::models::location::{self, Location};
+use client_profile::models::location::Location;
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 
@@ -65,11 +65,11 @@ fn destination_pos(ui_entity: &mut UiEntity, location: Location) {
     }
 }
 
-fn follow_pos(target: &mut UiEntity, group_target: String, query: &Vec<UiEntity>) {
+fn follow_pos(target: &mut UiEntity, group_target: Vec<String>, query: &Vec<UiEntity>) {
     let mut location: Option<Location> = None;
     for entity in query {
         // We check if the group is not the same, or target != entity
-        if group_target != entity.settings.group.group || target == entity {
+        if !group_target.contains(&entity.settings.group.group) || target == entity {
             continue;
         }
 
@@ -88,11 +88,11 @@ fn follow_pos(target: &mut UiEntity, group_target: String, query: &Vec<UiEntity>
     }
 }
 
-fn escape_pos(target: &mut UiEntity, group_target: String, query: &Vec<UiEntity>) {
+fn escape_pos(target: &mut UiEntity, group_target: Vec<String>, query: &Vec<UiEntity>) {
     let mut location: Option<Location> = None;
     for entity in query {
         // We check if the group is not the same, or target != entity
-        if group_target != entity.settings.group.group || target == entity {
+        if !group_target.contains(&entity.settings.group.group) || target == entity {
             continue;
         }
 
@@ -143,15 +143,13 @@ fn update_status(mut query: Query<(&mut Transform, &mut UiEntity)>) {
     let entities: Vec<UiEntity> = query.iter().map(|(_, entity)| entity.clone()).collect();
 
     for (mut style, mut ui_entity) in &mut query {
-        match ui_entity.settings.group.direction.clone() {
-            Direction::Random => {
-                random_pos(&mut ui_entity);
+        for direction in ui_entity.settings.group.directions.clone() {
+            match direction {
+                Direction::Random => random_pos(&mut ui_entity),
+                Direction::Location(location) => destination_pos(&mut ui_entity, location),
+                Direction::Follow(group_name) => follow_pos(&mut ui_entity, group_name, &entities),
+                Direction::Escape(group_name) => escape_pos(&mut ui_entity, group_name, &entities),
             }
-            Direction::Location(location) => {
-                destination_pos(&mut ui_entity, location);
-            }
-            Direction::Follow(group_name) => follow_pos(&mut ui_entity, group_name, &entities),
-            Direction::Escape(group_name) => escape_pos(&mut ui_entity, group_name, &entities),
         }
         style.translation = Vec3::new(ui_entity.x, ui_entity.y, 1.);
     }
