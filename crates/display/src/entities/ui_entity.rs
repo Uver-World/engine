@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use client_profile::models::entity::Entity;
 
-#[derive(Component)]
+#[derive(Component, Clone, PartialEq)]
 pub struct UiEntity {
     pub id: usize,
     pub x: f32,

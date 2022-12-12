@@ -4,26 +4,34 @@
     {
       "group": "RedSquare",
       "color": "RED",
+      "speed": 20.0,
       "direction": "Random",
-      "speed": 20.0
+      "shape": "RECTANGLE"
     },
     {
       "group": "GreenSquare",
       "color": "GREEN",
-      "direction": "Random",
-      "speed": 30.0
+      "speed": 5.0,
+      "direction": {
+        "Escape": "PinkSquare"
+      },
+      "shape": "CIRCLE"
     },
     {
       "group": "BlueSquare",
       "color": "BLUE",
+      "speed": 50.0,
       "direction": "Random",
-      "speed": 50.0
+      "shape": "RECTANGLE"
     },
     {
       "group": "PinkSquare",
       "color": "PINK",
-      "direction": "Random",
-      "speed": 2.5
+      "speed": 2.0,
+      "direction": {
+        "Follow": "GreenSquare"
+      },
+      "shape": "TRIANGLE"
     }
   ],
   "entities": [
@@ -47,7 +55,7 @@
         "x": 20.0,
         "y": 70.0
       }
-      },
+    },
     {
       "group": "BlueSquare",
       "location": {
@@ -58,15 +66,15 @@
     {
       "group": "PinkSquare",
       "location": {
-        "x": 100.0,
+        "x": 120.0,
         "y": 150.0
       }
     },
     {
       "group": "PinkSquare",
       "location": {
-        "x": 120.0,
-        "y": 150.0
+        "x": 30.0,
+        "y": -10.0
       }
     }
   ],
