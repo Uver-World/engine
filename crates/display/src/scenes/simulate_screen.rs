@@ -108,32 +108,20 @@ fn escape_pos(target: &mut UiEntity, group_target: Vec<String>, query: &Vec<UiEn
     match location {
         Some(location) => {
             let length = Location::new(target.x - location.x, target.y - location.y);
-
-            if length.x < 0.0 {
+            let (x, y) = if length.x < 0.0 {
                 if length.y < 0.0 {
-                    destination_pos(
-                        target,
-                        Location::new(target.x + length.x, target.y + length.y),
-                    );
+                    (target.x + length.x, target.y + length.y)
                 } else {
-                    destination_pos(
-                        target,
-                        Location::new(target.x + length.x, target.y - length.y),
-                    );
+                    (target.x + length.x, target.y - length.y)
                 }
             } else {
                 if length.y >= 0.0 {
-                    destination_pos(
-                        target,
-                        Location::new(target.x - length.x, target.y - length.y),
-                    );
+                    (target.x - length.x, target.y - length.y)
                 } else {
-                    destination_pos(
-                        target,
-                        Location::new(target.x - length.x, target.y + length.y),
-                    );
+                    (target.x - length.x, target.y + length.y)
                 }
-            }
+            };
+            destination_pos(target, Location::new(x, y));
         }
         _ => {}
     }
