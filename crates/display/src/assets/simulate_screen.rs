@@ -1,3 +1,4 @@
+use bevy::math::Vec3;
 use bevy::prelude::{Color, Transform};
 use bevy_prototype_lyon::{entity::ShapeBundle, prelude::*};
 use client_profile::models::{entity::Entity, shape::Shape};
@@ -13,6 +14,10 @@ pub fn retrieve_entities(entities: &Vec<Entity>) -> Vec<(Entity, ShapeBundle)> {
 }
 
 pub fn build_shape(entity: &Entity) -> ShapeBundle {
+    let transform: Transform = Transform {
+        translation: (Vec3::new(entity.location.x, entity.location.y, 0.)),
+        ..Transform::default()
+    };
     match entity.group.shape {
         Shape::Circle => GeometryBuilder::build_as(
             &shapes::Circle {
@@ -27,7 +32,7 @@ pub fn build_shape(entity: &Entity) -> ShapeBundle {
                 )),
                 outline_mode: StrokeMode::new(Color::BLACK, 10.0),
             },
-            Transform::default(),
+            transform,
         ),
         Shape::Rectangle => GeometryBuilder::build_as(
             &shapes::RegularPolygon {
@@ -43,7 +48,7 @@ pub fn build_shape(entity: &Entity) -> ShapeBundle {
                 )),
                 outline_mode: StrokeMode::new(Color::BLACK, 10.0),
             },
-            Transform::default(),
+            transform,
         ),
         Shape::Triangle => GeometryBuilder::build_as(
             &shapes::RegularPolygon {
@@ -59,7 +64,7 @@ pub fn build_shape(entity: &Entity) -> ShapeBundle {
                 )),
                 outline_mode: StrokeMode::new(Color::BLACK, 10.0),
             },
-            Transform::default(),
+            transform,
         ),
         /*_ => GeometryBuilder::build_as(
             &shapes::RegularPolygon {
