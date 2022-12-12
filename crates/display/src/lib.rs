@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::WindowDescriptor};
+use bevy::{prelude::*, prelude::Time, window::WindowDescriptor};
 use bevy_prototype_lyon::prelude::*;
 
 use client_profile::*;
@@ -38,6 +38,7 @@ impl ClientDisplay {
             .add_plugin(ShapePlugin)
             .add_state(states::DisplayState::LoadingScreen)
             .insert_resource(self)
+            .insert_resource(Time::default())
             .run()
     }
 }

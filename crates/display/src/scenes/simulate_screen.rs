@@ -49,24 +49,28 @@ fn random_pos(ui_entity: &mut UiEntity) {
     }
 }
 
-fn update_status(mut query: Query<(&mut Transform, &mut UiEntity)>) {
+fn update_status(mut query: Query<(&mut Transform, &mut UiEntity)>, time: Res<Time>) {
     for (mut style, mut ui_entity) in &mut query {
-        match ui_entity.settings.group.direction.clone() {
-            Direction::Random => {
-                random_pos(&mut ui_entity);
-            }
-            Direction::Location(location) => {
-                if ui_entity.x < location.x {
-                    ui_entity.x += ui_entity.settings.group.speed;
+        ui_entity.timer.tick(time.delta());
+        if ui_entity.timer.finished() {
+            ui_entity.timer.reset();
+            match ui_entity.settings.group.direction.clone() {
+                Direction::Random => {
+                    random_pos(&mut ui_entity);
                 }
-                if ui_entity.x > location.x {
-                    ui_entity.x -= ui_entity.settings.group.speed;
-                }
-                if ui_entity.y < location.y {
-                    ui_entity.y += ui_entity.settings.group.speed;
-                }
-                if ui_entity.y > location.y {
-                    ui_entity.y -= ui_entity.settings.group.speed;
+                Direction::Location(location) => {
+                    if ui_entity.x < location.x {
+                        ui_entity.x += ui_entity.settings.group.speed;
+                    }
+                    if ui_entity.x > location.x {
+                        ui_entity.x -= ui_entity.settings.group.speed;
+                    }
+                    if ui_entity.y < location.y {
+                        ui_entity.y += ui_entity.settings.group.speed;
+                    }
+                    if ui_entity.y > location.y {
+                        ui_entity.y -= ui_entity.settings.group.speed;
+                    }
                 }
             }
         }

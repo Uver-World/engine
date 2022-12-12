@@ -7,6 +7,7 @@ pub struct UiEntity {
     pub x: f32,
     pub y: f32,
     pub settings: Entity,
+    pub timer: Timer,
 }
 
 impl UiEntity {
@@ -24,6 +25,7 @@ impl UiEntity {
             x: entity.location.x,
             y: entity.location.y,
             settings: entity,
+            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
         }
     }
 }
