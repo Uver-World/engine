@@ -22,7 +22,7 @@ impl Plugin for SimulateScreen {
             SystemSet::on_update(DisplayState::SimulateScreen)
                 .with_system(check_collision)
                 .with_system(update_status.before(check_collision))
-                .with_system(apply_velocity.before(check_collision)),
+                .with_system(apply_velocity.after(check_collision)),
         );
     }
 }
@@ -54,23 +54,16 @@ fn check_collision(mut query: Query<(&mut Transform, &mut UiEntity)>) {
             );
 
             if let Some(collision) = collision {
-                if collision == Collision::Left {
-                    entity1.velocity.x -= entity1.settings.group.speed;
-                    // entity1.x -= entity1.settings.group.speed;
-                } else if collision == Collision::Right {
-                    entity1.velocity.x += entity1.settings.group.speed;
-                    // entity1.x += entity1.settings.group.speed;
+                if collision == Collision::Inside {
+                    entity1.velocity.x *= -200.;
+                } else {
+                    if collision == Collision::Left || collision == Collision::Right {
+                        entity1.velocity.x *= -0.5;
+                    }
+                    if collision == Collision::Top || collision == Collision::Bottom {
+                        entity1.velocity.y *= -0.5;
+                    }
                 }
-
-                if collision == Collision::Top {
-                    entity1.velocity.y += entity1.settings.group.speed;
-                    // entity1.y += entity1.settings.group.speed;
-                } else if collision == Collision::Bottom {
-                    entity1.velocity.y -= entity1.settings.group.speed;
-                    // entity1.y -= entity1.settings.group.speed;
-                }
-
-                // transform1.translation = Vec3::new(entity1.x, entity1.y, 1.);
             }
         }
     }

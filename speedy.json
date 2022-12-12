@@ -34,43 +34,43 @@
     {
       "group": "RedSquare",
       "location": {
-        "x": 20.0,
-        "y": 30.0
+        "x": -240.0,
+        "y": -120.0
       }
     },
     {
       "group": "RedSquare",
       "location": {
-        "x": 22.0,
-        "y": 10.0
+        "x": -120.0,
+        "y": -120.0
       }
     },
     {
       "group": "GreenSquare",
       "location": {
-        "x": 20.0,
-        "y": 70.0
+        "x": 0.0,
+        "y": 120.0
       }
     },
     {
       "group": "BlueSquare",
       "location": {
-        "x": 20.0,
-        "y": 150.0
-      }
-    },
-    {
-      "group": "PinkSquare",
-      "location": {
-        "x": 100.0,
-        "y": 150.0
+        "x": 0.0,
+        "y": 120.0
       }
     },
     {
       "group": "PinkSquare",
       "location": {
         "x": 120.0,
-        "y": 150.0
+        "y": 120.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 240.0,
+        "y": 120.0
       }
     }
   ],
