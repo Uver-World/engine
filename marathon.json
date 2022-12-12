@@ -4,7 +4,7 @@
     {
       "group": "MagentaSquare",
       "color": "MAGENTA",
-      "speed": 0.7,
+      "speed": 0.5,
       "direction": {
         "Location": {
           "x": 300.0,
@@ -16,7 +16,7 @@
     {
       "group": "PinkSquare",
       "color": "PINK",
-      "speed": 2.0,
+      "speed": 0.4,
       "direction": {
         "Location": {
           "x": 300.0,
@@ -28,7 +28,7 @@
     {
       "group": "CyanSquare",
       "color": "CYAN",
-      "speed": 1.0,
+      "speed": 0.3,
       "direction": {
         "Location": {
           "x": 300.0,
@@ -43,14 +43,14 @@
       "group": "MagentaSquare",
       "location": {
         "x": 0.0,
-        "y": -20.0
+        "y": -80.0
       }
     },
     {
       "group": "PinkSquare",
       "location": {
         "x": 0.0,
-        "y": 20.0
+        "y": 80.0
       }
     },
     {

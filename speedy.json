@@ -4,26 +4,30 @@
     {
       "group": "RedSquare",
       "color": "RED",
+      "speed": 2.0,
       "direction": "Random",
-      "speed": 20.0
+      "shape": "RECTANGLE"
     },
     {
       "group": "GreenSquare",
       "color": "GREEN",
+      "speed": 3.0,
       "direction": "Random",
-      "speed": 30.0
+      "shape": "RECTANGLE"
     },
     {
       "group": "BlueSquare",
       "color": "BLUE",
+      "speed": 5.0,
       "direction": "Random",
-      "speed": 50.0
+      "shape": "CIRCLE"
     },
     {
       "group": "PinkSquare",
       "color": "PINK",
+      "speed": 2.5,
       "direction": "Random",
-      "speed": 2.5
+      "shape": "TRIANGLE"
     }
   ],
   "entities": [
@@ -47,7 +51,7 @@
         "x": 20.0,
         "y": 70.0
       }
-      },
+    },
     {
       "group": "BlueSquare",
       "location": {

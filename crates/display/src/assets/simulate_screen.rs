@@ -1,5 +1,5 @@
 use bevy::prelude::{Color, Transform};
-use bevy_prototype_lyon::{entity::ShapeBundle, prelude::*, shapes::Circle};
+use bevy_prototype_lyon::{entity::ShapeBundle, prelude::*};
 use client_profile::models::{entity::Entity, shape::Shape};
 
 pub fn retrieve_entities(entities: &Vec<Entity>) -> Vec<(Entity, ShapeBundle)> {
@@ -16,7 +16,7 @@ pub fn build_shape(entity: &Entity) -> ShapeBundle {
     match entity.group.shape {
         Shape::Circle => GeometryBuilder::build_as(
             &shapes::Circle {
-                radius: 80.0,
+                radius: 60.0,
                 ..shapes::Circle::default()
             },
             DrawMode::Outlined {
@@ -61,7 +61,7 @@ pub fn build_shape(entity: &Entity) -> ShapeBundle {
             },
             Transform::default(),
         ),
-        _ => GeometryBuilder::build_as(
+        /*_ => GeometryBuilder::build_as(
             &shapes::RegularPolygon {
                 sides: 6,
                 feature: shapes::RegularPolygonFeature::Radius(80.0),
@@ -76,6 +76,6 @@ pub fn build_shape(entity: &Entity) -> ShapeBundle {
                 outline_mode: StrokeMode::new(Color::BLACK, 10.0),
             },
             Transform::default(),
-        ),
+        ),*/
     }
 }
