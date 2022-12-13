@@ -3,9 +3,10 @@ use bevy::ui::{Style, Display, FlexDirection, Val, Size, AlignItems, AlignConten
 use bevy::window::Windows;
 
 use crate::ClientDisplay;
-use crate::assets::blueprint::{drag, Object};
+use crate::assets::blueprint::drag;
+use crate::assets::blueprint_structure::{BlueprintBase, Object};
 use crate::states::DisplayState;
-use crate::assets::{blueprint};
+use crate::assets::blueprint;
 
 #[derive(Component)]
 pub struct Blueprint;
@@ -49,7 +50,7 @@ pub fn destroy(mut commands: Commands, query: Query<Entity, With<Blueprint>>, qu
     }
 }
 
-pub fn update_status(_query: Query<Entity, With<blueprint::BlueprintBase>>) {}
+pub fn update_status(_query: Query<Entity, With<BlueprintBase>>) {}
 
 pub fn keyboard_input(keys: Res<Input<KeyCode>>, mut app_state: ResMut<State<DisplayState>>) {
     if keys.just_pressed(KeyCode::S) {
