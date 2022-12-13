@@ -34,6 +34,7 @@ pub fn get_world_pos(
 }
 
 pub fn is_in_rect(obj: Object, pos: Vec2) -> bool {
+    return true;
     let rect: Rect = Rect {
         min: obj.pos,
         max: obj.pos + obj.size,
@@ -59,19 +60,12 @@ pub fn drag(
 ) {
     for (_entity, _, mut object, mut style, mut transform) in &mut query {
         if buttons.pressed(MouseButton::Left) {
-            cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed {
-                break;
-            } else {
-                true
-            };
+            cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed { break; } else { true };
             if object.is_dragable {
                 let wnd = windows.get_primary().unwrap();
                 if let Some(screen_pos) = wnd.cursor_position() {
                     if !is_in_rect(object.clone(), screen_pos) {
-                        println!(
-                            "Not in range mouse: {:?} object: {:?}",
-                            screen_pos, object.pos
-                        );
+                        println!("Not in range mouse: {:?} object: {:?}", screen_pos, object.pos);
                         continue;
                     }
                     cursor_state.is_dragging = true;
@@ -91,11 +85,7 @@ pub fn drag(
                 (cursor_state.is_clicked, cursor_state.is_dragging) = (false, false);
                 continue;
             }
-            (
-                cursor_state.is_clicked,
-                cursor_state.is_dragging,
-                object.is_pressed,
-            ) = (false, false, false);
+            (cursor_state.is_clicked, cursor_state.is_dragging, object.is_pressed,) = (false, false, false);
             println!("Clone");
             let cpy = object.clone_at(object.init_pos);
             commands
@@ -150,7 +140,7 @@ pub fn spawn_blueprint(
         true,
         false,
         Vec2::new(732., 362.),
-        Vec2::new(50., 50.),
+        Vec2::new(100., 50.),
         Entity { group, location },
         wnds,
         q_camera,
@@ -172,16 +162,37 @@ pub fn spawn_blueprint(
     });
 }
 
-pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, windows: Res<Windows>) {
-    let window = windows.get_primary().unwrap();
-    commands.insert(NodeBundle {
-        style: Style {
-            position: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Px(0.), Val::Px(0.)),
-            position_type: PositionType::Absolute,
-            size: Size::new(Val::Px(window.width() * 0.15), Val::Px(window.height())),
-            ..default()
-        },
-        background_color: Color::rgba(1., 1., 1., 0.6).into(),
-        ..default()
-    });
+pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<Windows>) {
+    commands
+        .insert(NodeBundle {
+            style: Style {
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .with_children(|parent| {
+            parent.spawn(NodeBundle {
+                style: Style {
+                    position: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Percent(80.), Val::Px(0.)),
+                    position_type: PositionType::Absolute,
+                    size: Size::new(Val::Percent(100.0), Val::Percent(20.0)),
+                    ..default()
+                },
+                background_color: Color::rgb(1., 1., 1.).into(),
+                ..default()
+            });
+        })
+        .with_children(|parent| {
+            parent.spawn(NodeBundle {
+                style: Style {
+                    position: UiRect::new(Val::Percent(80.), Val::Px(0.), Val::Px(0.), Val::Px(0.)),
+                    position_type: PositionType::Absolute,
+                    size: Size::new(Val::Percent(20.0), Val::Percent(100.0)),
+                    ..default()
+                },
+                background_color: Color::rgb(1., 1., 1.).into(),
+                ..default()
+            });
+        });
 }

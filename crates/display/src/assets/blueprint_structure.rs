@@ -67,7 +67,7 @@ impl Object {
                         bottom: Val::Px(world_pos.y),
                         ..default()
                     },
-                    size: Size::new(Val::Px(size.x), Val::Px(size.y)),
+                    size: Size {height: Val::Px(size.x), width: Val::Px(size.y) },
                     ..default()
                 },
                 // transform: Transform::default(),
@@ -126,12 +126,12 @@ impl Object {
                     size: Size::new(Val::Px(self.size.x), Val::Px(self.size.y)),
                     ..default()
                 },
-                transform: Transform {
-                    translation: Vec3::new(pos.x, pos.y, 0.),
-                    scale: Vec3::new(1., 1., 1.),
-                    ..Default::default()
-                },
-                // transform: Transform::from_scale(Vec3::new(1., 1., 1.)),
+                // transform: Transform {
+                //     translation: Vec3::new(pos.x, pos.y, 0.),
+                //     scale: Vec3::new(1., 1., 1.),
+                //     ..Default::default()
+                // },
+                transform: Transform::from_scale(Vec3::new(1., 1., 1.)),
                 // transform: Transform::from_translation(Vec3::new(pos.x, pos.y, 0.)),
                 // transform: Transform::from_translation(Vec3::new(world_pos.x, world_pos.y, 0.)),
                 image: self.asset.icon.clone().into(),
