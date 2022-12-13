@@ -55,7 +55,10 @@ pub fn drag(
                 let wnd = windows.get_primary().unwrap();
                 if let Some(screen_pos) = wnd.cursor_position() {
                     if !is_in_rect(object.get_rect(), screen_pos) {
-                        println!("Not in range mouse: {:?} object: {:?}", screen_pos, object.pos);
+                        println!(
+                            "Not in range mouse: {:?} object: {:?}",
+                            screen_pos, object.pos
+                        );
                         continue;
                     }
                     object.pos = Vec2::new(screen_pos.x - object.size.x, screen_pos.y);
@@ -103,7 +106,12 @@ pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
     commands.insert_resource(ui_assets);
 }
 
-pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets, wnds: Res<Windows>, q_camera: Query<(&Camera, &GlobalTransform)>) {
+pub fn spawn_blueprint(
+    mut commands: EntityCommands,
+    _assets: &Assets,
+    wnds: Res<Windows>,
+    q_camera: Query<(&Camera, &GlobalTransform)>,
+) {
     let group = EntityGroup {
         group: "todo!()".to_string(),
         color: client_profile::models::color::Color::Red,
@@ -120,7 +128,7 @@ pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets, wnds: Res
         Vec2::new(50., 50.),
         Entity { group, location },
         wnds,
-        q_camera
+        q_camera,
     );
     // let obj2 = Object::new(_assets, "Button 2".to_string(), "Second button".to_string(), true, false, Vec2::new(500., 100.));
     commands.with_children(|parent| obj.spawn(parent.spawn_empty()));
@@ -139,16 +147,37 @@ pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets, wnds: Res
     });
 }
 
-pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, windows: Res<Windows>) {
-    let window = windows.get_primary().unwrap();
-    commands.insert(NodeBundle {
-        style: Style {
-            position: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Px(0.), Val::Px(0.)),
-            position_type: PositionType::Absolute,
-            size: Size::new(Val::Px(window.width() * 0.15), Val::Px(window.height())),
-            ..default()
-        },
-        background_color: Color::rgba(1., 1., 1., 0.6).into(),
-        ..default()
-    });
+pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<Windows>) {
+    commands
+        .insert(NodeBundle {
+            style: Style {
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .with_children(|parent| {
+            parent.spawn(NodeBundle {
+                style: Style {
+                    position: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Percent(80.), Val::Px(0.)),
+                    position_type: PositionType::Absolute,
+                    size: Size::new(Val::Percent(100.0), Val::Percent(20.0)),
+                    ..default()
+                },
+                background_color: Color::rgb(1., 1., 1.).into(),
+                ..default()
+            });
+        })
+        .with_children(|parent| {
+            parent.spawn(NodeBundle {
+                style: Style {
+                    position: UiRect::new(Val::Percent(80.), Val::Px(0.), Val::Px(0.), Val::Px(0.)),
+                    position_type: PositionType::Absolute,
+                    size: Size::new(Val::Percent(20.0), Val::Percent(100.0)),
+                    ..default()
+                },
+                background_color: Color::rgb(1., 1., 1.).into(),
+                ..default()
+            });
+        });
 }
