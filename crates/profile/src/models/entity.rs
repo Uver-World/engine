@@ -1,3 +1,4 @@
+use bevy::prelude::Component;
 use serde::{
     ser::{self, SerializeStruct, Serializer},
     Deserialize, Serialize,
@@ -6,14 +7,14 @@ use serde_json::{from_value, Value};
 
 use crate::models::{color::Color, location::Location};
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone)]
 pub struct EntityGroup {
     pub group: String,
     pub color: Color,
     pub speed: f32,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Component)]
 pub struct Entity {
     pub group: EntityGroup,
     pub location: Location,
@@ -39,6 +40,24 @@ impl Entity {
         }
 
         Some(entities)
+    }
+}
+
+impl PartialEq for Entity {
+    fn eq(&self, other: &Self) -> bool {
+        self.group == other.group && self.location == other.location
+    }
+}
+
+impl PartialEq for EntityGroup {
+    fn eq(&self, other: &Self) -> bool {
+        self.group == other.group
+    }
+}
+
+impl PartialEq for Location {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
     }
 }
 

@@ -1,6 +1,8 @@
-use bevy::prelude::{SystemSet, App, Plugin, With, Entity, Query, Commands, Res, NodeBundle, default, Color, BuildChildren, KeyCode, Input, ResMut, State, Component, DespawnRecursiveExt};
+use bevy::prelude::{SystemSet, App, Plugin, With, Entity, Query, Commands, Res, NodeBundle, default, Color, BuildChildren, KeyCode, Input, ResMut, State, Component, DespawnRecursiveExt, Camera, GlobalTransform};
 use bevy::ui::{Style, Display, FlexDirection, Val, Size, AlignItems, AlignContent};
+use bevy::window::Windows;
 
+use crate::ClientDisplay;
 use crate::assets::blueprint::{drag, Object};
 use crate::states::DisplayState;
 use crate::assets::{blueprint};
@@ -18,7 +20,7 @@ impl Plugin for Blueprint {
     }
 }
 
-pub fn construct(mut commands: Commands, assets: Res<blueprint::Assets>, windows: Res<bevy::window::Windows>) {
+pub fn construct(mut commands: Commands, assets: Res<blueprint::Assets>, windows: Res<bevy::window::Windows>, wnds: Res<Windows>, q_camera: Query<(&Camera, &GlobalTransform)>) {
     let mut node = commands.spawn(Blueprint);
     node.insert(NodeBundle {
         style: Style {
@@ -32,11 +34,12 @@ pub fn construct(mut commands: Commands, assets: Res<blueprint::Assets>, windows
         background_color: Color::rgba(0., 0., 0., 0.).into(),
         ..default()
     });
-    node.with_children(|parent| blueprint::spawn_blueprint(parent.spawn_empty(), &assets));
+    node.with_children(|parent| blueprint::spawn_blueprint(parent.spawn_empty(), &assets, wnds, q_camera));
     node.with_children(|parent| blueprint::spawn_box(parent.spawn_empty(), &assets, windows));
 }
 
-pub fn destroy(mut commands: Commands, query: Query<Entity, With<Blueprint>>, query2: Query<Entity, With<Object>>) {
+pub fn destroy(mut commands: Commands, query: Query<Entity, With<Blueprint>>, query2: Query<Entity, With<Object>>, client: ResMut<ClientDisplay>,) {
+    client.profile.save();
     println!("destroying blueprint");
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();

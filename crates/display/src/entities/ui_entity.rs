@@ -17,4 +17,13 @@ impl UiEntity {
             ..default()
         }
     }
+
+    pub fn clone(&self) -> Self {
+        Self {
+            id: self.id,
+            x: self.x,
+            y: self.y,
+            settings: self.settings.clone(),
+        }
+    }
 }
