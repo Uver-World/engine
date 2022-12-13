@@ -7,14 +7,14 @@ use serde_json::{from_value, Value};
 
 use crate::models::{color::Color, location::Location};
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct EntityGroup {
     pub group: String,
     pub color: Color,
     pub speed: f32,
 }
 
-#[derive(Clone, Component)]
+#[derive(Clone, Component, Debug)]
 pub struct Entity {
     pub group: EntityGroup,
     pub location: Location,

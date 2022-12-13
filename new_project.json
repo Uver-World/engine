@@ -1,29 +1,7 @@
 {
   "project_name": "new_project",
   "entity_groups": [],
-  "entities": [
-    {
-      "group": "todo!()",
-      "location": {
-        "x": 0.0,
-        "y": 0.0
-      }
-    },
-    {
-      "group": "todo!()",
-      "location": {
-        "x": 0.0,
-        "y": 0.0
-      }
-    },
-    {
-      "group": "todo!()",
-      "location": {
-        "x": 0.0,
-        "y": 0.0
-      }
-    }
-  ],
+  "entities": [],
   "surface_groups": [],
   "surfaces": []
 }
