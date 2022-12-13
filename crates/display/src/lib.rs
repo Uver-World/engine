@@ -42,7 +42,7 @@ impl ClientDisplay {
             .add_plugin(scenes::simulate_screen::SimulateScreen)
             .add_plugin(scenes::blueprint::Blueprint)
             .add_plugin(scenes::blueprint::Blueprint)
-            .add_state(states::DisplayState::LoadingScreen)
+            .add_state(states::DisplayState::Blueprint)
             .insert_resource(self)
             .insert_resource(CursorState::default())
             .run()

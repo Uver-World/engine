@@ -8,7 +8,7 @@ use client_profile::models::location::Location;
 
 use super::blueprint_structure::*;
 
-#[derive(Resource, Clone)]
+#[derive(Resource, Clone, Debug)]
 pub struct Assets {
     pub font: Handle<Font>,
     pub icon: Handle<Image>,
@@ -33,10 +33,13 @@ pub fn get_world_pos(
     return world_pos;
 }
 
-pub fn is_in_rect(_rect: UiRect, _pos: Vec2) -> bool {
-    return true;
-    // let rect: Rect = rect.into(Rect::Zero);
-    // rect.contains(pos)
+pub fn is_in_rect(obj: Object, pos: Vec2) -> bool {
+    let rect: Rect = Rect {
+        min: obj.pos,
+        max: obj.pos + obj.size,
+    };
+    println!("Rect: {:?} pos: {:?}", rect, pos);
+    rect.contains(pos)
 }
 
 pub fn drag(
@@ -45,38 +48,54 @@ pub fn drag(
     windows: Res<Windows>,
     q_camera: Query<(&Camera, &GlobalTransform)>,
     mut client: ResMut<ClientDisplay>,
-    mut query: Query<(bevy::prelude::Entity, With<Object>, &mut Object, &mut Style, &mut Transform)>,
+    mut query: Query<(
+        bevy::prelude::Entity,
+        With<Object>,
+        &mut Object,
+        &mut Style,
+        &mut Transform,
+    )>,
     mut cursor_state: ResMut<CursorState>,
 ) {
     for (_entity, _, mut object, mut style, mut transform) in &mut query {
         if buttons.pressed(MouseButton::Left) {
-            // cursor_state.is_clicked = if cursor_state.is_clicked { break } else { true };
+            cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed {
+                break;
+            } else {
+                true
+            };
             if object.is_dragable {
-                cursor_state.is_dragging = true;
                 let wnd = windows.get_primary().unwrap();
-                if let Some(mut screen_pos) = wnd.cursor_position() {
-                    if !is_in_rect(object.get_rect(), screen_pos) {
-                        println!("Not in range mouse: {:?} object: {:?}", screen_pos, object.pos);
+                if let Some(screen_pos) = wnd.cursor_position() {
+                    if !is_in_rect(object.clone(), screen_pos) {
+                        println!(
+                            "Not in range mouse: {:?} object: {:?}",
+                            screen_pos, object.pos
+                        );
                         continue;
                     }
-                    println!("first In range mouse: {:?} object: {:?}", screen_pos, object.pos);
+                    cursor_state.is_dragging = true;
                     // screen_pos = get_world_pos(&windows, &q_camera, screen_pos);
                     object.pos = Vec2::new(screen_pos.x - object.size.x / 2., screen_pos.y);
-                    println!("In range mouse: {:?} object: {:?}", screen_pos, object.pos);
+                    println!("Drag to {:?}", object.pos);
                 }
                 style.position = object.get_rect();
-                transform.scale = Vec3::ONE;
                 transform.translation = object.pos.extend(0.);
-                println!("transform: {:?}", transform);
-                // transform.translation = object.pos.extend(0.);
                 object.is_pressed = true;
             }
         } else if buttons.just_released(MouseButton::Left) {
             if !cursor_state.is_dragging {
                 cursor_state.is_clicked = false;
                 continue;
+            } else if !cursor_state.is_clicked || !object.is_pressed {
+                (cursor_state.is_clicked, cursor_state.is_dragging) = (false, false);
+                continue;
             }
-            (cursor_state.is_clicked, cursor_state.is_dragging) = (false, false);
+            (
+                cursor_state.is_clicked,
+                cursor_state.is_dragging,
+                object.is_pressed,
+            ) = (false, false, false);
             println!("Clone");
             let cpy = object.clone_at(object.init_pos);
             commands
@@ -85,6 +104,7 @@ pub fn drag(
             commands.entity(_entity).insert(cpy);
             client.profile.add_entity(object.obj.clone());
             object.is_placed = true;
+            println!("object = {:?}", object);
         }
     }
 }
@@ -111,7 +131,12 @@ pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
     commands.insert_resource(ui_assets);
 }
 
-pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets, wnds: Res<Windows>, q_camera: Query<(&Camera, &GlobalTransform)>) {
+pub fn spawn_blueprint(
+    mut commands: EntityCommands,
+    _assets: &Assets,
+    wnds: Res<Windows>,
+    q_camera: Query<(&Camera, &GlobalTransform)>,
+) {
     let group = EntityGroup {
         group: "todo!()".to_string(),
         color: client_profile::models::color::Color::Red,
@@ -128,7 +153,7 @@ pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets, wnds: Res
         Vec2::new(50., 50.),
         Entity { group, location },
         wnds,
-        q_camera
+        q_camera,
     );
     // let obj2 = Object::new(_assets, "Button 2".to_string(), "Second button".to_string(), true, false, Vec2::new(500., 100.));
     commands.with_children(|parent| obj.spawn(parent.spawn_empty()));
