@@ -55,6 +55,13 @@ pub fn drag(
         &mut Style,
         &mut Transform,
     )>,
+    mut query: Query<(
+        bevy::prelude::Entity,
+        With<Object>,
+        &mut Object,
+        &mut Style,
+        &mut Transform,
+    )>,
     mut cursor_state: ResMut<CursorState>,
 ) {
     for (_entity, _, mut object, mut style, mut transform) in &mut query {
@@ -74,7 +81,10 @@ pub fn drag(
                         );
                         continue;
                     }
-                    cursor_state.is_dragging = true;
+                    println!(
+                        "first In range mouse: {:?} object: {:?}",
+                        screen_pos, object.pos
+                    );
                     // screen_pos = get_world_pos(&windows, &q_camera, screen_pos);
                     object.pos = Vec2::new(screen_pos.x - object.size.x / 2., screen_pos.y);
                     println!("Drag to {:?}", object.pos);
@@ -179,47 +189,36 @@ pub fn spawn_blueprint(
         });
     }
 
-    pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<Windows>) {
-        commands
-            .insert(NodeBundle {
-                style: Style {
-                    size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-                    ..Default::default()
-                },
+pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<Windows>) {
+    commands
+        .insert(NodeBundle {
+            style: Style {
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 ..Default::default()
-            })
-            .with_children(|parent| {
-                parent.spawn(NodeBundle {
-                    style: Style {
-                        position: UiRect::new(
-                            Val::Px(0.),
-                            Val::Px(0.),
-                            Val::Percent(80.),
-                            Val::Px(0.),
-                        ),
-                        position_type: PositionType::Absolute,
-                        size: Size::new(Val::Percent(100.0), Val::Percent(20.0)),
-                        ..default()
-                    },
-                    background_color: Color::rgb(1., 1., 1.).into(),
+            },
+            ..Default::default()
+        })
+        .with_children(|parent| {
+            parent.spawn(NodeBundle {
+                style: Style {
+                    position: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Percent(80.), Val::Px(0.)),
+                    position_type: PositionType::Absolute,
+                    size: Size::new(Val::Percent(100.0), Val::Percent(20.0)),
                     ..default()
-                });
-            })
-            .with_children(|parent| {
-                parent.spawn(NodeBundle {
-                    style: Style {
-                        position: UiRect::new(
-                            Val::Percent(80.),
-                            Val::Px(0.),
-                            Val::Px(0.),
-                            Val::Px(0.),
-                        ),
-                        position_type: PositionType::Absolute,
-                        size: Size::new(Val::Percent(20.0), Val::Percent(100.0)),
-                        ..default()
-                    },
-                    background_color: Color::rgb(1., 1., 1.).into(),
+                },
+                background_color: Color::rgb(1., 1., 1.).into(),
+                ..default()
+            });
+        })
+        .with_children(|parent| {
+            parent.spawn(NodeBundle {
+                style: Style {
+                    position: UiRect::new(Val::Percent(80.), Val::Px(0.), Val::Px(0.), Val::Px(0.)),
+                    position_type: PositionType::Absolute,
+                    size: Size::new(Val::Percent(20.0), Val::Percent(100.0)),
                     ..default()
-                });
+                },
+                background_color: Color::rgb(1., 1., 1.).into(),
+                ..default()
             });
     }
