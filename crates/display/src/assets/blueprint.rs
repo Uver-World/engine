@@ -60,12 +60,19 @@ pub fn drag(
 ) {
     for (_entity, _, mut object, mut style, mut transform) in &mut query {
         if buttons.pressed(MouseButton::Left) {
-            cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed { break; } else { true };
+            cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed {
+                break;
+            } else {
+                true
+            };
             if object.is_dragable {
                 let wnd = windows.get_primary().unwrap();
                 if let Some(screen_pos) = wnd.cursor_position() {
                     if !is_in_rect(object.clone(), screen_pos) {
-                        println!("Not in range mouse: {:?} object: {:?}", screen_pos, object.pos);
+                        println!(
+                            "Not in range mouse: {:?} object: {:?}",
+                            screen_pos, object.pos
+                        );
                         continue;
                     }
                     cursor_state.is_dragging = true;
@@ -85,16 +92,16 @@ pub fn drag(
                 (cursor_state.is_clicked, cursor_state.is_dragging) = (false, false);
                 continue;
             }
-            (cursor_state.is_clicked, cursor_state.is_dragging, object.is_pressed,) = (false, false, false);
-            println!("Clone");
+            (
+                cursor_state.is_clicked,
+                cursor_state.is_dragging,
+                object.is_pressed,
+            ) = (false, false, false);
             let cpy = object.clone_at(object.init_pos);
-            commands
-                .entity(_entity)
-                .with_children(|parent| cpy.spawn(parent.spawn_empty()));
+            cpy.spawn(commands.spawn_empty());
             commands.entity(_entity).insert(cpy);
             client.profile.add_entity(object.obj.clone());
             object.is_placed = true;
-            println!("object = {:?}", object);
         }
     }
 }
@@ -145,21 +152,7 @@ pub fn spawn_blueprint(
         wnds,
         q_camera,
     );
-    // let obj2 = Object::new(_assets, "Button 2".to_string(), "Second button".to_string(), true, false, Vec2::new(500., 100.));
-    commands.with_children(|parent| obj.spawn(parent.spawn_empty()));
-    // commands.with_children(|parent| obj2.spawn(parent.spawn_empty()));
-    commands.insert(obj);
-    // commands.insert(obj2);
-    commands.insert(ImageBundle {
-        style: Style {
-            align_self: AlignSelf::Center,
-            position_type: PositionType::Absolute,
-            ..default()
-        },
-        transform: Transform::from_scale(Vec3::new(2.5, 2.5, 2.5)),
-        image: _assets.icon.clone().into(),
-        ..default()
-    });
+    obj.spawn(commands);
 }
 
 pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<Windows>) {
