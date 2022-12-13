@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Copy, Debug)]
 pub struct Location {
     pub x: f32,
     pub y: f32,

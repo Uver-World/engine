@@ -67,7 +67,7 @@ pub fn drag(
             if object.is_dragable {
                 let wnd = windows.get_primary().unwrap();
                 if let Some(screen_pos) = wnd.cursor_position() {
-                    if !is_in_rect(object.clone(), screen_pos) {
+                    if !is_in_rect(object.get_rect(), screen_pos) {
                         println!(
                             "Not in range mouse: {:?} object: {:?}",
                             screen_pos, object.pos
@@ -137,51 +137,89 @@ pub fn spawn_blueprint(
     wnds: Res<Windows>,
     q_camera: Query<(&Camera, &GlobalTransform)>,
 ) {
-    let group = EntityGroup {
-        group: "todo!()".to_string(),
-        color: client_profile::models::color::Color::Red,
-        speed: 23.,
-    };
-    let location = Location { x: 0., y: 0. };
-    let obj = Object::new(
-        _assets,
-        "Button 1".to_string(),
-        "First button".to_string(),
-        true,
-        false,
-        Vec2::new(732., 362.),
-        Vec2::new(50., 50.),
-        Entity { group, location },
-        wnds,
-        q_camera,
-    );
-    // let obj2 = Object::new(_assets, "Button 2".to_string(), "Second button".to_string(), true, false, Vec2::new(500., 100.));
-    commands.with_children(|parent| obj.spawn(parent.spawn_empty()));
-    // commands.with_children(|parent| obj2.spawn(parent.spawn_empty()));
-    commands.insert(obj);
-    // commands.insert(obj2);
-    commands.insert(ImageBundle {
-        style: Style {
-            align_self: AlignSelf::Center,
-            position_type: PositionType::Absolute,
+    pub fn spawn_blueprint(
+        mut commands: EntityCommands,
+        _assets: &Assets,
+        wnds: Res<Windows>,
+        q_camera: Query<(&Camera, &GlobalTransform)>,
+    ) {
+        let group = EntityGroup {
+            group: "todo!()".to_string(),
+            color: client_profile::models::color::Color::Red,
+            speed: 23.,
+        };
+        let location = Location { x: 0., y: 0. };
+        let obj = Object::new(
+            _assets,
+            "Button 1".to_string(),
+            "First button".to_string(),
+            true,
+            false,
+            Vec2::new(732., 362.),
+            Vec2::new(50., 50.),
+            Entity { group, location },
+            wnds,
+            q_camera,
+            q_camera,
+        );
+        // let obj2 = Object::new(_assets, "Button 2".to_string(), "Second button".to_string(), true, false, Vec2::new(500., 100.));
+        commands.with_children(|parent| obj.spawn(parent.spawn_empty()));
+        // commands.with_children(|parent| obj2.spawn(parent.spawn_empty()));
+        commands.insert(obj);
+        // commands.insert(obj2);
+        commands.insert(ImageBundle {
+            style: Style {
+                align_self: AlignSelf::Center,
+                position_type: PositionType::Absolute,
+                ..default()
+            },
+            transform: Transform::from_scale(Vec3::new(2.5, 2.5, 2.5)),
+            image: _assets.icon.clone().into(),
             ..default()
-        },
-        transform: Transform::from_scale(Vec3::new(2.5, 2.5, 2.5)),
-        image: _assets.icon.clone().into(),
-        ..default()
-    });
-}
+        });
+    }
 
-pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, windows: Res<Windows>) {
-    let window = windows.get_primary().unwrap();
-    commands.insert(NodeBundle {
-        style: Style {
-            position: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Px(0.), Val::Px(0.)),
-            position_type: PositionType::Absolute,
-            size: Size::new(Val::Px(window.width() * 0.15), Val::Px(window.height())),
-            ..default()
-        },
-        background_color: Color::rgba(1., 1., 1., 0.6).into(),
-        ..default()
-    });
-}
+    pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<Windows>) {
+        commands
+            .insert(NodeBundle {
+                style: Style {
+                    size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                    ..Default::default()
+                },
+                ..Default::default()
+            })
+            .with_children(|parent| {
+                parent.spawn(NodeBundle {
+                    style: Style {
+                        position: UiRect::new(
+                            Val::Px(0.),
+                            Val::Px(0.),
+                            Val::Percent(80.),
+                            Val::Px(0.),
+                        ),
+                        position_type: PositionType::Absolute,
+                        size: Size::new(Val::Percent(100.0), Val::Percent(20.0)),
+                        ..default()
+                    },
+                    background_color: Color::rgb(1., 1., 1.).into(),
+                    ..default()
+                });
+            })
+            .with_children(|parent| {
+                parent.spawn(NodeBundle {
+                    style: Style {
+                        position: UiRect::new(
+                            Val::Percent(80.),
+                            Val::Px(0.),
+                            Val::Px(0.),
+                            Val::Px(0.),
+                        ),
+                        position_type: PositionType::Absolute,
+                        size: Size::new(Val::Percent(20.0), Val::Percent(100.0)),
+                        ..default()
+                    },
+                    background_color: Color::rgb(1., 1., 1.).into(),
+                    ..default()
+                });
+            });
+    }
