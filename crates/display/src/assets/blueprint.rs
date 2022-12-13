@@ -71,10 +71,15 @@ pub fn drag(
             } else {
                 true
             };
+            cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed {
+                break;
+            } else {
+                true
+            };
             if object.is_dragable {
                 let wnd = windows.get_primary().unwrap();
                 if let Some(screen_pos) = wnd.cursor_position() {
-                    if !is_in_rect(object.get_rect(), screen_pos) {
+                    if !is_in_rect(object.clone(), screen_pos) {
                         println!(
                             "Not in range mouse: {:?} object: {:?}",
                             screen_pos, object.pos
@@ -106,15 +111,11 @@ pub fn drag(
                 cursor_state.is_dragging,
                 object.is_pressed,
             ) = (false, false, false);
-            println!("Clone");
             let cpy = object.clone_at(object.init_pos);
-            commands
-                .entity(_entity)
-                .with_children(|parent| cpy.spawn(parent.spawn_empty()));
+            cpy.spawn(commands.spawn_empty());
             commands.entity(_entity).insert(cpy);
             client.profile.add_entity(object.obj.clone());
             object.is_placed = true;
-            println!("object = {:?}", object);
         }
     }
 }
@@ -188,6 +189,7 @@ pub fn spawn_blueprint(
             ..default()
         });
     }
+}
 
 pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<Windows>) {
     commands
@@ -222,3 +224,4 @@ pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<W
                 ..default()
             });
     }
+}

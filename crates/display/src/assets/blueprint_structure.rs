@@ -42,10 +42,8 @@ impl Object {
         wnds: Res<Windows>,
         q_camera: Query<(&Camera, &GlobalTransform)>,
     ) -> Self {
-        // let world_pos = get_world_pos(&wnds, &q_camera, pos);
-        let world_pos = pos;
         let transform = Transform {
-            translation: Vec3::new(world_pos.x, world_pos.y, 0.),
+            translation: Vec3::new(pos.x, pos.y, 0.),
             scale: Vec3::new(1., 1., 1.),
             ..Default::default()
         };
@@ -57,17 +55,20 @@ impl Object {
             is_dragable,
             is_pressed,
             pos,
-            init_pos: world_pos,
+            init_pos: pos,
             bund: ImageBundle {
                 style: Style {
                     align_self: AlignSelf::Center,
                     position_type: PositionType::Absolute,
-                    position: UiRect {
-                        left: Val::Px(world_pos.x),
-                        bottom: Val::Px(world_pos.y),
-                        ..default()
+                    // position: UiRect {
+                    //     left: Val::Px(world_pos.x),
+                    //     bottom: Val::Px(world_pos.y),
+                    //     ..default()
+                    // },
+                    size: Size {
+                        height: Val::Px(size.x),
+                        width: Val::Px(size.y),
                     },
-                    size: Size::new(Val::Px(size.x), Val::Px(size.y)),
                     ..default()
                 },
                 // transform: Transform::default(),
@@ -82,65 +83,37 @@ impl Object {
     }
 
     pub fn spawn(&self, mut commands: EntityCommands) {
-        println!("object = {:?}", self);
-        commands.insert(self.bund.clone()).with_children(|parent| {
-            parent.spawn(TextBundle::from_sections([
-                TextSection::new(
-                    self.name.clone(),
-                    TextStyle {
-                        font: self.asset.font.clone(),
-                        font_size: 20.0,
-                        color: Color::RED,
-                    },
-                ),
-                TextSection::new(
-                    self.description.clone(),
-                    TextStyle {
-                        font: self.asset.font.clone(),
-                        font_size: 15.0,
-                        color: Color::BLUE,
-                    },
-                ),
-            ]));
-        });
+        commands
+            .insert(self.bund.clone())
+            .with_children(|parent| {
+                parent.spawn(TextBundle::from_sections([
+                    TextSection::new(
+                        self.name.clone(),
+                        TextStyle {
+                            font: self.asset.font.clone(),
+                            font_size: 20.0,
+                            color: Color::RED,
+                        },
+                    ),
+                    TextSection::new(
+                        self.description.clone(),
+                        TextStyle {
+                            font: self.asset.font.clone(),
+                            font_size: 15.0,
+                            color: Color::BLUE,
+                        },
+                    ),
+                ]));
+            })
+            .insert(self.clone());
     }
 
     pub fn clone_at(&self, pos: Vec2) -> Self {
-        Self {
-            asset: self.asset.clone(),
-            name: self.name.clone(),
-            description: self.description.clone(),
-            is_dragable: self.is_dragable,
-            is_pressed: self.is_pressed,
-            pos,
-            init_pos: pos,
-            bund: ImageBundle {
-                style: Style {
-                    align_self: AlignSelf::Center,
-                    position_type: PositionType::Absolute,
-                    position: UiRect {
-                        left: Val::Px(pos.x),
-                        bottom: Val::Px(pos.y),
-                        ..default()
-                    },
-                    size: Size::new(Val::Px(self.size.x), Val::Px(self.size.y)),
-                    ..default()
-                },
-                transform: Transform {
-                    translation: Vec3::new(pos.x, pos.y, 0.),
-                    scale: Vec3::new(1., 1., 1.),
-                    ..Default::default()
-                },
-                // transform: Transform::from_scale(Vec3::new(1., 1., 1.)),
-                // transform: Transform::from_translation(Vec3::new(pos.x, pos.y, 0.)),
-                // transform: Transform::from_translation(Vec3::new(world_pos.x, world_pos.y, 0.)),
-                image: self.asset.icon.clone().into(),
-                ..default()
-            },
-            size: self.size,
-            is_placed: false,
-            obj: self.obj.clone(),
-        }
+        let mut cloned = self.clone();
+
+        cloned.bund.transform = Transform::from_translation(Vec3::new(pos.x, pos.y, 0.));
+        cloned.pos = pos;
+        cloned
     }
 
     pub fn get_rect(&self) -> UiRect {
