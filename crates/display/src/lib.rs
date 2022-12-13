@@ -1,5 +1,5 @@
 use bevy::{prelude::*, window::WindowDescriptor};
-
+use assets::blueprint_structure::CursorState;
 use client_profile::*;
 
 pub mod assets;
@@ -38,6 +38,7 @@ impl ClientDisplay {
             .add_plugin(scenes::blueprint::Blueprint)
             .add_state(states::DisplayState::LoadingScreen)
             .insert_resource(self)
+            .insert_resource(CursorState::default())
             .run()
     }
 }
