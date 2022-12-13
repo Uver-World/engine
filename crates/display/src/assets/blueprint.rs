@@ -15,8 +15,8 @@ pub struct Assets {
 }
 
 pub fn get_world_pos(
-    wnds: Res<Windows>,
-    q_camera: Query<(&Camera, &GlobalTransform)>,
+    wnds: &Res<Windows>,
+    q_camera: &Query<(&Camera, &GlobalTransform)>,
     pos: Vec2,
 ) -> Vec2 {
     let (camera, camera_transform) = q_camera.single();
@@ -33,8 +33,8 @@ pub fn get_world_pos(
     return world_pos;
 }
 
-pub fn is_in_rect(rect: UiRect, pos: Vec2) -> bool {
-    return (true);
+pub fn is_in_rect(_rect: UiRect, _pos: Vec2) -> bool {
+    return true;
     // let rect: Rect = rect.into(Rect::Zero);
     // rect.contains(pos)
 }
@@ -43,24 +43,32 @@ pub fn drag(
     mut commands: Commands,
     buttons: Res<Input<MouseButton>>,
     windows: Res<Windows>,
+    q_camera: Query<(&Camera, &GlobalTransform)>,
     mut client: ResMut<ClientDisplay>,
-    mut query: Query<(bevy::prelude::Entity, With<Object>, &mut Object, &mut Style)>,
+    mut query: Query<(bevy::prelude::Entity, With<Object>, &mut Object, &mut Style, &mut Transform)>,
     mut cursor_state: ResMut<CursorState>,
 ) {
-    for (_entity, _, mut object, mut style) in &mut query {
+    for (_entity, _, mut object, mut style, mut transform) in &mut query {
         if buttons.pressed(MouseButton::Left) {
             // cursor_state.is_clicked = if cursor_state.is_clicked { break } else { true };
             if object.is_dragable {
                 cursor_state.is_dragging = true;
                 let wnd = windows.get_primary().unwrap();
-                if let Some(screen_pos) = wnd.cursor_position() {
+                if let Some(mut screen_pos) = wnd.cursor_position() {
                     if !is_in_rect(object.get_rect(), screen_pos) {
                         println!("Not in range mouse: {:?} object: {:?}", screen_pos, object.pos);
                         continue;
                     }
-                    object.pos = Vec2::new(screen_pos.x - object.size.x, screen_pos.y);
+                    println!("first In range mouse: {:?} object: {:?}", screen_pos, object.pos);
+                    // screen_pos = get_world_pos(&windows, &q_camera, screen_pos);
+                    object.pos = Vec2::new(screen_pos.x - object.size.x / 2., screen_pos.y);
+                    println!("In range mouse: {:?} object: {:?}", screen_pos, object.pos);
                 }
                 style.position = object.get_rect();
+                transform.scale = Vec3::ONE;
+                transform.translation = object.pos.extend(0.);
+                println!("transform: {:?}", transform);
+                // transform.translation = object.pos.extend(0.);
                 object.is_pressed = true;
             }
         } else if buttons.just_released(MouseButton::Left) {
