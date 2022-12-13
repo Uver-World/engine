@@ -1,7 +1,7 @@
 use bevy::ecs::system::EntityCommands;
 use bevy::prelude::*;
 
-use client_profile::models::entity::{Entity};
+use client_profile::models::entity::Entity;
 
 use super::blueprint::{get_world_pos, Assets};
 
@@ -42,7 +42,8 @@ impl Object {
         wnds: Res<Windows>,
         q_camera: Query<(&Camera, &GlobalTransform)>
     ) -> Self {
-        let world_pos = get_world_pos(wnds, q_camera, pos);
+        let world_pos = get_world_pos(&wnds, &q_camera, pos);
+        // let world_pos = pos;
         Self {
             asset: asset.clone().into(),
             name,
@@ -55,16 +56,16 @@ impl Object {
                 style: Style {
                     align_self: AlignSelf::Center,
                     position_type: PositionType::Absolute,
-                    position: UiRect {
-                        left: Val::Px(world_pos.x),
-                        bottom: Val::Px(world_pos.y),
-                        ..default()
-                    },
+                    // position: UiRect {
+                    //     left: Val::Px(world_pos.x),
+                    //     bottom: Val::Px(world_pos.y),
+                    //     ..default()
+                    // },
                     size: Size::new(Val::Px(size.x), Val::Px(size.y)),
                     ..default()
                 },
-                transform: Transform::default(),
-                // transform: Transform::from_translation(Vec3::new(1., 1., 0.)),
+                // transform: Transform::default(),
+                transform: Transform::from_translation(Vec3::new(world_pos.x, world_pos.y, 0.)),
                 image: asset.icon.clone().into(),
                 ..default()
             },
@@ -110,16 +111,17 @@ impl Object {
                 style: Style {
                     align_self: AlignSelf::Center,
                     position_type: PositionType::Absolute,
-                    position: UiRect {
-                        left: Val::Px(pos.x),
-                        bottom: Val::Px(pos.y),
-                        ..default()
-                    },
+                    // position: UiRect {
+                    //     left: Val::Px(pos.x),
+                    //     bottom: Val::Px(pos.y),
+                    //     ..default()
+                    // },
                     size: Size::new(Val::Px(self.size.x), Val::Px(self.size.y)),
                     ..default()
                 },
                 // transform: Transform::from_scale(Vec3::new(1., 1., 1.)),
                 transform: Transform::from_translation(Vec3::new(pos.x,pos.y,0.)),
+                // transform: Transform::from_translation(Vec3::new(world_pos.x, world_pos.y, 0.)),
                 image: self.asset.icon.clone().into(),
                 ..default()
             },
