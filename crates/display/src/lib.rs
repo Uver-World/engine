@@ -1,3 +1,4 @@
+use assets::blueprint_structure::CursorState;
 use bevy::{prelude::*, window::WindowDescriptor};
 use bevy_rapier3d::prelude::*;
 
