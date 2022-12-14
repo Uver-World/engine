@@ -43,11 +43,31 @@ impl Object {
         q_camera: Query<(&Camera, &GlobalTransform)>,
     ) -> Self {
         let transform = Transform {
-            translation: Vec3::new(pos.x, pos.y, 0.),
+            translation: Vec3::new(get_world_pos(&wnds, &q_camera, pos).x, get_world_pos(&wnds, &q_camera, pos).y, 0.),
             scale: Vec3::new(1., 1., 1.),
             ..Default::default()
         };
-        println!("transform init: {:?}", transform);
+        let bund = ImageBundle {
+            style: Style {
+                align_self: AlignSelf::Center,
+                position_type: PositionType::Absolute,
+                // position: UiRect {
+                //     left: Val::Px(world_pos.x),
+                //     bottom: Val::Px(world_pos.y),
+                //     ..default()
+                // },
+                size: Size {
+                    height: Val::Px(size.x),
+                    width: Val::Px(size.y),
+                },
+                ..default()
+            },
+            // transform: Transform::default(),
+            transform,
+            image: asset.icon.clone().into(),
+            ..default()
+        };
+        println!("transform init: {:?}", bund);
         Self {
             asset: asset.clone().into(),
             name,
@@ -56,26 +76,7 @@ impl Object {
             is_pressed,
             pos,
             init_pos: pos,
-            bund: ImageBundle {
-                style: Style {
-                    align_self: AlignSelf::Center,
-                    position_type: PositionType::Absolute,
-                    // position: UiRect {
-                    //     left: Val::Px(world_pos.x),
-                    //     bottom: Val::Px(world_pos.y),
-                    //     ..default()
-                    // },
-                    size: Size {
-                        height: Val::Px(size.x),
-                        width: Val::Px(size.y),
-                    },
-                    ..default()
-                },
-                // transform: Transform::default(),
-                transform,
-                image: asset.icon.clone().into(),
-                ..default()
-            },
+            bund: bund,
             size,
             is_placed: false,
             obj,
@@ -112,6 +113,7 @@ impl Object {
         let mut cloned = self.clone();
 
         cloned.bund.transform = Transform::from_translation(Vec3::new(pos.x, pos.y, 0.));
+        println!("transform cloned: {:?}", cloned.bund);
         cloned.pos = pos;
         cloned
     }
