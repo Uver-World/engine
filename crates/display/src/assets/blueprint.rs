@@ -39,6 +39,10 @@ pub fn is_in_rect(obj: Object, pos: Vec2) -> bool {
         min: obj.pos,
         max: obj.pos + obj.size,
     };
+    let rect2: Rect = Rect {
+        min: obj.pos,
+        max: obj.pos + obj.size,
+    };
     println!("Rect: {:?} pos: {:?}", rect, pos);
     rect.contains(pos)
 }
@@ -47,7 +51,6 @@ pub fn drag(
     mut commands: Commands,
     buttons: Res<Input<MouseButton>>,
     windows: Res<Windows>,
-    q_camera: Query<(&Camera, &GlobalTransform)>,
     mut client: ResMut<ClientDisplay>,
     mut query: Query<(
         bevy::prelude::Entity,
@@ -88,7 +91,9 @@ pub fn drag(
             if !cursor_state.is_dragging {
                 cursor_state.is_clicked = false;
                 continue;
-            } else if !cursor_state.is_clicked || !object.is_pressed {
+            } else if !object.is_pressed {
+                continue;
+            } else if !cursor_state.is_clicked {
                 (cursor_state.is_clicked, cursor_state.is_dragging) = (false, false);
                 continue;
             }
