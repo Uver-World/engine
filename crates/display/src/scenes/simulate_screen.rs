@@ -1,11 +1,13 @@
 use bevy::prelude::*;
-use bevy::sprite::collide_aabb::{collide, Collision};
+use bevy_rapier3d::rapier::prelude::*;
+use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::direction::Direction;
+use nalgebra::vector;
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 
 use crate::assets::simulate_screen::retrieve_entities;
-use crate::entities::ui_entity::UiEntity;
+use crate::entities::ui_entity::DisplayEntity;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
 
@@ -20,82 +22,46 @@ impl Plugin for SimulateScreen {
         .add_system_set(SystemSet::on_exit(DisplayState::SimulateScreen).with_system(destroy))
         .add_system_set(
             SystemSet::on_update(DisplayState::SimulateScreen)
-                .with_system(check_collision)
-                .with_system(update_status.before(check_collision))
-                .with_system(apply_velocity.after(check_collision)),
+                .with_system(update_status)
+                .with_system(apply_velocity),
         );
     }
 }
 
-fn apply_velocity(mut query: Query<(&mut Transform, &mut UiEntity)>) {
+fn apply_velocity(mut query: Query<(&mut Transform, &mut DisplayEntity)>) {
     for (mut transform, entity) in &mut query {
         transform.translation.x += entity.velocity.x;
         transform.translation.y += entity.velocity.y;
     }
 }
 
-fn check_collision(mut query: Query<(&mut Transform, &mut UiEntity)>) {
-    let entities: Vec<(Transform, UiEntity)> = query
-        .iter()
-        .map(|(transform, entity)| (transform.clone(), entity.clone()))
-        .collect();
-
-    for (transform1, mut entity1) in &mut query {
-        for (transform2, entity2) in &entities {
-            if entity1.id == entity2.id {
-                continue;
-            }
-
-            let collision = collide(
-                transform1.translation,
-                Vec2::new(120., 120.),
-                transform2.translation,
-                Vec2::new(120., 120.),
-            );
-
-            if let Some(collision) = collision {
-                if collision == Collision::Inside {
-                    entity1.velocity.x *= -200.;
-                } else {
-                    if collision == Collision::Left || collision == Collision::Right {
-                        entity1.velocity.x *= -0.5;
-                    }
-                    if collision == Collision::Top || collision == Collision::Bottom {
-                        entity1.velocity.y *= -0.5;
-                    }
-                }
-            }
-        }
-    }
-}
-
-fn random_pos(entity: &mut UiEntity, transform: &mut Transform) {
+fn random_pos(entity: &mut DisplayEntity, transform: &mut Transform) {
     let rand = Uniform::from(1..5).sample(&mut rand::thread_rng()); // TOP BOT, RIGHT, LEFT
     match rand {
         1 => {
             if transform.translation.y > -100.0 {
-                entity.velocity.y -= entity.settings.group.speed;
+                entity.velocity.y = -entity.settings.group.speed;
             }
         }
         2 => {
             if transform.translation.y <= 100.0 {
-                entity.velocity.y += entity.settings.group.speed;
+                entity.velocity.y = entity.settings.group.speed;
             }
         }
         3 => {
             if transform.translation.x <= 300.0 {
-                entity.velocity.x += entity.settings.group.speed;
+                entity.velocity.x = entity.settings.group.speed;
             }
         }
         _ => {
             if transform.translation.x > 20.0 {
-                entity.velocity.x -= entity.settings.group.speed;
+                entity.velocity.x = -entity.settings.group.speed;
             }
         }
     }
 }
 
-fn update_status(mut query: Query<(&mut Transform, &mut UiEntity)>) {
+fn update_status(mut query: Query<(&mut Transform, &mut DisplayEntity)>) {
     for (mut transform, mut entity) in &mut query {
         match entity.settings.group.direction.clone() {
             Direction::Random => {
@@ -103,16 +69,16 @@ fn update_status(mut query: Query<(&mut Transform, &mut UiEntity)>) {
             }
             Direction::Location(location) => {
                 if transform.translation.x < location.x {
-                    entity.velocity.x += entity.settings.group.speed;
+                    entity.velocity.x = entity.settings.group.speed;
                 }
                 if transform.translation.x > location.x {
-                    entity.velocity.x -= entity.settings.group.speed;
+                    entity.velocity.x = -entity.settings.group.speed;
                 }
                 if transform.translation.y < location.y {
-                    entity.velocity.y += entity.settings.group.speed;
+                    entity.velocity.y = entity.settings.group.speed;
                 }
                 if transform.translation.y > location.y {
-                    entity.velocity.y -= entity.settings.group.speed;
+                    entity.velocity.y = -entity.settings.group.speed;
                 }
                 if transform.translation.x >= location.x - 10.
                     && transform.translation.x <= location.x + 10.
@@ -133,11 +99,54 @@ fn update_status(mut query: Query<(&mut Transform, &mut UiEntity)>) {
 fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
     let entities = retrieve_entities(client.profile.get_entities());
     let mut id = 0;
+    let ground_size = 500.;
+    let ground_height = 0.1;
+
+    let mut bodies = RigidBodySet::new();
+    let mut colliders = ColliderSet::new();
+    let impulse_joints = ImpulseJointSet::new();
+    let multibody_joints = MultibodyJointSet::new();
+
+    let rigid_body = RigidBodyBuilder::fixed().translation(vector![0.0, -ground_height, 0.0]);
+    let ground_handle = bodies.insert(rigid_body);
+    let collider = ColliderBuilder::cuboid(ground_size, ground_height, ground_size);
+    colliders.insert_with_parent(collider, ground_handle, &mut bodies);
+
+    let num_z = 8;
+    let num_x = 5;
+    let shift_y = ground_height + 0.5;
+    let shift_z = (num_z as f32 + 2.0) * 2.0;
+
+    let collider = ColliderBuilder::ball(1.0).density(10.0);
+    let rigid_body = RigidBodyBuilder::dynamic()
+        .linvel(vector![1000.0, 0.0, 0.0])
+        .translation(vector![-20.0, shift_y + 2.0, shift_z])
+        .ccd_enabled(true);
+    let handle = bodies.insert(rigid_body);
+    colliders.insert_with_parent(collider.clone(), handle, &mut bodies);
+    //    testbed.set_initial_body_color(handle, [0.2, 0.2, 1.0]);
+
+    let mut node = commands.spawn(SimulateScreen);
+
+    node.insert(Camera3dBundle {
+        transform: Transform::from_xyz(0., 500.0, 0.).looking_at(Vec3::ZERO, Vec3::X),
+        ..Default::default()
+    });
 
     for (entity, shape) in entities {
         commands
             .spawn(shape)
-            .insert(UiEntity::from_entity(entity, id));
+            .insert(DisplayEntity::from_entity(entity.clone(), id))
+            .insert(ColliderDebugColor(Color::rgb_u8(
+                entity.group.color.red(),
+                entity.group.color.green(),
+                entity.group.color.blue(),
+            )))
+            .insert(TransformBundle::from(Transform::from_xyz(
+                entity.location.x,
+                entity.location.y,
+                0.0,
+            )));
         id += 1;
     }
 }

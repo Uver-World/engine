@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use client_profile::models::entity::Entity;
 
 #[derive(Component, Clone)]
-pub struct UiEntity {
+pub struct DisplayEntity {
     pub id: usize,
     pub x: f32,
     pub y: f32,
@@ -10,7 +10,7 @@ pub struct UiEntity {
     pub velocity: Vec2,
 }
 
-impl UiEntity {
+impl DisplayEntity {
     pub fn get_rect(&self) -> UiRect {
         UiRect {
             left: Val::Px(self.x),
