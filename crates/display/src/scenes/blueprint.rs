@@ -1,12 +1,16 @@
-use bevy::prelude::{SystemSet, App, Plugin, With, Entity, Query, Commands, Res, NodeBundle, default, Color, BuildChildren, KeyCode, Input, ResMut, State, Component, DespawnRecursiveExt, Camera, GlobalTransform};
-use bevy::ui::{Style, Display, FlexDirection, Val, Size, AlignItems, AlignContent};
+use bevy::prelude::{
+    default, App, AssetServer, BuildChildren, Camera, Color, Commands, Component,
+    DespawnRecursiveExt, Entity, GlobalTransform, Input, KeyCode, NodeBundle, Plugin, Query, Res,
+    ResMut, State, SystemSet, With,
+};
+use bevy::ui::{AlignContent, AlignItems, Display, FlexDirection, Size, Style, Val};
 use bevy::window::Windows;
 
-use crate::ClientDisplay;
+use crate::assets::blueprint;
 use crate::assets::blueprint::drag;
 use crate::assets::blueprint_structure::{BlueprintBase, Object};
 use crate::states::DisplayState;
-use crate::assets::blueprint;
+use crate::ClientDisplay;
 
 #[derive(Component)]
 pub struct Blueprint;
@@ -16,12 +20,19 @@ impl Plugin for Blueprint {
         app.add_system_set(SystemSet::on_enter(DisplayState::Blueprint).with_system(construct))
             .add_system_set(SystemSet::on_exit(DisplayState::Blueprint).with_system(destroy))
             // .add_system_set(SystemSet::on_update(DisplayState::Blueprint).with_system(update_status),)
-            .add_system_set(SystemSet::on_update(DisplayState::Blueprint).with_system(drag),)
+            .add_system_set(SystemSet::on_update(DisplayState::Blueprint).with_system(drag))
             .add_system(keyboard_input);
     }
 }
 
-pub fn construct(mut commands: Commands, assets: Res<blueprint::Assets>, windows: Res<bevy::window::Windows>, wnds: Res<Windows>, q_camera: Query<(&Camera, &GlobalTransform)>) {
+pub fn construct(
+    mut commands: Commands,
+    assets: Res<blueprint::Assets>,
+    windows: Res<bevy::window::Windows>,
+    wnds: Res<Windows>,
+    q_camera: Query<(&Camera, &GlobalTransform)>,
+    ass: Res<AssetServer>,
+) {
     let mut node = commands.spawn(Blueprint);
     node.insert(NodeBundle {
         style: Style {
@@ -35,11 +46,18 @@ pub fn construct(mut commands: Commands, assets: Res<blueprint::Assets>, windows
         background_color: Color::rgba(0., 0., 0., 0.).into(),
         ..default()
     });
-    node.with_children(|parent| blueprint::spawn_blueprint(parent.spawn_empty(), &assets, wnds, q_camera));
-    node.with_children(|parent| blueprint::spawn_box(parent.spawn_empty(), &assets, windows));
+    node.with_children(|parent| {
+        blueprint::spawn_blueprint(parent.spawn_empty(), &assets, wnds, q_camera)
+    });
+    node.with_children(|parent| blueprint::spawn_box(parent.spawn_empty(), &assets, windows, ass));
 }
 
-pub fn destroy(mut commands: Commands, query: Query<Entity, With<Blueprint>>, query2: Query<Entity, With<Object>>, client: ResMut<ClientDisplay>,) {
+pub fn destroy(
+    mut commands: Commands,
+    query: Query<Entity, With<Blueprint>>,
+    query2: Query<Entity, With<Object>>,
+    client: ResMut<ClientDisplay>,
+) {
     client.profile.save();
     println!("destroying blueprint");
     for entity in query.iter() {
@@ -58,9 +76,9 @@ pub fn keyboard_input(keys: Res<Input<KeyCode>>, mut app_state: ResMut<State<Dis
             DisplayState::Blueprint => {
                 app_state.set(DisplayState::SimulateScreen).unwrap();
             }
-            DisplayState::SimulateScreen => {},
-            DisplayState::LoadingScreen => {},
-            DisplayState::Menu => {},
+            DisplayState::SimulateScreen => {}
+            DisplayState::LoadingScreen => {}
+            DisplayState::Menu => {}
         }
     }
 }
