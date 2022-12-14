@@ -196,7 +196,12 @@ pub fn spawn_blueprint(
     }
 }
 
-pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<Windows>) {
+pub fn spawn_box(
+    mut commands: EntityCommands,
+    assets: &Assets,
+    _windows: Res<Windows>,
+    ass: Res<AssetServer>,
+) {
     commands
         .insert(NodeBundle {
             style: Style {
@@ -206,16 +211,53 @@ pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<W
             ..Default::default()
         })
         .with_children(|parent| {
-            parent.spawn(NodeBundle {
-                style: Style {
-                    position: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Percent(80.), Val::Px(0.)),
-                    position_type: PositionType::Absolute,
-                    size: Size::new(Val::Percent(100.0), Val::Percent(20.0)),
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        position: UiRect::new(
+                            Val::Px(0.),
+                            Val::Px(0.),
+                            Val::Percent(80.),
+                            Val::Px(0.),
+                        ),
+                        justify_content: JustifyContent::FlexStart,
+                        align_items: AlignItems::Center,
+                        position_type: PositionType::Absolute,
+                        size: Size::new(Val::Percent(100.0), Val::Percent(20.0)),
+                        ..default()
+                    },
+                    background_color: Color::rgb_u8(52, 73, 94).into(),
                     ..default()
-                },
-                background_color: Color::rgb(1., 1., 1.).into(),
-                ..default()
-            });
+                })
+                .with_children(|parent| {
+                    parent
+                        .spawn(ButtonBundle {
+                            style: Style {
+                                position: UiRect::new(
+                                    Val::Percent(1.),
+                                    Val::Px(0.),
+                                    Val::Px(0.),
+                                    Val::Px(0.),
+                                ),
+                                size: Size::new(Val::Percent(10.0), Val::Percent(80.0)),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            background_color: Color::rgba(0., 0., 0., 0.).into(),
+                            ..default()
+                        })
+                        .with_children(|parent| {
+                            parent.spawn(ImageBundle {
+                                image: ass.load("Plus.png").into(),
+                                style: Style {
+                                    size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                                    ..Default::default()
+                                },
+                                ..Default::default()
+                            });
+                        });
+                });
         })
         .with_children(|parent| {
             parent.spawn(NodeBundle {
@@ -225,7 +267,7 @@ pub fn spawn_box(mut commands: EntityCommands, _assets: &Assets, _windows: Res<W
                     size: Size::new(Val::Percent(20.0), Val::Percent(100.0)),
                     ..default()
                 },
-                background_color: Color::rgb(1., 1., 1.).into(),
+                background_color: Color::rgb_u8(52, 73, 94).into(),
                 ..default()
             });
     }
