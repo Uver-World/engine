@@ -30,14 +30,14 @@
     {
       "group": "MagentaSquare",
       "location": {
-        "x": 240.0,
+        "x": 40.0,
         "y": 0.0
       }
     },
     {
       "group": "PinkSquare",
       "location": {
-        "x": -240.0,
+        "x": -40.0,
         "y": 0.0
       }
     }
