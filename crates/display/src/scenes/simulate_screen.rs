@@ -322,9 +322,9 @@ pub fn keyboard_input(keys: Res<Input<KeyCode>>, mut app_state: ResMut<State<Dis
             DisplayState::SimulateScreen => {
                 app_state.set(DisplayState::Blueprint).unwrap();
             }
-            DisplayState::LoadingScreen => {},
-            DisplayState::Menu => {},
-            DisplayState::Blueprint => {},
+            DisplayState::LoadingScreen => {}
+            DisplayState::Menu => {}
+            DisplayState::Blueprint => {}
         }
     }
 }
