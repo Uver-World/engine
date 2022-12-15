@@ -34,16 +34,18 @@ pub fn get_world_pos(
 }
 
 pub fn is_in_rect(obj: Object, pos: Vec2) -> bool {
-    let rect: Rect = Rect {
-        min: obj.pos,
-        max: obj.pos + obj.size,
-    };
-    let rect2: Rect = Rect {
-        min: obj.pos,
-        max: obj.pos + obj.size,
-    };
-    println!("Rect: {:?} pos: {:?}", rect, pos);
-    rect.contains(pos)
+    // return true;
+    println!("pos: {:?}; point: {:?}; size: {:?}; final pos: {:?}", obj.pos, pos, obj.size, obj.pos + obj.size);
+    pos.x >= obj.pos.x && pos.x <= obj.pos.x + obj.size.x && pos.y >= obj.pos.y && pos.y <= obj.pos.y + obj.size.y
+    // let rect: Rect = Rect {
+    //     min: obj.pos,
+    //     max: obj.pos + obj.size,
+    // };
+    // let rect2: Rect = Rect {
+    //     min: obj.pos,
+    //     max: obj.pos - obj.size,
+    // };
+    // rect2.contains(pos)
 }
 
 pub fn drag(
@@ -70,24 +72,24 @@ pub fn drag(
     for (_entity, _, mut object, mut style, mut transform) in &mut query {
         if buttons.pressed(MouseButton::Left) {
             cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed {
-                break;
+                continue;
             } else {
                 true
             };
             cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed {
-                break;
+                continue;
             } else {
                 true
             };
             if object.is_dragable {
                 let wnd = windows.get_primary().unwrap();
                 if let Some(screen_pos) = wnd.cursor_position() {
-                    if !is_in_rect(object.clone(), screen_pos) {
-                        println!("Not in range mouse: {:?} object: {:?}", screen_pos, object.pos);
+                    if is_in_rect(object.clone(), screen_pos) || object.is_pressed {
+                        cursor_state.is_dragging = true;
+                        object.pos = Vec2::new(screen_pos.x - object.size.x / 2., screen_pos.y);
+                    } else {
                         continue;
                     }
-                    cursor_state.is_dragging = true;
-                    object.pos = Vec2::new(screen_pos.x - object.size.x / 2., screen_pos.y);
                 }
                 style.position = object.get_rect();
                 transform.translation = object.pos.extend(0.);
@@ -132,57 +134,31 @@ pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
 }
 
 pub fn spawn_blueprint(
-    mut commands: EntityCommands,
+    commands: EntityCommands,
     _assets: &Assets,
-    wnds: Res<Windows>,
-    q_camera: Query<(&Camera, &GlobalTransform)>,
 ) {
-    pub fn spawn_blueprint(
-        mut commands: EntityCommands,
-        _assets: &Assets,
-        wnds: Res<Windows>,
-        q_camera: Query<(&Camera, &GlobalTransform)>,
-    ) {
-        let group = EntityGroup {
-            group: "todo!()".to_string(),
-            color: client_profile::models::color::Color::Red,
-            speed: 23.,
-        };
-        let location = Location { x: 0., y: 0. };
-        let obj = Object::new(
-            _assets,
-            "Button 1".to_string(),
-            "First button".to_string(),
-            true,
-            false,
-            Vec2::new(732., 362.),
-            Vec2::new(50., 50.),
-            Entity { group, location },
-            wnds,
-            q_camera,
-            q_camera,
-        );
-        // let obj2 = Object::new(_assets, "Button 2".to_string(), "Second button".to_string(), true, false, Vec2::new(500., 100.));
-        commands.with_children(|parent| obj.spawn(parent.spawn_empty()));
-        // commands.with_children(|parent| obj2.spawn(parent.spawn_empty()));
-        commands.insert(obj);
-        // commands.insert(obj2);
-        commands.insert(ImageBundle {
-            style: Style {
-                align_self: AlignSelf::Center,
-                position_type: PositionType::Absolute,
-                ..default()
-            },
-            transform: Transform::from_scale(Vec3::new(2.5, 2.5, 2.5)),
-            image: _assets.icon.clone().into(),
-            ..default()
-        });
-    }
+    let group = EntityGroup {
+        group: "todo!()".to_string(),
+        color: client_profile::models::color::Color::Red,
+        speed: 23.,
+    };
+    let location = Location { x: 0., y: 0. };
+    let obj = Object::new(
+        _assets,
+        "Button 1".to_string(),
+        "First button".to_string(),
+        true,
+        false,
+        Vec2::new(732., 362.),
+        Vec2::new(100., 50.),
+        Entity { group, location },
+    );
+    obj.spawn(commands);
 }
 
 pub fn spawn_box(
     mut commands: EntityCommands,
-    assets: &Assets,
+    _assets: &Assets,
     _windows: Res<Windows>,
     ass: Res<AssetServer>,
 ) {

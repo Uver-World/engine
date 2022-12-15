@@ -1,10 +1,9 @@
 use bevy::prelude::{
-    default, App, AssetServer, BuildChildren, Camera, Color, Commands, Component,
-    DespawnRecursiveExt, Entity, GlobalTransform, Input, KeyCode, NodeBundle, Plugin, Query, Res,
+    default, App, AssetServer, BuildChildren, Color, Commands, Component,
+    DespawnRecursiveExt, Entity, Input, KeyCode, NodeBundle, Plugin, Query, Res,
     ResMut, State, SystemSet, With,
 };
 use bevy::ui::{AlignContent, AlignItems, Display, FlexDirection, Size, Style, Val};
-use bevy::window::Windows;
 
 use crate::assets::blueprint;
 use crate::assets::blueprint::drag;
@@ -33,8 +32,6 @@ pub fn construct(
     mut commands: Commands,
     assets: Res<blueprint::Assets>,
     windows: Res<bevy::window::Windows>,
-    wnds: Res<Windows>,
-    q_camera: Query<(&Camera, &GlobalTransform)>,
     ass: Res<AssetServer>,
 ) {
     let mut node = commands.spawn(Blueprint);
@@ -51,7 +48,7 @@ pub fn construct(
         ..default()
     });
     node.with_children(|parent| {
-        blueprint::spawn_blueprint(parent.spawn_empty(), &assets, wnds, q_camera)
+        blueprint::spawn_blueprint(parent.spawn_empty(), &assets)
     });
     node.with_children(|parent| blueprint::spawn_box(parent.spawn_empty(), &assets, windows, ass));
 }
