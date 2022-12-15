@@ -4,4 +4,5 @@ use serde::{Deserialize, Serialize};
 pub struct Location {
     pub x: f32,
     pub y: f32,
+    pub z: f32,
 }

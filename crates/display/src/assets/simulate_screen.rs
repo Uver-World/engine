@@ -1,5 +1,5 @@
 use bevy::prelude::Vec3;
-use bevy_rapier3d::{na::point, prelude::*, rapier::prelude::ColliderBuilder};
+use bevy_rapier3d::prelude::*;
 use client_profile::models::{entity::Entity, shape::Shape};
 
 pub fn retrieve_entities(entities: &Vec<Entity>) -> Vec<(Entity, Collider)> {
@@ -21,5 +21,6 @@ pub fn build_shape(entity: &Entity) -> Collider {
             Vec3::new(10.0, 5.0, 10.0),
             Vec3::new(10.0, 5.0, 10.0),
         ),
+        Shape::Ball => Collider::ball(10.0),
     }
 }

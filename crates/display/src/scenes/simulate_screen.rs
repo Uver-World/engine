@@ -1,13 +1,12 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
-use bevy_rapier3d::rapier::prelude::*;
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::direction::Direction;
-use nalgebra::vector;
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 
 use crate::assets::simulate_screen::retrieve_entities;
+use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
 use crate::entities::ui_entity::DisplayEntity;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
@@ -25,7 +24,8 @@ impl Plugin for SimulateScreen {
             SystemSet::on_update(DisplayState::SimulateScreen)
                 .with_system(update_status)
                 .with_system(apply_velocity),
-        );
+        )
+        .add_plugin(Camera3DPlugin);
     }
 }
 
@@ -92,8 +92,8 @@ fn update_status(mut query: Query<(&mut Transform, &mut DisplayEntity)>) {
                     entity.velocity.y = 0.;
                 }
             }
+            Direction::Static => {}
         }
-        // style.translation = Vec3::new(ui_entity.x, ui_entity.y, 1.);
     }
 }
 
@@ -101,17 +101,54 @@ fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
     let entities = retrieve_entities(client.profile.get_entities());
     let mut id = 0;
 
-    let mut node = commands.spawn(SimulateScreen);
-
-    node.insert(Camera3dBundle {
-        transform: Transform::from_xyz(20., 500.0, 20.).looking_at(Vec3::ZERO, Vec3::X),
-        ..Default::default()
-    });
+    commands
+        .spawn(Camera3dBundle {
+            transform: Transform::from_xyz(20., 500.0, 20.).looking_at(Vec3::ZERO, Vec3::X),
+            ..Default::default()
+        })
+        .insert(Camera3D {
+            x: 300.,
+            distance: 300.,
+            center: Vec3::new(0., 50., 0.),
+            rotate_sensitivity: 0.05,
+            ..Camera3D::default()
+        });
 
     commands
         .spawn_empty()
         .insert(Collider::cuboid(1000.0, -0.1, 1000.0))
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, -2.0, 0.0)));
+        .insert(ColliderDebugColor(Color::rgb_u8(0, 255, 0)))
+        .insert(TransformBundle::from(Transform::from_xyz(0., -2., 0.)));
+
+    commands
+        .spawn_empty()
+        .insert(Collider::cuboid(1000.0, -0.1, 1000.0))
+        .insert(ColliderDebugColor(Color::rgb_u8(0, 255, 0)))
+        .insert(TransformBundle::from(Transform::from_xyz(0., 2000., 0.)));
+
+    commands
+        .spawn_empty()
+        .insert(Collider::cuboid(1000.0, 1000.0, -0.1))
+        .insert(ColliderDebugColor(Color::rgb_u8(255, 0, 0)))
+        .insert(TransformBundle::from(Transform::from_xyz(0., 998., 1000.)));
+
+    commands
+        .spawn_empty()
+        .insert(Collider::cuboid(1000.0, 1000.0, -0.1))
+        .insert(ColliderDebugColor(Color::rgb_u8(255, 0, 0)))
+        .insert(TransformBundle::from(Transform::from_xyz(0., 998., -1000.)));
+
+    commands
+        .spawn_empty()
+        .insert(Collider::cuboid(-0.1, 1000.0, 1000.0))
+        .insert(ColliderDebugColor(Color::rgb_u8(0, 0, 255)))
+        .insert(TransformBundle::from(Transform::from_xyz(-1000., 998., 0.)));
+
+    commands
+        .spawn_empty()
+        .insert(Collider::cuboid(-0.1, 1000.0, 1000.0))
+        .insert(ColliderDebugColor(Color::rgb_u8(0, 0, 255)))
+        .insert(TransformBundle::from(Transform::from_xyz(1000., 998., 0.)));
 
     for (entity, shape) in entities {
         commands
@@ -126,7 +163,7 @@ fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
             .insert(TransformBundle::from(Transform::from_xyz(
                 entity.location.x,
                 entity.location.y,
-                0.0,
+                entity.location.z,
             )));
         id += 1;
     }

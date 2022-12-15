@@ -6,4 +6,5 @@ pub enum Shape {
     Rectangle,
     Circle,
     Triangle,
+    Ball,
 }

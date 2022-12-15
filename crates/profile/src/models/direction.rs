@@ -6,4 +6,5 @@ use crate::models::location::Location;
 pub enum Direction {
     Random,
     Location(Location),
+    Static,
 }
