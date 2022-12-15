@@ -3,7 +3,7 @@ use bevy::prelude::*;
 
 use client_profile::models::entity::Entity;
 
-use super::blueprint::{Assets};
+use super::blueprint::Assets;
 
 #[derive(Component)]
 pub struct BlueprintBase;
