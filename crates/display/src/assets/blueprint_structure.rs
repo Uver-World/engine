@@ -67,7 +67,6 @@ impl Object {
             image: asset.icon.clone().into(),
             ..default()
         };
-        println!("transform init: {:?}", bund);
         Self {
             asset: asset.clone().into(),
             name,
@@ -113,8 +112,9 @@ impl Object {
         let mut cloned = self.clone();
 
         cloned.bund.transform = Transform::from_translation(Vec3::new(pos.x, pos.y, 0.));
-        println!("transform cloned: {:?}", cloned.bund);
         cloned.pos = pos;
+        cloned.name = cloned.name + "1";
+        (cloned.is_dragable, cloned.is_pressed, cloned.is_placed) = (true, false, false);
         cloned
     }
 

@@ -89,38 +89,25 @@ pub fn drag(
                         );
                         continue;
                     }
-                    println!(
-                        "first In range mouse: {:?} object: {:?}",
-                        screen_pos, object.pos
-                    );
-                    // screen_pos = get_world_pos(&windows, &q_camera, screen_pos);
+                    cursor_state.is_dragging = true;
                     object.pos = Vec2::new(screen_pos.x - object.size.x / 2., screen_pos.y);
-                    println!("Drag to {:?}", object.pos);
                 }
                 style.position = object.get_rect();
                 transform.translation = object.pos.extend(0.);
                 object.is_pressed = true;
             }
-        } else if buttons.just_released(MouseButton::Left) {
+        } else if cursor_state.is_clicked {
             if !cursor_state.is_dragging {
                 cursor_state.is_clicked = false;
-                continue;
-            } else if !object.is_pressed {
-                continue;
-            } else if !cursor_state.is_clicked {
-                (cursor_state.is_clicked, cursor_state.is_dragging) = (false, false);
-                continue;
+            } else if object.is_pressed {
+                println!("clone");
+                (cursor_state.is_clicked, cursor_state.is_dragging, object.is_dragable, object.is_pressed) = (false, false, false, false);
+                let cpy = object.clone_at(object.init_pos);
+                cpy.spawn(commands.spawn_empty());
+                commands.entity(_entity).insert(cpy);
+                client.profile.add_entity(object.obj.clone());
+                object.is_placed = true;
             }
-            (
-                cursor_state.is_clicked,
-                cursor_state.is_dragging,
-                object.is_pressed,
-            ) = (false, false, false);
-            let cpy = object.clone_at(object.init_pos);
-            cpy.spawn(commands.spawn_empty());
-            commands.entity(_entity).insert(cpy);
-            client.profile.add_entity(object.obj.clone());
-            object.is_placed = true;
         }
     }
 }
