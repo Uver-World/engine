@@ -1,3 +1,4 @@
+use bevy::prelude::Component;
 use serde::{
     ser::{self, SerializeStruct, Serializer},
     Deserialize, Serialize,
@@ -41,6 +42,24 @@ impl Entity {
         }
 
         Some(entities)
+    }
+}
+
+impl PartialEq for Entity {
+    fn eq(&self, other: &Self) -> bool {
+        self.group == other.group && self.location == other.location
+    }
+}
+
+impl PartialEq for EntityGroup {
+    fn eq(&self, other: &Self) -> bool {
+        self.group == other.group
+    }
+}
+
+impl PartialEq for Location {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
     }
 }
 

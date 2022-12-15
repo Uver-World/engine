@@ -46,6 +46,8 @@ impl ClientDisplay {
             .insert_resource(self)
             .insert_resource(CursorState::default())
             .insert_resource(Turn::default())
+            .insert_resource(CursorState::default())
+            .insert_resource(Turn::default())
             .run()
     }
 }
