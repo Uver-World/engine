@@ -155,7 +155,7 @@ pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
     commands.insert_resource(ui_assets);
 }
 
-pub fn spawn_blueprint(commands: EntityCommands, _assets: &Assets) {
+pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets) {
     let group = EntityGroup {
         group: "todo!()".to_string(),
         color: client_profile::models::color::Color::Red,
