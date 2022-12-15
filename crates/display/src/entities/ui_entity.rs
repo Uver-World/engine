@@ -1,13 +1,13 @@
 use bevy::prelude::*;
 use client_profile::models::entity::Entity;
 
-#[derive(Component, Clone)]
+#[derive(Component, Clone, PartialEq)]
 pub struct DisplayEntity {
     pub id: usize,
     pub x: f32,
     pub y: f32,
     pub settings: Entity,
-    pub velocity: Vec2,
+    pub velocity: Vec3,
 }
 
 impl DisplayEntity {
@@ -25,7 +25,7 @@ impl DisplayEntity {
             x: entity.location.x,
             y: entity.location.y,
             settings: entity,
-            velocity: Vec2::new(0., 0.),
+            velocity: Vec3::new(0., 0., 0.),
         }
     }
 }

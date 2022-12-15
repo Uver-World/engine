@@ -1,0 +1,87 @@
+{
+  "project_name": "game",
+  "entity_groups": [
+    {
+      "group": "Fox",
+      "color": "RED",
+      "speed": 1.5,
+      "directions": [
+        {
+          "Escape": [
+            "Snake"
+          ]
+        },
+        {
+          "Follow": [
+            "Chicken"
+          ]
+        }
+      ],
+      "shape": "RECTANGLE"
+    },
+    {
+      "group": "Snake",
+      "color": "GREEN",
+      "speed": 2.0,
+      "directions": [
+        {
+          "Escape": [
+            "Chicken"
+          ]
+        },
+        {
+          "Follow": [
+            "Fox"
+          ]
+        }
+      ],
+      "shape": "BALL"
+    },
+    {
+      "group": "Chicken",
+      "color": "GRAY",
+      "speed": 1.0,
+      "directions": [
+        {
+          "Escape": [
+            "Fox"
+          ]
+        },
+        {
+          "Follow": [
+            "Snake"
+          ]
+        }
+      ],
+      "shape": "CIRCLE"
+    }
+  ],
+  "entities": [
+    {
+      "group": "Fox",
+      "location": {
+        "x": 320.0,
+        "y": 10.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "Snake",
+      "location": {
+        "x": -320.0,
+        "y": 10.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "Chicken",
+      "location": {
+        "x": 320.0,
+        "y": 10.0,
+        "z": 320.0
+      }
+    }
+  ],
+  "surface_groups": [],
+  "surfaces": []
+}

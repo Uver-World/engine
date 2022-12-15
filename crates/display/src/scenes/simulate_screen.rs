@@ -34,6 +34,7 @@ fn apply_velocity(mut query: Query<(&mut Transform, &mut DisplayEntity)>) {
     for (mut transform, entity) in &mut query {
         transform.translation.x += entity.velocity.x;
         transform.translation.y += entity.velocity.y;
+        transform.translation.z += entity.velocity.z;
     }
 }
 
@@ -41,13 +42,13 @@ fn random_pos(entity: &mut DisplayEntity, transform: &mut Transform) {
     let rand = Uniform::from(1..5).sample(&mut rand::thread_rng()); // TOP BOT, RIGHT, LEFT
     match rand {
         1 => {
-            if transform.translation.y > -100.0 {
-                entity.velocity.y = -entity.settings.group.speed;
+            if transform.translation.z > -100.0 {
+                entity.velocity.z = -entity.settings.group.speed;
             }
         }
         2 => {
-            if transform.translation.y <= 100.0 {
-                entity.velocity.y = entity.settings.group.speed;
+            if transform.translation.z <= 100.0 {
+                entity.velocity.z = entity.settings.group.speed;
             }
         }
         3 => {
@@ -76,33 +77,56 @@ fn destination_pos(entity: &mut DisplayEntity, transform: &Transform, location: 
     if transform.translation.y > location.y {
         entity.velocity.y = -entity.settings.group.speed;
     }
-    if transform.translation.x >= location.x - 10.
-        && transform.translation.x <= location.x + 10.
-    {
+    if transform.translation.z < location.z {
+        entity.velocity.z = entity.settings.group.speed;
+    }
+    if transform.translation.z > location.z {
+        entity.velocity.z = -entity.settings.group.speed;
+    }
+    if transform.translation.x >= location.x - 10. && transform.translation.x <= location.x + 10. {
         entity.velocity.x = 0.;
     }
-    if transform.translation.y >= location.y - 10.
-        && transform.translation.y <= location.y + 10.
-    {
+    if transform.translation.y >= location.y - 10. && transform.translation.y <= location.y + 10. {
         entity.velocity.y = 0.;
+    }
+    if transform.translation.z >= location.z - 10. && transform.translation.z <= location.z + 10. {
+        entity.velocity.z = 0.;
     }
 }
 
-fn follow_pos(target: &mut DisplayEntity, transform: &Transform, group_target: Vec<String>, query: &Vec<DisplayEntity>) {
+fn follow_pos(
+    target: &mut DisplayEntity,
+    transform: &Transform,
+    group_target: Vec<String>,
+    query: &Vec<(DisplayEntity, Transform)>,
+) {
     let mut location: Option<Location> = None;
-    for entity in query {
+    for (entity, ent_transform) in query {
         // We check if the group is not the same, or target != entity
         if !group_target.contains(&entity.settings.group.group) || target == entity {
             continue;
         }
-
         match location {
             Some(found_location) => {
-                if found_location.x + found_location.y > entity.x + entity.y {
-                    location = Some(Location::new(entity.x, entity.y));
+                if found_location.x + found_location.y + found_location.z
+                    > ent_transform.translation.x
+                        + ent_transform.translation.y
+                        + ent_transform.translation.z
+                {
+                    location = Some(Location::new(
+                        ent_transform.translation.x,
+                        ent_transform.translation.y,
+                        ent_transform.translation.z,
+                    ));
                 }
             }
-            None => location = Some(Location::new(entity.x, entity.y)),
+            None => {
+                location = Some(Location::new(
+                    ent_transform.translation.x,
+                    ent_transform.translation.y,
+                    ent_transform.translation.z,
+                ))
+            }
         }
     }
     match location {
@@ -111,9 +135,14 @@ fn follow_pos(target: &mut DisplayEntity, transform: &Transform, group_target: V
     }
 }
 
-fn escape_pos(target: &mut DisplayEntity, transform: &Transform, group_target: Vec<String>, query: &Vec<DisplayEntity>) {
+fn escape_pos(
+    target: &mut DisplayEntity,
+    transform: &Transform,
+    group_target: Vec<String>,
+    query: &Vec<(DisplayEntity, Transform)>,
+) {
     let mut location: Option<Location> = None;
-    for entity in query {
+    for (entity, ent_transform) in query {
         // We check if the group is not the same, or target != entity
         if !group_target.contains(&entity.settings.group.group) || target == entity {
             continue;
@@ -121,45 +150,88 @@ fn escape_pos(target: &mut DisplayEntity, transform: &Transform, group_target: V
 
         match location {
             Some(found_location) => {
-                if found_location.x + found_location.y > entity.x + entity.y {
-                    location = Some(Location::new(entity.x, entity.y));
+                if found_location.x + found_location.y + found_location.z
+                    > ent_transform.translation.x
+                        + ent_transform.translation.y
+                        + ent_transform.translation.z
+                {
+                    location = Some(Location::new(
+                        ent_transform.translation.x,
+                        ent_transform.translation.y,
+                        ent_transform.translation.z,
+                    ));
                 }
             }
-            None => location = Some(Location::new(entity.x, entity.y)),
+            None => {
+                location = Some(Location::new(
+                    transform.translation.x,
+                    transform.translation.y,
+                    transform.translation.z,
+                ))
+            }
         }
     }
     match location {
         Some(location) => {
-            let length = Location::new(target.x - location.x, target.y - location.y);
-            let (x, y) = if length.x < 0.0 {
+            let length = Location::new(
+                transform.translation.x - location.x,
+                transform.translation.y - location.y,
+                transform.translation.z - location.z,
+            );
+            let (x, y, z) = if length.x < 0.0 {
                 if length.y < 0.0 {
-                    (target.x + length.x, target.y + length.y)
+                    (
+                        transform.translation.x + length.x,
+                        transform.translation.y + length.y,
+                        transform.translation.z + length.z,
+                    )
                 } else {
-                    (target.x + length.x, target.y - length.y)
+                    (
+                        transform.translation.x + length.x,
+                        transform.translation.y - length.y,
+                        transform.translation.z + length.z,
+                    )
                 }
             } else {
                 if length.y >= 0.0 {
-                    (target.x - length.x, target.y - length.y)
+                    (
+                        transform.translation.x - length.x,
+                        transform.translation.y - length.y,
+                        transform.translation.z + length.z,
+                    )
                 } else {
-                    (target.x - length.x, target.y + length.y)
+                    (
+                        transform.translation.x - length.x,
+                        transform.translation.y + length.y,
+                        transform.translation.z + length.z,
+                    )
                 }
             };
-            destination_pos(target, transform, Location::new(x, y));
+            destination_pos(target, transform, Location::new(x, y, z));
         }
         _ => {}
     }
 }
 
-fn update_status(mut query: Query<(&mut Transform, &mut DisplayEntity)>) {
-    let entities: Vec<DisplayEntity> = query.iter().map(|(_, entity)| entity.clone()).collect();
+fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
+    let entities: Vec<(DisplayEntity, Transform)> = query
+        .iter()
+        .map(|(entity, transform)| (entity.clone(), transform.clone()))
+        .collect();
 
-    for (mut transform, mut ui_entity) in &mut query {
+    for (mut ui_entity, mut transform) in &mut query {
         for direction in ui_entity.settings.group.directions.clone() {
             match direction {
-                Direction::Random => random_pos(&mut ui_entity),
-                Direction::Location(location) => destination_pos(&mut ui_entity, &transform, location),
-                Direction::Follow(group_name) => follow_pos(&mut ui_entity, &transform, group_name, &entities),
-                Direction::Escape(group_name) => escape_pos(&mut ui_entity, &transform, group_name, &entities),
+                Direction::Random => random_pos(&mut ui_entity, &mut transform),
+                Direction::Location(location) => {
+                    destination_pos(&mut ui_entity, &transform, location)
+                }
+                Direction::Follow(group_name) => {
+                    follow_pos(&mut ui_entity, &transform, group_name, &entities)
+                }
+                Direction::Escape(group_name) => {
+                    escape_pos(&mut ui_entity, &transform, group_name, &entities)
+                }
                 Direction::Static => {}
             }
         }

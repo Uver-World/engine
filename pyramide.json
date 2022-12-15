@@ -5,20 +5,24 @@
       "group": "MagentaSquare",
       "color": "MAGENTA",
       "speed": 5.0,
-      "direction": {
-        "Location": {
-          "x": -2000.0,
-          "y": 0.0,
-          "z": 0.0
+      "directions": [
+        {
+          "Location": {
+            "x": -2000.0,
+            "y": 0.0,
+            "z": 0.0
+          }
         }
-      },
+      ],
       "shape": "BALL"
     },
     {
       "group": "PinkSquare",
       "color": "PINK",
       "speed": 0.0,
-      "direction": "Static",
+      "directions": [
+        "Static"
+      ],
       "shape": "RECTANGLE"
     }
   ],
