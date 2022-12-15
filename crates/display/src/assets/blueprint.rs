@@ -72,10 +72,7 @@ pub fn drag(
                 let wnd = windows.get_primary().unwrap();
                 if let Some(screen_pos) = wnd.cursor_position() {
                     if !is_in_rect(object.clone(), screen_pos) {
-                        println!(
-                            "Not in range mouse: {:?} object: {:?}",
-                            screen_pos, object.pos
-                        );
+                        println!("Not in range mouse: {:?} object: {:?}", screen_pos, object.pos);
                         continue;
                     }
                     cursor_state.is_dragging = true;
