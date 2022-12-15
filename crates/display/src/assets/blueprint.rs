@@ -1,6 +1,8 @@
 use bevy::ecs::system::EntityCommands;
 use bevy::prelude::*;
 use bevy::render::camera::RenderTarget;
+use client_profile::models::direction::Direction;
+use client_profile::models::shape::Shape;
 
 use crate::ClientDisplay;
 use client_profile::models::entity::{Entity, EntityGroup};
@@ -73,13 +75,6 @@ pub fn drag(
     buttons: Res<Input<MouseButton>>,
     windows: Res<Windows>,
     mut client: ResMut<ClientDisplay>,
-    mut query: Query<(
-        bevy::prelude::Entity,
-        With<Object>,
-        &mut Object,
-        &mut Style,
-        &mut Transform,
-    )>,
     mut query: Query<(
         bevy::prelude::Entity,
         With<Object>,
@@ -172,8 +167,14 @@ pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets, pos: Vec2
         group: "todo!()".to_string(),
         color: client_profile::models::color::Color::Red,
         speed: 23.,
+        directions: vec![Direction::Static],
+        shape: Shape::Rectangle,
     };
-    let location = Location { x: 0., y: 0. };
+    let location = Location {
+        x: 0.,
+        y: 0.,
+        z: 0.,
+    };
     let obj = Object::new(
         _assets,
         "Button 1".to_string(),

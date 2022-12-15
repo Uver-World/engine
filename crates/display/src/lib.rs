@@ -1,8 +1,7 @@
-use assets::{blueprint_structure::CursorState, blueprint::Turn};
+use assets::{blueprint::Turn, blueprint_structure::CursorState};
 use bevy::{prelude::*, window::WindowDescriptor};
 use bevy_rapier3d::prelude::*;
 
-use assets::blueprint_structure::CursorState;
 use client_profile::*;
 
 pub mod assets;
@@ -43,8 +42,7 @@ impl ClientDisplay {
             .add_plugin(scenes::loading_screen::LoadingScreen)
             .add_plugin(scenes::simulate_screen::SimulateScreen)
             .add_plugin(scenes::blueprint::Blueprint)
-            .add_plugin(scenes::blueprint::Blueprint)
-            .add_state(states::DisplayState::Blueprint)
+            .add_state(states::DisplayState::LoadingScreen)
             .insert_resource(self)
             .insert_resource(CursorState::default())
             .insert_resource(Turn::default())

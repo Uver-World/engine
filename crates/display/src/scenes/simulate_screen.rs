@@ -120,14 +120,111 @@ fn follow_pos(
                     ));
                 }
             }
-            2 => {
-                if ui_entity.y <= 150.0 {
-                    ui_entity.y += ui_entity.settings.group.speed;
+            None => {
+                location = Some(Location::new(
+                    ent_transform.translation.x,
+                    ent_transform.translation.y,
+                    ent_transform.translation.z,
+                ))
+            }
+        }
+    }
+    match location {
+        Some(location) => destination_pos(target, transform, location),
+        _ => {}
+    }
+}
+
+fn escape_pos(
+    target: &mut DisplayEntity,
+    transform: &Transform,
+    group_target: Vec<String>,
+    query: &Vec<(DisplayEntity, Transform)>,
+) {
+    let mut location: Option<Location> = None;
+    for (entity, ent_transform) in query {
+        // We check if the group is not the same, or target != entity
+        if !group_target.contains(&entity.settings.group.group) || target == entity {
+            continue;
+        }
+
+        match location {
+            Some(found_location) => {
+                if found_location.x + found_location.y + found_location.z
+                    > ent_transform.translation.x
+                        + ent_transform.translation.y
+                        + ent_transform.translation.z
+                {
+                    location = Some(Location::new(
+                        ent_transform.translation.x,
+                        ent_transform.translation.y,
+                        ent_transform.translation.z,
+                    ));
                 }
             }
-            3 => {
-                if ui_entity.x <= 485.0 {
-                    ui_entity.x += ui_entity.settings.group.speed;
+            None => {
+                location = Some(Location::new(
+                    transform.translation.x,
+                    transform.translation.y,
+                    transform.translation.z,
+                ))
+            }
+        }
+    }
+    match location {
+        Some(location) => {
+            let length = Location::new(
+                transform.translation.x - location.x,
+                transform.translation.y - location.y,
+                transform.translation.z - location.z,
+            );
+            let (x, y, z) = if length.x < 0.0 {
+                if length.y < 0.0 {
+                    (
+                        transform.translation.x + length.x,
+                        transform.translation.y + length.y,
+                        transform.translation.z + length.z,
+                    )
+                } else {
+                    (
+                        transform.translation.x + length.x,
+                        transform.translation.y - length.y,
+                        transform.translation.z + length.z,
+                    )
+                }
+            } else {
+                if length.y >= 0.0 {
+                    (
+                        transform.translation.x - length.x,
+                        transform.translation.y - length.y,
+                        transform.translation.z + length.z,
+                    )
+                } else {
+                    (
+                        transform.translation.x - length.x,
+                        transform.translation.y + length.y,
+                        transform.translation.z + length.z,
+                    )
+                }
+            };
+            destination_pos(target, transform, Location::new(x, y, z));
+        }
+        _ => {}
+    }
+}
+
+fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
+    let entities: Vec<(DisplayEntity, Transform)> = query
+        .iter()
+        .map(|(entity, transform)| (entity.clone(), transform.clone()))
+        .collect();
+
+    for (mut ui_entity, mut transform) in &mut query {
+        for direction in ui_entity.settings.group.directions.clone() {
+            match direction {
+                Direction::Random => random_pos(&mut ui_entity, &mut transform),
+                Direction::Location(location) => {
+                    destination_pos(&mut ui_entity, &transform, location)
                 }
                 Direction::Follow(group_name) => {
                     follow_pos(&mut ui_entity, &transform, group_name, &entities)
@@ -216,18 +313,5 @@ fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
 fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();
-    }
-}
-
-pub fn keyboard_input(keys: Res<Input<KeyCode>>, mut app_state: ResMut<State<DisplayState>>) {
-    if keys.just_pressed(KeyCode::B) {
-        match app_state.current() {
-            DisplayState::SimulateScreen => {
-                app_state.set(DisplayState::Blueprint).unwrap();
-            }
-            DisplayState::LoadingScreen => {},
-            DisplayState::Menu => {},
-            DisplayState::Blueprint => {},
-        }
     }
 }

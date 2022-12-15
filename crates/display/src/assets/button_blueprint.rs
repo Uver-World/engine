@@ -1,4 +1,4 @@
-use bevy::ecs::system::EntityCommands;
+
 use bevy::prelude::*;
 use bevy::{ecs::system::Query, text::Text, ui::Interaction};
 
@@ -19,7 +19,7 @@ pub fn button_system(
     mut entity: Query<Entity, With<Blueprint>>,
     wnd: Res<Windows>,
 ) {
-    for (interaction, children, mut style, transform) in &mut interaction_query {
+    for (interaction, children, mut style, _transform) in &mut interaction_query {
         let mut text = text_query.get_mut(children[0]).unwrap();
         match *interaction {
             Interaction::Clicked => {

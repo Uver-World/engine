@@ -82,7 +82,7 @@ impl Object {
         }
     }
 
-    pub fn spawn(&self, mut commands: &mut EntityCommands) {
+    pub fn spawn(&self, commands: &mut EntityCommands) {
         commands
             .insert(self.bund.clone())
             .with_children(|parent| {
