@@ -14,6 +14,7 @@ pub struct Camera3D {
     pub pan_button: MouseButton,
     pub pitch_range: RangeInclusive<f32>,
     pub zoom_sensitivity: f32,
+    pub move_sensitivy: f32,
 }
 
 impl Default for Camera3D {
@@ -29,6 +30,7 @@ impl Default for Camera3D {
             pan_button: MouseButton::Right,
             pitch_range: 0.01..=3.13,
             zoom_sensitivity: 0.8,
+            move_sensitivy: 300.,
         }
     }
 }
@@ -77,6 +79,45 @@ impl Camera3DPlugin {
         }
     }
 
+    fn key(
+        time: Res<Time>,
+        keys: Res<Input<KeyCode>>,
+        mut query: Query<(&mut Camera3D, &mut Transform, &mut Camera)>,
+    ) {
+        for (mut camera, transform, _) in query.iter_mut() {
+            if keys.pressed(KeyCode::Z) {
+                let front_dir = transform.rotation * -Vec3::Z;
+                let pan_vector = front_dir * camera.move_sensitivy * time.delta_seconds();
+                camera.center += pan_vector;
+            }
+            if keys.pressed(KeyCode::S) {
+                let front_dir = transform.rotation * Vec3::Z;
+                let pan_vector = front_dir * camera.move_sensitivy * time.delta_seconds();
+                camera.center += pan_vector;
+            }
+            if keys.pressed(KeyCode::Space) {
+                let up_dir = transform.rotation * Vec3::Y;
+                let pan_vector = up_dir * camera.move_sensitivy * time.delta_seconds();
+                camera.center += pan_vector;
+            }
+            if keys.pressed(KeyCode::LShift) {
+                let up_dir = transform.rotation * -Vec3::Y;
+                let pan_vector = up_dir * camera.move_sensitivy * time.delta_seconds();
+                camera.center += pan_vector;
+            }
+            if keys.pressed(KeyCode::Q) {
+                let right_dir = transform.rotation * -Vec3::X;
+                let pan_vector = right_dir * camera.move_sensitivy * time.delta_seconds();
+                camera.center += pan_vector;
+            }
+            if keys.pressed(KeyCode::D) {
+                let right_dir = transform.rotation * Vec3::X;
+                let pan_vector = right_dir * camera.move_sensitivy * time.delta_seconds();
+                camera.center += pan_vector;
+            }
+        }
+    }
+
     fn zoom(
         mut mouse_wheel_events: EventReader<MouseWheel>,
         mut query: Query<&mut Camera3D, With<Camera>>,
@@ -94,6 +135,7 @@ impl Camera3DPlugin {
 impl Plugin for Camera3DPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(Self::mouse_motion)
+            .add_system(Self::key)
             .add_system(Self::zoom)
             .add_system(Self::update_transform);
     }
