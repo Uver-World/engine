@@ -1,23 +1,22 @@
+use bevy::prelude::*;
 use bevy::{
     ecs::system::Query,
-    prelude::{Button, Changed, With},
-    ui::Interaction,
+    text::Text,
+    ui::{BackgroundColor, Interaction},
 };
 
 pub fn button_system(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>)>,
+    mut interaction_query: Query<(&Interaction, &Children), (Changed<Interaction>, With<Button>)>,
+    mut text_query: Query<&mut Text>,
 ) {
-    for interaction in &mut interaction_query {
+    for (interaction, children) in &mut interaction_query {
+        let mut text = text_query.get_mut(children[0]).unwrap();
         match *interaction {
-            Interaction::Clicked => {
-                println!("NTM");
-            }
+            Interaction::Clicked => text.sections[0].style.color = Color::rgb_u8(0, 0, 0).into(),
             Interaction::Hovered => {
-                println!("FDP");
+                text.sections[0].style.color = Color::rgb_u8(100, 100, 100).into()
             }
-            Interaction::None => {
-                println!("Weeeee");
-            }
+            Interaction::None => text.sections[0].style.color = Color::rgb_u8(176, 176, 176).into(),
         }
     }
 }
