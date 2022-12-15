@@ -46,7 +46,7 @@ pub fn construct(
         background_color: Color::rgba(0., 0., 0., 0.).into(),
         ..default()
     });
-    node.with_children(|parent| blueprint::spawn_blueprint(parent.spawn_empty(), &assets));
+    // node.with_children(|parent| blueprint::spawn_blueprint(parent.spawn_empty(), &assets));
     node.with_children(|parent| blueprint::spawn_box(parent.spawn_empty(), &assets, windows, ass));
 }
 

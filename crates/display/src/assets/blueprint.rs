@@ -167,7 +167,7 @@ pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
     commands.insert_resource(ui_assets);
 }
 
-pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets) {
+pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets, pos: Vec2) {
     let group = EntityGroup {
         group: "todo!()".to_string(),
         color: client_profile::models::color::Color::Red,
@@ -180,7 +180,7 @@ pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets) {
         "First button".to_string(),
         true,
         false,
-        Vec2::new(732., 362.),
+        Vec2::new(pos.x, pos.y),
         Vec2::new(100., 50.),
         Entity { group, location },
     );
