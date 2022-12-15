@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::direction::Direction;
+use client_profile::models::location::Location;
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 
@@ -62,37 +63,105 @@ fn random_pos(entity: &mut DisplayEntity, transform: &mut Transform) {
     }
 }
 
+fn destination_pos(entity: &mut DisplayEntity, transform: &Transform, location: Location) {
+    if transform.translation.x < location.x {
+        entity.velocity.x = entity.settings.group.speed;
+    }
+    if transform.translation.x > location.x {
+        entity.velocity.x = -entity.settings.group.speed;
+    }
+    if transform.translation.y < location.y {
+        entity.velocity.y = entity.settings.group.speed;
+    }
+    if transform.translation.y > location.y {
+        entity.velocity.y = -entity.settings.group.speed;
+    }
+    if transform.translation.x >= location.x - 10.
+        && transform.translation.x <= location.x + 10.
+    {
+        entity.velocity.x = 0.;
+    }
+    if transform.translation.y >= location.y - 10.
+        && transform.translation.y <= location.y + 10.
+    {
+        entity.velocity.y = 0.;
+    }
+}
+
+fn follow_pos(target: &mut DisplayEntity, transform: &Transform, group_target: Vec<String>, query: &Vec<DisplayEntity>) {
+    let mut location: Option<Location> = None;
+    for entity in query {
+        // We check if the group is not the same, or target != entity
+        if !group_target.contains(&entity.settings.group.group) || target == entity {
+            continue;
+        }
+
+        match location {
+            Some(found_location) => {
+                if found_location.x + found_location.y > entity.x + entity.y {
+                    location = Some(Location::new(entity.x, entity.y));
+                }
+            }
+            None => location = Some(Location::new(entity.x, entity.y)),
+        }
+    }
+    match location {
+        Some(location) => destination_pos(target, transform, location),
+        _ => {}
+    }
+}
+
+fn escape_pos(target: &mut DisplayEntity, transform: &Transform, group_target: Vec<String>, query: &Vec<DisplayEntity>) {
+    let mut location: Option<Location> = None;
+    for entity in query {
+        // We check if the group is not the same, or target != entity
+        if !group_target.contains(&entity.settings.group.group) || target == entity {
+            continue;
+        }
+
+        match location {
+            Some(found_location) => {
+                if found_location.x + found_location.y > entity.x + entity.y {
+                    location = Some(Location::new(entity.x, entity.y));
+                }
+            }
+            None => location = Some(Location::new(entity.x, entity.y)),
+        }
+    }
+    match location {
+        Some(location) => {
+            let length = Location::new(target.x - location.x, target.y - location.y);
+            let (x, y) = if length.x < 0.0 {
+                if length.y < 0.0 {
+                    (target.x + length.x, target.y + length.y)
+                } else {
+                    (target.x + length.x, target.y - length.y)
+                }
+            } else {
+                if length.y >= 0.0 {
+                    (target.x - length.x, target.y - length.y)
+                } else {
+                    (target.x - length.x, target.y + length.y)
+                }
+            };
+            destination_pos(target, transform, Location::new(x, y));
+        }
+        _ => {}
+    }
+}
+
 fn update_status(mut query: Query<(&mut Transform, &mut DisplayEntity)>) {
-    for (mut transform, mut entity) in &mut query {
-        match entity.settings.group.direction.clone() {
-            Direction::Random => {
-                random_pos(&mut entity, &mut transform);
+    let entities: Vec<DisplayEntity> = query.iter().map(|(_, entity)| entity.clone()).collect();
+
+    for (mut transform, mut ui_entity) in &mut query {
+        for direction in ui_entity.settings.group.directions.clone() {
+            match direction {
+                Direction::Random => random_pos(&mut ui_entity),
+                Direction::Location(location) => destination_pos(&mut ui_entity, &transform, location),
+                Direction::Follow(group_name) => follow_pos(&mut ui_entity, &transform, group_name, &entities),
+                Direction::Escape(group_name) => escape_pos(&mut ui_entity, &transform, group_name, &entities),
+                Direction::Static => {}
             }
-            Direction::Location(location) => {
-                if transform.translation.x < location.x {
-                    entity.velocity.x = entity.settings.group.speed;
-                }
-                if transform.translation.x > location.x {
-                    entity.velocity.x = -entity.settings.group.speed;
-                }
-                if transform.translation.y < location.y {
-                    entity.velocity.y = entity.settings.group.speed;
-                }
-                if transform.translation.y > location.y {
-                    entity.velocity.y = -entity.settings.group.speed;
-                }
-                if transform.translation.x >= location.x - 10.
-                    && transform.translation.x <= location.x + 10.
-                {
-                    entity.velocity.x = 0.;
-                }
-                if transform.translation.y >= location.y - 10.
-                    && transform.translation.y <= location.y + 10.
-                {
-                    entity.velocity.y = 0.;
-                }
-            }
-            Direction::Static => {}
         }
     }
 }

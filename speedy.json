@@ -4,29 +4,54 @@
     {
       "group": "RedSquare",
       "color": "RED",
-      "speed": 2.0,
-      "direction": "Random",
+      "speed": 10.0,
+      "directions": [
+        {
+          "Follow": [
+            "PinkSquare"
+          ]
+        }
+      ],
       "shape": "RECTANGLE"
     },
     {
       "group": "GreenSquare",
       "color": "GREEN",
-      "speed": 3.0,
-      "direction": "Random",
-      "shape": "RECTANGLE"
+      "speed": 5.0,
+      "directions": [
+        {
+          "Escape": [
+            "PinkSquare"
+          ]
+        }
+      ],
+      "shape": "CIRCLE"
     },
     {
       "group": "BlueSquare",
       "color": "BLUE",
-      "speed": 5.0,
-      "direction": "Random",
-      "shape": "CIRCLE"
+      "speed": 50.0,
+      "directions": [
+        "Random"
+      ],
+      "shape": "RECTANGLE"
     },
     {
       "group": "PinkSquare",
       "color": "PINK",
-      "speed": 2.5,
-      "direction": "Random",
+      "speed": 2.0,
+      "directions": [
+        {
+          "Follow": [
+            "GreenSquare"
+          ]
+        },
+        {
+          "Escape": [
+            "RedSquare"
+          ]
+        }
+      ],
       "shape": "TRIANGLE"
     }
   ],
