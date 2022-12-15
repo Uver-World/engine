@@ -30,7 +30,7 @@ fn update_status(
             }
             style.size.width = Val::Percent(loading_bar.val);
         } else {
-            app_state.set(DisplayState::SimulateScreen).unwrap();
+            app_state.set(DisplayState::Blueprint).unwrap();
         }
     }
 }

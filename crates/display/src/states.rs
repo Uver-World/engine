@@ -3,4 +3,5 @@ pub enum DisplayState {
     SimulateScreen,
     LoadingScreen,
     Menu,
+    Blueprint,
 }

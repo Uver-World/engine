@@ -1,3 +1,4 @@
+use assets::{blueprint::Turn, blueprint_structure::CursorState};
 use bevy::{prelude::*, window::WindowDescriptor};
 use bevy_rapier3d::prelude::*;
 
@@ -12,6 +13,7 @@ pub mod states;
 #[derive(Resource)]
 pub struct ClientDisplay {
     pub profile: Profile,
+    pub is_toggled: bool,
 }
 
 impl ClientDisplay {
@@ -33,12 +35,19 @@ impl ClientDisplay {
             }))
             // .add_startup_system(cameras::spawn_camera)
             .add_startup_system(assets::loading_screen::load_assets)
+            .add_startup_system(assets::blueprint::load_assets)
             .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
             .add_plugin(RapierDebugRenderPlugin::default())
+            .add_startup_system(assets::blueprint::load_assets)
             .add_plugin(scenes::loading_screen::LoadingScreen)
             .add_plugin(scenes::simulate_screen::SimulateScreen)
+            .add_plugin(scenes::blueprint::Blueprint)
             .add_state(states::DisplayState::LoadingScreen)
             .insert_resource(self)
+            .insert_resource(CursorState::default())
+            .insert_resource(Turn::default())
+            .insert_resource(CursorState::default())
+            .insert_resource(Turn::default())
             .run()
     }
 }

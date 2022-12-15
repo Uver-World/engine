@@ -1,72 +1,68 @@
 {
-  "project_name": "features",
-  "entity_groups": [
-    {
-      "group": "RedSquare",
-      "color": "RED",
-      "speed": 20.0,
-      "direction": "Random"
-    },
-    {
-      "group": "GreenSquare",
-      "color": "GREEN",
-      "speed": 30.0,
-      "direction": "Random"
-    },
-    {
-      "group": "BlueSquare",
-      "color": "BLUE",
-      "speed": 50.0,
-      "direction": "Random"
-    },
-    {
-      "group": "PinkSquare",
-      "color": "PINK",
-      "speed": 2.5,
-      "direction": "Random"
-    }
-  ],
+  "project_name": "new_project",
+  "entity_groups": [],
   "entities": [
     {
-      "group": "RedSquare",
+      "group": "todo!()",
       "location": {
-        "x": 20.0,
-        "y": 30.0
+        "x": 0.0,
+        "y": 0.0
       }
     },
     {
-      "group": "RedSquare",
+      "group": "todo!()",
       "location": {
-        "x": 22.0,
-        "y": 10.0
+        "x": 0.0,
+        "y": 0.0
       }
     },
     {
-      "group": "GreenSquare",
+      "group": "todo!()",
       "location": {
-        "x": 20.0,
-        "y": 70.0
+        "x": 0.0,
+        "y": 0.0
       }
     },
     {
-      "group": "BlueSquare",
+      "group": "todo!()",
       "location": {
-        "x": 20.0,
-        "y": 150.0
+        "x": 0.0,
+        "y": 0.0
       }
     },
     {
-      "group": "PinkSquare",
+      "group": "todo!()",
       "location": {
-        "x": 100.0,
-        "y": 150.0
+        "x": 0.0,
+        "y": 0.0
       }
     },
     {
-      "group": "PinkSquare",
+      "group": "todo!()",
       "location": {
-        "x": 120.0,
-        "y": 150.0
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "group": "todo!()",
+      "location": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "group": "todo!()",
+      "location": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "group": "todo!()",
+      "location": {
+        "x": 0.0,
+        "y": 0.0
       }
     }
   ],
