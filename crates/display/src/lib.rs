@@ -1,3 +1,4 @@
+use assets::{blueprint_structure::CursorState, blueprint::Turn};
 use bevy::{prelude::*, window::WindowDescriptor};
 use bevy_rapier3d::prelude::*;
 
@@ -39,6 +40,8 @@ impl ClientDisplay {
             .add_plugin(scenes::simulate_screen::SimulateScreen)
             .add_state(states::DisplayState::LoadingScreen)
             .insert_resource(self)
+            .insert_resource(CursorState::default())
+            .insert_resource(Turn::default())
             .run()
     }
 }

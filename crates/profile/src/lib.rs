@@ -16,8 +16,8 @@ use crate::models::{
 #[derive(Serialize)]
 pub struct Profile {
     project_name: String,
-    entity_groups: Vec<EntityGroup>,
-    entities: Vec<Entity>,
+    pub entity_groups: Vec<EntityGroup>,
+    pub entities: Vec<Entity>,
     surface_groups: Vec<SurfaceGroup>,
     surfaces: Vec<Surface>,
 }
@@ -58,8 +58,44 @@ impl Profile {
         .unwrap();
     }
 
+    pub fn get_entity<P>(&mut self, mut filter: P) -> Option<&mut Entity>
+    where
+        P: FnMut(&Entity) -> bool,
+    {
+        for entity in &mut self.entities {
+            if filter(entity) {
+                return Some(entity);
+            }
+        }
+        None
+    }
+
+    pub fn get_group<P>(&mut self, mut filter: P) -> Option<&mut EntityGroup>
+    where
+        P: FnMut(&EntityGroup) -> bool,
+    {
+        for entity_group in &mut self.entity_groups {
+            if filter(entity_group) {
+                return Some(entity_group);
+            }
+        }
+        None
+    }
+
     pub fn get_entities(&self) -> &Vec<Entity> {
         &self.entities
+    }
+
+    pub fn get_entit_groups(&self) -> &Vec<EntityGroup> {
+        &self.entity_groups
+    }
+
+    pub fn add_entity(&mut self, entity: Entity) {
+        self.entities.push(entity);
+    }
+
+    pub fn add_entity_group(&mut self, entity_group: EntityGroup) {
+        self.entity_groups.push(entity_group);
     }
 }
 

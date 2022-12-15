@@ -22,17 +22,9 @@ impl Plugin for SimulateScreen {
         )
         .add_system_set(SystemSet::on_exit(DisplayState::SimulateScreen).with_system(destroy))
         .add_system_set(
-<<<<<<< HEAD
             SystemSet::on_update(DisplayState::SimulateScreen).with_system(update_status),
         )
         .add_system(keyboard_input);
-=======
-            SystemSet::on_update(DisplayState::SimulateScreen)
-                .with_system(update_status)
-                .with_system(apply_velocity),
-        )
-        .add_plugin(Camera3DPlugin);
->>>>>>> 56e1c7a92d39f2e6522d99f45870a4e31ed31665
     }
 }
 
@@ -324,6 +316,13 @@ fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {
 
 pub fn keyboard_input(keys: Res<Input<KeyCode>>, mut app_state: ResMut<State<DisplayState>>) {
     if keys.just_pressed(KeyCode::B) {
-        app_state.set(DisplayState::Blueprint).unwrap();
+        match app_state.current() {
+            DisplayState::SimulateScreen => {
+                app_state.set(DisplayState::Blueprint).unwrap();
+            }
+            DisplayState::LoadingScreen => {},
+            DisplayState::Menu => {},
+            DisplayState::Blueprint => {},
+        }
     }
 }
