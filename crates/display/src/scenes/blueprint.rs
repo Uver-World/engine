@@ -9,6 +9,7 @@ use bevy::window::Windows;
 use crate::assets::blueprint;
 use crate::assets::blueprint::drag;
 use crate::assets::blueprint_structure::{BlueprintBase, Object};
+use crate::assets::button_blueprint::button_system;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
 
@@ -21,6 +22,9 @@ impl Plugin for Blueprint {
             .add_system_set(SystemSet::on_exit(DisplayState::Blueprint).with_system(destroy))
             // .add_system_set(SystemSet::on_update(DisplayState::Blueprint).with_system(update_status),)
             .add_system_set(SystemSet::on_update(DisplayState::Blueprint).with_system(drag))
+            .add_system_set(
+                SystemSet::on_update(DisplayState::Blueprint).with_system(button_system),
+            )
             .add_system(keyboard_input);
     }
 }

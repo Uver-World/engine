@@ -1,5 +1,5 @@
-use bevy::{prelude::*, window::WindowDescriptor};
 use assets::blueprint_structure::CursorState;
+use bevy::{prelude::*, window::WindowDescriptor};
 use client_profile::*;
 
 pub mod assets;

@@ -202,14 +202,14 @@ pub fn spawn_box(
                             ..default()
                         })
                         .with_children(|parent| {
-                            parent.spawn(ImageBundle {
-                                image: ass.load("Plus.png").into(),
-                                style: Style {
-                                    size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-                                    ..Default::default()
+                            parent.spawn(TextBundle::from_section(
+                                "+",
+                                TextStyle {
+                                    font: ass.load("FiraCode-Regular.ttf"),
+                                    font_size: 250.0,
+                                    color: Color::rgb(1.0, 1., 1.0),
                                 },
-                                ..Default::default()
-                            });
+                            ));
                         });
                 });
         })
