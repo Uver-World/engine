@@ -1,4 +1,4 @@
-use assets::blueprint_structure::CursorState;
+use assets::{blueprint_structure::CursorState, blueprint::Turn};
 use bevy::{prelude::*, window::WindowDescriptor};
 use bevy_rapier3d::prelude::*;
 
@@ -47,6 +47,7 @@ impl ClientDisplay {
             .add_state(states::DisplayState::Blueprint)
             .insert_resource(self)
             .insert_resource(CursorState::default())
+            .insert_resource(Turn::default())
             .run()
     }
 }

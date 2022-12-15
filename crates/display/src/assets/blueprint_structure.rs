@@ -62,7 +62,7 @@ impl Object {
                 },
                 ..default()
             },
-            // transform: Transform::default(),
+            transform: Transform::default(),
             // transform,
             image: asset.icon.clone().into(),
             ..default()
@@ -82,7 +82,7 @@ impl Object {
         }
     }
 
-    pub fn spawn(&self, mut commands: EntityCommands) {
+    pub fn spawn(&self, mut commands: &mut EntityCommands) {
         commands
             .insert(self.bund.clone())
             .with_children(|parent| {
