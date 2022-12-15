@@ -16,7 +16,10 @@ impl Plugin for LoadingScreen {
     }
 }
 
-fn update_status(mut query: Query<(&mut Style, &mut loading_screen::LoadingBar)>, mut app_state: ResMut<State<DisplayState>>) {
+fn update_status(
+    mut query: Query<(&mut Style, &mut loading_screen::LoadingBar)>,
+    mut app_state: ResMut<State<DisplayState>>,
+) {
     for (mut style, mut loading_bar) in query.iter_mut() {
         if loading_bar.val < 100.0 {
             let r = 1.0;
@@ -34,6 +37,7 @@ fn update_status(mut query: Query<(&mut Style, &mut loading_screen::LoadingBar)>
 
 fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
     let mut node = commands.spawn(LoadingScreen);
+    node.insert(Camera2dBundle::default());
     node.insert(NodeBundle {
         style: Style {
             display: Display::Flex,

@@ -4,13 +4,14 @@
     {
       "group": "MagentaSquare",
       "color": "MAGENTA",
-      "speed": 0.7,
+      "speed": 0.5,
       "direction": {
         "Location": {
           "x": 300.0,
-          "y": 100.0
+          "y": 100.0,
+          "z": 0.0
         }
-      },
+      ],
       "shape": "RECTANGLE"
     },
     {
@@ -20,21 +21,23 @@
       "direction": {
         "Location": {
           "x": 300.0,
-          "y": 100.0
+          "y": 100.0,
+          "z": 0.0
         }
-      },
+      ],
       "shape": "TRIANGLE"
     },
     {
       "group": "CyanSquare",
       "color": "CYAN",
-      "speed": 1.0,
+      "speed": 10.0,
       "direction": {
         "Location": {
           "x": 300.0,
-          "y": 100.0
+          "y": 100.0,
+          "z": 0.0
         }
-      },
+      ],
       "shape": "CIRCLE"
     }
   ],
@@ -43,21 +46,24 @@
       "group": "MagentaSquare",
       "location": {
         "x": 0.0,
-        "y": -20.0
+        "y": -120.0,
+        "z": 0.0
       }
     },
     {
       "group": "PinkSquare",
       "location": {
         "x": 0.0,
-        "y": 20.0
+        "y": 120.0,
+        "z": 0.0
       }
     },
     {
       "group": "CyanSquare",
       "location": {
         "x": 0.0,
-        "y": 0.0
+        "y": 0.0,
+        "z": 0.0
       }
     }
   ],

@@ -4,46 +4,97 @@
     {
       "group": "RedSquare",
       "color": "RED",
+<<<<<<< HEAD
       "speed": 20.0,
       "direction": "Random"
+=======
+      "speed": 10.0,
+      "directions": [
+        {
+          "Follow": [
+            "PinkSquare"
+          ]
+        }
+      ],
+      "shape": "RECTANGLE"
+>>>>>>> 56e1c7a92d39f2e6522d99f45870a4e31ed31665
     },
     {
       "group": "GreenSquare",
       "color": "GREEN",
+<<<<<<< HEAD
       "speed": 30.0,
       "direction": "Random"
+=======
+      "speed": 5.0,
+      "directions": [
+        {
+          "Escape": [
+            "PinkSquare"
+          ]
+        }
+      ],
+      "shape": "CIRCLE"
+>>>>>>> 56e1c7a92d39f2e6522d99f45870a4e31ed31665
     },
     {
       "group": "BlueSquare",
       "color": "BLUE",
       "speed": 50.0,
+<<<<<<< HEAD
       "direction": "Random"
+=======
+      "directions": [
+        "Random"
+      ],
+      "shape": "RECTANGLE"
+>>>>>>> 56e1c7a92d39f2e6522d99f45870a4e31ed31665
     },
     {
       "group": "PinkSquare",
       "color": "PINK",
+<<<<<<< HEAD
       "speed": 2.5,
       "direction": "Random"
+=======
+      "speed": 2.0,
+      "directions": [
+        {
+          "Follow": [
+            "GreenSquare"
+          ]
+        },
+        {
+          "Escape": [
+            "RedSquare"
+          ]
+        }
+      ],
+      "shape": "TRIANGLE"
+>>>>>>> 56e1c7a92d39f2e6522d99f45870a4e31ed31665
     }
   ],
   "entities": [
     {
       "group": "RedSquare",
       "location": {
-        "x": 20.0,
-        "y": 30.0
+        "x": -240.0,
+        "y": 10.0,
+        "z": -120.0
       }
     },
     {
       "group": "RedSquare",
       "location": {
-        "x": 22.0,
-        "y": 10.0
+        "x": -120.0,
+        "y": 10.0,
+        "z": -120.0
       }
     },
     {
       "group": "GreenSquare",
       "location": {
+<<<<<<< HEAD
         "x": 20.0,
         "y": 70.0
       }
@@ -53,20 +104,35 @@
       "location": {
         "x": 20.0,
         "y": 150.0
+=======
+        "x": 0.0,
+        "y": 10.0,
+        "z": 0.0
+>>>>>>> 56e1c7a92d39f2e6522d99f45870a4e31ed31665
       }
     },
     {
-      "group": "PinkSquare",
+      "group": "BlueSquare",
       "location": {
-        "x": 100.0,
-        "y": 150.0
+        "x": 0.0,
+        "y": 80.0,
+        "z": 0.0
       }
     },
     {
       "group": "PinkSquare",
       "location": {
         "x": 120.0,
-        "y": 150.0
+        "y": 10.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 240.0,
+        "y": 10.0,
+        "z": 0.0
       }
     }
   ],
