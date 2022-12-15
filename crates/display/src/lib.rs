@@ -11,6 +11,7 @@ pub mod states;
 #[derive(Resource)]
 pub struct ClientDisplay {
     pub profile: Profile,
+    pub is_toggled: bool,
 }
 
 impl ClientDisplay {

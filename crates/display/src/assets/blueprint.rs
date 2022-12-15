@@ -217,17 +217,5 @@ pub fn spawn_box(
                             ));
                         });
                 });
-        })
-        .with_children(|parent| {
-            parent.spawn(NodeBundle {
-                style: Style {
-                    position: UiRect::new(Val::Percent(85.), Val::Px(0.), Val::Px(0.), Val::Px(0.)),
-                    position_type: PositionType::Absolute,
-                    size: Size::new(Val::Percent(15.0), Val::Percent(100.0)),
-                    ..default()
-                },
-                background_color: Color::rgb_u8(52, 73, 94).into(),
-                ..default()
-            });
         });
 }
