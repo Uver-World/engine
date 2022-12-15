@@ -1,12 +1,11 @@
 use bevy::prelude::{
-    default, App, AssetServer, BuildChildren, Color, Commands, Component,
-    DespawnRecursiveExt, Entity, Input, KeyCode, NodeBundle, Plugin, Query, Res,
-    ResMut, State, SystemSet, With,
+    default, App, AssetServer, BuildChildren, Color, Commands, Component, DespawnRecursiveExt,
+    Entity, Input, KeyCode, NodeBundle, Plugin, Query, Res, ResMut, State, SystemSet, With,
 };
 use bevy::ui::{AlignContent, AlignItems, Display, FlexDirection, Size, Style, Val};
 
-use crate::assets::blueprint;
 use crate::assets::blueprint::drag;
+use crate::assets::blueprint::{self};
 use crate::assets::blueprint_structure::{BlueprintBase, Object};
 use crate::assets::button_blueprint::button_system;
 use crate::states::DisplayState;
@@ -47,9 +46,7 @@ pub fn construct(
         background_color: Color::rgba(0., 0., 0., 0.).into(),
         ..default()
     });
-    node.with_children(|parent| {
-        blueprint::spawn_blueprint(parent.spawn_empty(), &assets)
-    });
+    node.with_children(|parent| blueprint::spawn_blueprint(parent.spawn_empty(), &assets));
     node.with_children(|parent| blueprint::spawn_box(parent.spawn_empty(), &assets, windows, ass));
 }
 

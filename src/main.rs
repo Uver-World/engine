@@ -19,6 +19,11 @@ fn get_profile() -> Profile {
 fn main() {
     let profile = get_profile();
     profile.save();
+    let is_toggled = false;
 
-    ClientDisplay { profile }.run_display();
+    ClientDisplay {
+        profile,
+        is_toggled,
+    }
+    .run_display();
 }
