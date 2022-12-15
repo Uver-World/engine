@@ -48,6 +48,17 @@ pub fn is_in_rect(obj: Object, pos: Vec2) -> bool {
     // rect2.contains(pos)
 }
 
+#[derive(Resource, Debug)]
+pub struct Turn {
+    pub is_turn: f32,
+}
+
+impl Turn {
+    pub fn default() -> Self {
+        Self { is_turn: 0. }
+    }
+}
+
 pub fn drag(
     mut commands: Commands,
     buttons: Res<Input<MouseButton>>,
@@ -61,23 +72,31 @@ pub fn drag(
         &mut Transform,
     )>,
     mut cursor_state: ResMut<CursorState>,
+    mut turn: ResMut<Turn>,
 ) {
     for (_entity, _, mut object, mut style, mut transform) in &mut query {
+        let mut is_good = false;
+        let mut screen_pos = Vec2::new(0., 0.);
         if buttons.pressed(MouseButton::Left) {
-            cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed {
-                continue;
-            } else {
-                true
-            };
-            if object.is_dragable {
-                let wnd = windows.get_primary().unwrap();
-                if let Some(screen_pos) = wnd.cursor_position() {
-                    if is_in_rect(object.clone(), screen_pos) || object.is_pressed {
-                        cursor_state.is_dragging = true;
-                        object.pos = Vec2::new(screen_pos.x - object.size.x / 2., screen_pos.y);
-                    } else {
+            turn.is_turn += 1.;
+            let wnd = windows.get_primary().unwrap();
+            if let Some(screen_posb) = wnd.cursor_position() {
+                if is_in_rect(object.clone(), screen_posb) || object.is_pressed {
+                    is_good = true;
+                    screen_pos = screen_posb;
+                } else {
+                    if !cursor_state.is_dragging {
                         continue;
                     }
+                }
+            }
+            cursor_state.is_clicked = if cursor_state.is_clicked && !object.is_pressed { println!("cursor {:?} {:?}", cursor_state, turn); continue; } else { true };
+            println!("drag: {:?}", object);
+            if object.is_dragable {
+                println!("dragable: {}", object.name);
+                if is_good {
+                    cursor_state.is_dragging = true;
+                    object.pos = Vec2::new(screen_pos.x - object.size.x / 2., screen_pos.y);
                 }
                 style.position = object.get_rect();
                 transform.translation = object.pos.extend(0.);
@@ -85,13 +104,14 @@ pub fn drag(
             }
         } else if cursor_state.is_clicked {
             if !cursor_state.is_dragging {
+                println!("click without drag");
                 cursor_state.is_clicked = false;
             } else if object.is_pressed {
                 println!("clone");
                 (cursor_state.is_clicked, cursor_state.is_dragging, object.is_dragable, object.is_pressed) = (false, false, false, false);
                 let cpy = object.clone_at(object.init_pos);
-                cpy.spawn(commands.spawn_empty());
-                commands.entity(_entity).insert(cpy);
+                let mut empty = commands.spawn_empty();
+                cpy.spawn(&mut empty);
                 client.profile.add_entity(object.obj.clone());
                 object.is_placed = true;
             }
@@ -122,7 +142,7 @@ pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
 }
 
 pub fn spawn_blueprint(
-    commands: EntityCommands,
+    mut commands: EntityCommands,
     _assets: &Assets,
 ) {
     let group = EntityGroup {
@@ -141,7 +161,7 @@ pub fn spawn_blueprint(
         Vec2::new(100., 50.),
         Entity { group, location },
     );
-    obj.spawn(commands);
+    obj.spawn(&mut commands);
 }
 
 pub fn spawn_box(
