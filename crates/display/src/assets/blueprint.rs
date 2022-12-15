@@ -35,8 +35,17 @@ pub fn get_world_pos(
 
 pub fn is_in_rect(obj: Object, pos: Vec2) -> bool {
     // return true;
-    println!("pos: {:?}; point: {:?}; size: {:?}; final pos: {:?}", obj.pos, pos, obj.size, obj.pos + obj.size);
-    pos.x >= obj.pos.x && pos.x <= obj.pos.x + obj.size.x && pos.y >= obj.pos.y && pos.y <= obj.pos.y + obj.size.y
+    println!(
+        "pos: {:?}; point: {:?}; size: {:?}; final pos: {:?}",
+        obj.pos,
+        pos,
+        obj.size,
+        obj.pos + obj.size
+    );
+    pos.x >= obj.pos.x
+        && pos.x <= obj.pos.x + obj.size.x
+        && pos.y >= obj.pos.y
+        && pos.y <= obj.pos.y + obj.size.y
     // let rect: Rect = Rect {
     //     min: obj.pos,
     //     max: obj.pos + obj.size,
@@ -88,7 +97,12 @@ pub fn drag(
                 cursor_state.is_clicked = false;
             } else if object.is_pressed {
                 println!("clone");
-                (cursor_state.is_clicked, cursor_state.is_dragging, object.is_dragable, object.is_pressed) = (false, false, false, false);
+                (
+                    cursor_state.is_clicked,
+                    cursor_state.is_dragging,
+                    object.is_dragable,
+                    object.is_pressed,
+                ) = (false, false, false, false);
                 let cpy = object.clone_at(object.init_pos);
                 cpy.spawn(commands.spawn_empty());
                 commands.entity(_entity).insert(cpy);
@@ -121,10 +135,7 @@ pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
     commands.insert_resource(ui_assets);
 }
 
-pub fn spawn_blueprint(
-    commands: EntityCommands,
-    _assets: &Assets,
-) {
+pub fn spawn_blueprint(commands: EntityCommands, _assets: &Assets) {
     let group = EntityGroup {
         group: "todo!()".to_string(),
         color: client_profile::models::color::Color::Red,
