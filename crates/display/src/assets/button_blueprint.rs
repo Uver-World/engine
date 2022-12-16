@@ -24,7 +24,7 @@ pub fn button_system(
             Interaction::Clicked => {
                 for entity in &mut entity {
                     commands.entity(entity).with_children(|parent| {
-                        spawn_blueprint(parent.spawn_empty(), &assets, Vec2 { x: 1., y: 80. })
+                        spawn_blueprint(parent.spawn_empty(), &assets, Vec2 { x: 1., y: 87. })
                     });
                 }
                 text.sections[0].style.color = Color::rgb_u8(0, 0, 0).into();
