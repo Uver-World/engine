@@ -63,6 +63,7 @@ pub fn draw_modal(
                                 size: Size::new(Val::Percent(100.0), Val::Percent(10.0)),
                                 ..default()
                             },
+                            background_color: Color::rgb_u8(123, 139, 156).into(),
                             ..default()
                         })
                         .add_children(|parent| {

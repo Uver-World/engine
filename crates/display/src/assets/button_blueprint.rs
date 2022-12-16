@@ -23,8 +23,8 @@ pub fn button_system(
         let mut text = text_query.get_mut(children[0]).unwrap();
         match *interaction {
             Interaction::Clicked => {
+                text.sections[0].style.color = Color::rgb_u8(0, 0, 0).into();
                 if text.sections[0].value == "+" {
-                    text.sections[0].style.color = Color::rgb_u8(0, 0, 0).into();
                     client_display.is_toggled = true;
                     let mut i = 1.0;
                     let mut temp = Val::Percent(i);
@@ -41,6 +41,7 @@ pub fn button_system(
                     temp = Val::Percent(i);
                     style.position.left = temp;
                 }
+                if text.sections[0].value == "Valider" {}
             }
             Interaction::Hovered => {
                 text.sections[0].style.color = Color::rgb_u8(100, 100, 100).into()
