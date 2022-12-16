@@ -36,7 +36,6 @@ pub fn get_world_pos(
 }
 
 pub fn is_in_rect(obj: Object, pos: Vec2) -> bool {
-    // return true;
     println!(
         "pos: {:?}; point: {:?}; size: {:?}; final pos: {:?}",
         obj.pos,
@@ -48,15 +47,6 @@ pub fn is_in_rect(obj: Object, pos: Vec2) -> bool {
         && pos.x <= obj.pos.x + obj.size.x
         && pos.y >= obj.pos.y
         && pos.y <= obj.pos.y + obj.size.y
-    // let rect: Rect = Rect {
-    //     min: obj.pos,
-    //     max: obj.pos + obj.size,
-    // };
-    // let rect2: Rect = Rect {
-    //     min: obj.pos,
-    //     max: obj.pos - obj.size,
-    // };
-    // rect2.contains(pos)
 }
 
 #[derive(Resource, Debug)]
@@ -139,19 +129,6 @@ pub fn drag(
         }
     }
 }
-
-/*                 Ex get entity                */
-/*
-        match client
-            .profile
-            .get_entity(|entity| entity.group.group == "Hello")
-        {
-            Some(entity) => {
-                entity.group.group = "NoHello".to_string();
-            }
-            None => {}
-        }
-*/
 
 pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
     let ui_assets = Assets {

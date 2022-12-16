@@ -86,7 +86,7 @@ impl Profile {
         &self.entities
     }
 
-    pub fn get_entit_groups(&self) -> &Vec<EntityGroup> {
+    pub fn get_entity_groups(&self) -> &Vec<EntityGroup> {
         &self.entity_groups
     }
 

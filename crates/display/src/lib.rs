@@ -33,7 +33,6 @@ impl ClientDisplay {
                 window: self.get_window(),
                 ..default()
             }))
-            // .add_startup_system(cameras::spawn_camera)
             .add_startup_system(assets::loading_screen::load_assets)
             .add_startup_system(assets::blueprint::load_assets)
             .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())

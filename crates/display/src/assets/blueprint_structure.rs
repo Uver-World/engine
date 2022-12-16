@@ -40,20 +40,13 @@ impl Object {
         size: Vec2,
         obj: Entity,
     ) -> Self {
-        // let transform = Transform {
-        //     translation: Vec3::new(0., 0., 0.),
-        //     // translation: Vec3::new(get_world_pos(&wnds, &q_camera, pos).x, get_world_pos(&wnds, &q_camera, pos).y, 0.),
-        //     scale: Vec3::new(1., 1., 1.),
-        //     ..Default::default()
-        // };
-        // println!("{:?}", transform.translation);
         let bund = ImageBundle {
             style: Style {
                 align_self: AlignSelf::Center,
                 position_type: PositionType::Absolute,
                 position: UiRect {
-                    left: Val::Px(pos.x),
-                    top: Val::Px(pos.y),
+                    left: Val::Percent(pos.x),
+                    top: Val::Percent(pos.y),
                     ..default()
                 },
                 size: Size {
@@ -63,7 +56,6 @@ impl Object {
                 ..default()
             },
             transform: Transform::default(),
-            // transform,
             image: asset.icon.clone().into(),
             ..default()
         };

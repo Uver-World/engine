@@ -1,6 +1,7 @@
 use bevy::prelude::{
-    default, App, AssetServer, BuildChildren, Color, Commands, Component, DespawnRecursiveExt,
-    Entity, Input, KeyCode, NodeBundle, Plugin, Query, Res, ResMut, State, SystemSet, With,
+    default, App, AssetServer, BuildChildren, Camera2dBundle, Color, Commands, Component,
+    DespawnRecursiveExt, Entity, Input, KeyCode, NodeBundle, Plugin, Query, Res, ResMut, State,
+    SystemSet, With,
 };
 use bevy::ui::{AlignContent, AlignItems, Display, FlexDirection, Size, Style, Val};
 
@@ -33,6 +34,7 @@ pub fn construct(
     windows: Res<bevy::window::Windows>,
     ass: Res<AssetServer>,
 ) {
+    commands.spawn(Camera2dBundle::default()).insert(Blueprint);
     let mut node = commands.spawn(Blueprint);
     node.insert(NodeBundle {
         style: Style {

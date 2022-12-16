@@ -1,4 +1,3 @@
-
 use bevy::prelude::*;
 use bevy::{ecs::system::Query, text::Text, ui::Interaction};
 
@@ -23,30 +22,9 @@ pub fn button_system(
         let mut text = text_query.get_mut(children[0]).unwrap();
         match *interaction {
             Interaction::Clicked => {
-                // node.insert(NodeBundle {
-                //     style: Style {
-                //         display: Display::Flex,
-                //         flex_direction: FlexDirection::Column,
-                //         size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-                //         align_items: AlignItems::Center,
-                //         align_content: AlignContent::Center,
-
-                //         ..default()
-                //     },
-                //     background_color: Color::rgba(0., 0., 0., 0.).into(),
-                //     ..default()
-                // });
-                // let ent = entity.iter().last();
                 for entity in &mut entity {
                     commands.entity(entity).with_children(|parent| {
-                        spawn_blueprint(
-                            parent.spawn_empty(),
-                            &assets,
-                            Vec2 {
-                                x: wnd.get_primary().unwrap().width() * 0.1,
-                                y: wnd.get_primary().unwrap().height() * 0.8,
-                            },
-                        )
+                        spawn_blueprint(parent.spawn_empty(), &assets, Vec2 { x: 1., y: 80. })
                     });
                 }
                 text.sections[0].style.color = Color::rgb_u8(0, 0, 0).into();
