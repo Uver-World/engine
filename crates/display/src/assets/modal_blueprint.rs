@@ -29,22 +29,241 @@ pub fn draw_modal(
                 })
                 .with_children(|parent| {
                     // Spawn du coté gauche
-                    parent.spawn(NodeBundle {
-                        style: Style {
-                            position: UiRect::new(
-                                Val::Px(0.),
-                                Val::Px(0.),
-                                Val::Px(0.),
-                                Val::Px(0.),
-                            ),
-                            justify_content: JustifyContent::FlexStart,
-                            align_items: AlignItems::Center,
-                            position_type: PositionType::Absolute,
-                            size: Size::new(Val::Percent(50.0), Val::Percent(90.0)),
+                    parent
+                        .spawn(NodeBundle {
+                            style: Style {
+                                flex_wrap: FlexWrap::Wrap,
+                                position: UiRect::new(
+                                    Val::Px(0.),
+                                    Val::Px(0.),
+                                    Val::Px(0.),
+                                    Val::Px(0.),
+                                ),
+                                justify_content: JustifyContent::FlexStart,
+                                align_items: AlignItems::Center,
+                                position_type: PositionType::Absolute,
+                                size: Size::new(Val::Percent(50.0), Val::Percent(90.0)),
+                                ..default()
+                            },
                             ..default()
-                        },
-                        ..default()
-                    });
+                        })
+                        .with_children(|parent| {
+                            parent
+                                .spawn(ButtonBundle {
+                                    style: Style {
+                                        position: UiRect::new(
+                                            Val::Percent(5.),
+                                            Val::Px(0.),
+                                            Val::Percent(1.),
+                                            Val::Percent(1.),
+                                        ),
+                                        size: Size::new(Val::Percent(90.0), Val::Percent(10.0)),
+                                        align_items: AlignItems::Center,
+                                        ..default()
+                                    },
+                                    background_color: Color::rgb(0.8, 0.8, 0.8).into(),
+                                    ..default()
+                                })
+                                .with_children(|parent| {
+                                    parent.spawn(TextBundle::from_section(
+                                        " Nom du groupe",
+                                        TextStyle {
+                                            font: ass.load("FiraCode-Regular.ttf"),
+                                            font_size: 20.0,
+                                            color: Color::rgb(1.0, 1., 1.0),
+                                        },
+                                    ));
+                                });
+                        })
+                        .with_children(|parent| {
+                            parent
+                                .spawn(ButtonBundle {
+                                    style: Style {
+                                        position: UiRect::new(
+                                            Val::Percent(5.),
+                                            Val::Px(0.),
+                                            Val::Percent(1.),
+                                            Val::Percent(1.),
+                                        ),
+                                        size: Size::new(Val::Percent(90.0), Val::Percent(10.0)),
+                                        align_items: AlignItems::Center,
+                                        ..default()
+                                    },
+                                    background_color: Color::rgb(0.8, 0.8, 0.8).into(),
+                                    ..default()
+                                })
+                                .with_children(|parent| {
+                                    parent.spawn(TextBundle::from_section(
+                                        " Couleur",
+                                        TextStyle {
+                                            font: ass.load("FiraCode-Regular.ttf"),
+                                            font_size: 20.0,
+                                            color: Color::rgb(1.0, 1., 1.0),
+                                        },
+                                    ));
+                                });
+                        })
+                        .with_children(|parent| {
+                            parent
+                                .spawn(ButtonBundle {
+                                    style: Style {
+                                        position: UiRect::new(
+                                            Val::Percent(5.),
+                                            Val::Px(0.),
+                                            Val::Percent(1.),
+                                            Val::Percent(1.),
+                                        ),
+                                        size: Size::new(Val::Percent(90.0), Val::Percent(10.0)),
+                                        align_items: AlignItems::Center,
+                                        ..default()
+                                    },
+                                    background_color: Color::rgb(0.8, 0.8, 0.8).into(),
+                                    ..default()
+                                })
+                                .with_children(|parent| {
+                                    parent.spawn(TextBundle::from_section(
+                                        " Vitesse",
+                                        TextStyle {
+                                            font: ass.load("FiraCode-Regular.ttf"),
+                                            font_size: 20.0,
+                                            color: Color::rgb(1.0, 1., 1.0),
+                                        },
+                                    ));
+                                });
+                        })
+                        .with_children(|parent| {
+                            parent
+                                .spawn(ButtonBundle {
+                                    style: Style {
+                                        position: UiRect::new(
+                                            Val::Percent(5.),
+                                            Val::Px(0.),
+                                            Val::Percent(1.),
+                                            Val::Percent(1.),
+                                        ),
+                                        size: Size::new(Val::Percent(90.0), Val::Percent(10.0)),
+                                        align_items: AlignItems::Center,
+                                        ..default()
+                                    },
+                                    background_color: Color::rgb(0.8, 0.8, 0.8).into(),
+                                    ..default()
+                                })
+                                .with_children(|parent| {
+                                    parent.spawn(TextBundle::from_section(
+                                        " Forme",
+                                        TextStyle {
+                                            font: ass.load("FiraCode-Regular.ttf"),
+                                            font_size: 20.0,
+                                            color: Color::rgb(1.0, 1., 1.0),
+                                        },
+                                    ));
+                                });
+                        });
+                })
+                .with_children(|parent| {
+                    // Spawn du coté droit
+                    parent
+                        .spawn(NodeBundle {
+                            style: Style {
+                                flex_wrap: FlexWrap::Wrap,
+                                position: UiRect::new(
+                                    Val::Percent(50.),
+                                    Val::Px(0.),
+                                    Val::Px(0.),
+                                    Val::Px(0.),
+                                ),
+                                justify_content: JustifyContent::FlexStart,
+                                align_items: AlignItems::Center,
+                                position_type: PositionType::Absolute,
+                                size: Size::new(Val::Percent(50.0), Val::Percent(90.0)),
+                                ..default()
+                            },
+                            ..default()
+                        })
+                        .with_children(|parent| {
+                            parent
+                                .spawn(ButtonBundle {
+                                    style: Style {
+                                        position: UiRect::new(
+                                            Val::Percent(5.),
+                                            Val::Px(0.),
+                                            Val::Percent(1.),
+                                            Val::Percent(1.),
+                                        ),
+                                        size: Size::new(Val::Percent(90.0), Val::Percent(10.0)),
+                                        align_items: AlignItems::Center,
+                                        ..default()
+                                    },
+                                    background_color: Color::rgb(0.8, 0.8, 0.8).into(),
+                                    ..default()
+                                })
+                                .with_children(|parent| {
+                                    parent.spawn(TextBundle::from_section(
+                                        " Suit",
+                                        TextStyle {
+                                            font: ass.load("FiraCode-Regular.ttf"),
+                                            font_size: 20.0,
+                                            color: Color::rgb(1.0, 1., 1.0),
+                                        },
+                                    ));
+                                });
+                        })
+                        .with_children(|parent| {
+                            parent
+                                .spawn(ButtonBundle {
+                                    style: Style {
+                                        position: UiRect::new(
+                                            Val::Percent(5.),
+                                            Val::Px(0.),
+                                            Val::Percent(1.),
+                                            Val::Percent(1.),
+                                        ),
+                                        size: Size::new(Val::Percent(90.0), Val::Percent(10.0)),
+                                        align_items: AlignItems::Center,
+                                        ..default()
+                                    },
+                                    background_color: Color::rgb(0.8, 0.8, 0.8).into(),
+                                    ..default()
+                                })
+                                .with_children(|parent| {
+                                    parent.spawn(TextBundle::from_section(
+                                        " Fuit",
+                                        TextStyle {
+                                            font: ass.load("FiraCode-Regular.ttf"),
+                                            font_size: 20.0,
+                                            color: Color::rgb(1.0, 1., 1.0),
+                                        },
+                                    ));
+                                });
+                        })
+                        .with_children(|parent| {
+                            parent
+                                .spawn(ButtonBundle {
+                                    style: Style {
+                                        position: UiRect::new(
+                                            Val::Percent(5.),
+                                            Val::Px(0.),
+                                            Val::Percent(1.),
+                                            Val::Percent(1.),
+                                        ),
+                                        size: Size::new(Val::Percent(90.0), Val::Percent(10.0)),
+                                        align_items: AlignItems::Center,
+                                        ..default()
+                                    },
+                                    background_color: Color::rgb(0.8, 0.8, 0.8).into(),
+                                    ..default()
+                                })
+                                .with_children(|parent| {
+                                    parent.spawn(TextBundle::from_section(
+                                        " Se rend à la direction",
+                                        TextStyle {
+                                            font: ass.load("FiraCode-Regular.ttf"),
+                                            font_size: 20.0,
+                                            color: Color::rgb(1.0, 1., 1.0),
+                                        },
+                                    ));
+                                });
+                        });
                 })
                 .with_children(|parent| {
                     // Spawn du footer
@@ -66,7 +285,7 @@ pub fn draw_modal(
                             background_color: Color::rgb_u8(123, 139, 156).into(),
                             ..default()
                         })
-                        .add_children(|parent| {
+                        .with_children(|parent| {
                             parent
                                 .spawn(ButtonBundle {
                                     style: Style {
