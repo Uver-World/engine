@@ -16,7 +16,6 @@ pub fn button_system(
     assets: Res<blueprint::Assets>,
     mut commands: Commands,
     mut entity: Query<Entity, With<Blueprint>>,
-    wnd: Res<Windows>,
 ) {
     for (interaction, children, mut style, _transform) in &mut interaction_query {
         let mut text = text_query.get_mut(children[0]).unwrap();
