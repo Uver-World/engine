@@ -7,13 +7,30 @@
       "speed": 1.5,
       "directions": [
         {
-          "Escape": [
-            "Snake"
-          ]
-        },
-        {
           "Follow": [
             "Chicken"
+          ]
+        }
+      ],
+      "shape": "RECTANGLE"
+    },
+    {
+      "group": "Random",
+      "color": "MAGENTA",
+      "speed": 5.0,
+      "directions": [
+        "Random"
+      ],
+      "shape": "RECTANGLE"
+    },
+    {
+      "group": "FollowRandom",
+      "color": "PINK",
+      "speed": 1.5,
+      "directions": [
+        {
+          "Follow": [
+            "Random"
           ]
         }
       ],
@@ -24,11 +41,6 @@
       "color": "GREEN",
       "speed": 2.0,
       "directions": [
-        {
-          "Escape": [
-            "Chicken"
-          ]
-        },
         {
           "Follow": [
             "Fox"
@@ -42,11 +54,6 @@
       "color": "GRAY",
       "speed": 1.0,
       "directions": [
-        {
-          "Escape": [
-            "Fox"
-          ]
-        },
         {
           "Follow": [
             "Snake"
@@ -68,7 +75,7 @@
     {
       "group": "Snake",
       "location": {
-        "x": -320.0,
+        "x": -520.0,
         "y": 10.0,
         "z": 0.0
       }
@@ -76,9 +83,25 @@
     {
       "group": "Chicken",
       "location": {
-        "x": 320.0,
+        "x": 500.0,
         "y": 10.0,
         "z": 320.0
+      }
+    },
+    {
+      "group": "Random",
+      "location": {
+        "x": 50.0,
+        "y": 10.0,
+        "z": 20.0
+      }
+    },
+    {
+      "group": "FollowRandom",
+      "location": {
+        "x": 5.0,
+        "y": 10.0,
+        "z": -20.0
       }
     }
   ],
