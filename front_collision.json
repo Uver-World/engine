@@ -9,12 +9,12 @@
         {
           "Location": {
             "x": -2000.0,
-            "y": 0.0,
+            "y": 20.0,
             "z": 0.0
           }
         }
       ],
-      "shape": "BALL"
+      "shape": "RECTANGLE"
     },
     {
       "group": "PinkSquare",
@@ -30,8 +30,8 @@
     {
       "group": "MagentaSquare",
       "location": {
-        "x": 320.0,
-        "y": 0.0,
+        "x": 480.0,
+        "y": 20.0,
         "z": 0.0
       }
     },
@@ -79,6 +79,54 @@
       "group": "PinkSquare",
       "location": {
         "x": 0.0,
+        "y": 50.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 10.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 10.0,
+        "z": 20.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 10.0,
+        "z": -20.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 30.0,
+        "z": -10.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 30.0,
+        "z": 10.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
         "y": 50.0,
         "z": 0.0
       }
