@@ -155,7 +155,7 @@ pub fn spawn_blueprint(mut commands: EntityCommands, _assets: &Assets, pos: Vec2
     let obj = Object::new(
         _assets,
         "Button 1".to_string(),
-        "First button".to_string(),
+        "\nFirst button".to_string(),
         true,
         false,
         Vec2::new(pos.x, pos.y),
