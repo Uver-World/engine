@@ -2,6 +2,7 @@ Neutralino.init();
 
 import { square, canvas, context, drawSquare } from "./vars.js";
 import { openSquareContextMenu } from "./openSquare.js";
+import { openFile } from "./openFile.js";
 let squares = [];
 
 canvas.addEventListener("mousedown", (event) => {
@@ -71,11 +72,24 @@ Neutralino.events.on("load", async () => {
 Neutralino.events.on('windowClose', () => {
     Neutralino.app.exit();
 });
+
 const save_button = document.getElementById("save-button");
+const load_button = document.getElementById("load-button");
+
 save_button.addEventListener("click", (event) => {
     event.preventDefault();
     let data = JSON.stringify(squares);
     Neutralino.filesystem.writeFile('./resources/saves/squares.json', data);
 });
 
+load_button.addEventListener("click", async (event) => {
+    event.preventDefault();
+    const filename = await openFile();
+    const data = await Neutralino.filesystem.readFile(filename);
+    squares = JSON.parse(data);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < squares.length; i++) {
+        drawSquare(squares[i].x, squares[i].y, squares[i].fillStyle);
+    }
+});
 // getUsername();
