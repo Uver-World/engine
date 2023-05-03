@@ -85,6 +85,7 @@ save_button.addEventListener("click", (event) => {
 load_button.addEventListener("click", async (event) => {
     event.preventDefault();
     const filename = await openFile();
+    if (!filename) return;
     const data = await Neutralino.filesystem.readFile(filename);
     squares = JSON.parse(data);
     context.clearRect(0, 0, canvas.width, canvas.height);
