@@ -52,7 +52,18 @@ canvas.addEventListener("mouseup", (event) => {
 
 Neutralino.window.setTitle("Ma fenêtre NeutralinoJS");
 Neutralino.window.setSize(300, 300);
-Neutralino.events.on("load", () => {
+Neutralino.events.on("load", async () => {
+    try {
+        let fileId = await Neutralino.filesystem.openFile('./resources/saves/squares.json');
+        let content = await Neutralino.filesystem.readFile('./resources/saves/squares.json');
+        squares = JSON.parse(content);
+        for (let i = 0; i < squares.length; i++) {
+            drawSquare(squares[i].x, squares[i].y, squares[i].fillStyle);
+        }
+        return;
+    } catch (e) {
+        console.error(e);
+    }
     let newSquare = Object.assign({}, square);;
     squares.push(newSquare)
     drawSquare(newSquare.x, newSquare.y, square.fillStyle);
@@ -60,4 +71,11 @@ Neutralino.events.on("load", () => {
 Neutralino.events.on('windowClose', () => {
     Neutralino.app.exit();
 });
+const save_button = document.getElementById("save-button");
+save_button.addEventListener("click", (event) => {
+    event.preventDefault();
+    let data = JSON.stringify(squares);
+    Neutralino.filesystem.writeFile('./resources/saves/squares.json', data);
+});
+
 // getUsername();
