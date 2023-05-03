@@ -30,6 +30,7 @@ const handleDraggableChange = () => {
 
 const handleColorInputChange = () => {
     square.fillStyle = colorInput.value;
+    drawSquare(square.x, square.y, square.fillStyle);
 };
 
 const updatePopupInputs = (squarep) => {
