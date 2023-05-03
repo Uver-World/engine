@@ -1,0 +1,33 @@
+#canvas {
+    border: 1px solid black;
+    cursor: default;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Roboto-Thin;
+    /* font-family: Arial; */
+}
+
+h1 {
+    margin: 0;
+    padding: 0;
+}
+
+form {
+    margin: 10px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="number"] {
+    width: 50px;
+}
+
+input[type="color"] {
+    width: 50px;
+}
