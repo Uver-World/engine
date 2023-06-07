@@ -17,3 +17,5 @@ Cargo.lock
 .vscode/
 
 new_project.json
+
+.env
