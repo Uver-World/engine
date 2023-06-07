@@ -3,7 +3,7 @@ use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct LoadingBar {
-    pub val: f32
+    pub val: f32,
 }
 
 #[derive(Resource)]
@@ -29,7 +29,7 @@ pub fn spawn_loading_bar(mut commands: EntityCommands, _assets: &Assets) {
                 align_self: AlignSelf::Center,
                 ..default()
             },
-            visibility: Visibility { is_visible: true },
+            visibility: Visibility::Visible,
             background_color: Color::rgb(91., 91., 91.).into(),
             ..default()
         })
@@ -43,16 +43,15 @@ pub fn spawn_loading_bar(mut commands: EntityCommands, _assets: &Assets) {
                             left: Val::Px(3.0),
                             right: Val::Px(3.0),
                             top: Val::Px(3.0),
-                            bottom: Val::Px(3.0)
+                            bottom: Val::Px(3.0),
                         },
                         ..default()
                     },
-                    visibility: Visibility { is_visible: true },
+                    visibility: Visibility::Visible,
                     background_color: Color::rgb(0., 0., 0.).into(),
                     ..default()
-                }).insert(LoadingBar {
-                    val: 0.0,
-                });
+                })
+                .insert(LoadingBar { val: 0.0 });
         });
 }
 

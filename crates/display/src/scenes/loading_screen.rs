@@ -8,17 +8,15 @@ pub struct LoadingScreen;
 
 impl Plugin for LoadingScreen {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(DisplayState::LoadingScreen).with_system(construct))
-            .add_system_set(SystemSet::on_exit(DisplayState::LoadingScreen).with_system(destroy))
-            .add_system_set(
-                SystemSet::on_update(DisplayState::LoadingScreen).with_system(update_status),
-            );
+        app.add_system(construct.in_schedule(OnEnter(DisplayState::LoadingScreen)))
+            .add_system(destroy.in_schedule(OnExit(DisplayState::LoadingScreen)))
+            .add_system(update_status.in_set(OnUpdate(DisplayState::LoadingScreen)));
     }
 }
 
 fn update_status(
     mut query: Query<(&mut Style, &mut loading_screen::LoadingBar)>,
-    mut app_state: ResMut<State<DisplayState>>,
+    mut app_state: ResMut<NextState<DisplayState>>,
 ) {
     for (mut style, mut loading_bar) in query.iter_mut() {
         if loading_bar.val < 100.0 {
@@ -30,7 +28,7 @@ fn update_status(
             }
             style.size.width = Val::Percent(loading_bar.val);
         } else {
-            app_state.set(DisplayState::SimulateScreen).unwrap();
+            app_state.set(DisplayState::SimulateScreen);
         }
     }
 }

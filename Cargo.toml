@@ -13,3 +13,4 @@ members = [
 [dependencies]
 client-display = { path = "crates/display/" }
 client-profile = { path  = "crates/profile/" }
+dotenv = "0.15.0"
