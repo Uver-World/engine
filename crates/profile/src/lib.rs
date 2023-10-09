@@ -26,7 +26,7 @@ pub struct Profile {
 impl Profile {
     pub fn new(project_name: String) -> Self {
         Self {
-            project_name: project_name,
+            project_name,
             entity_groups: Vec::new(),
             entities: Vec::new(),
             surface_groups: Vec::new(),
@@ -57,30 +57,6 @@ impl Profile {
             serde_json::to_string_pretty(self).unwrap(),
         )
         .unwrap();
-    }
-
-    pub fn get_entity<P>(&mut self, mut filter: P) -> Option<&mut Entity>
-    where
-        P: FnMut(&Entity) -> bool,
-    {
-        for entity in &mut self.entities {
-            if filter(entity) {
-                return Some(entity);
-            }
-        }
-        None
-    }
-
-    pub fn get_group<P>(&mut self, mut filter: P) -> Option<&mut EntityGroup>
-    where
-        P: FnMut(&EntityGroup) -> bool,
-    {
-        for entity_group in &mut self.entity_groups {
-            if filter(entity_group) {
-                return Some(entity_group);
-            }
-        }
-        None
     }
 
     pub fn get_entities(&self) -> &Vec<Entity> {
@@ -131,17 +107,13 @@ impl<'de> de::Deserialize<'de> for Profile {
                 let project_name = seq
                     .next_element()?
                     .ok_or_else(|| de::Error::invalid_length(0, &self))?;
-                let entity_groups: Vec<EntityGroup> = Vec::new();
-                let entities: Vec<Entity> = Vec::new();
-                let surface_groups: Vec<SurfaceGroup> = Vec::new();
-                let surfaces: Vec<Surface> = Vec::new();
 
                 Ok(Profile {
                     project_name,
-                    entity_groups,
-                    entities,
-                    surface_groups,
-                    surfaces,
+                    entity_groups: Vec::new(),
+                    entities: Vec::new(),
+                    surface_groups: Vec::new(),
+                    surfaces: Vec::new(),
                 })
             }
 
