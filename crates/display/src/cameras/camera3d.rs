@@ -14,7 +14,7 @@ pub struct Camera3D {
     pub pan_button: MouseButton,
     pub pitch_range: RangeInclusive<f32>,
     pub zoom_sensitivity: f32,
-    pub move_sensitivy: f32,
+    pub move_sensitivity: f32,
 }
 
 impl Default for Camera3D {
@@ -30,7 +30,7 @@ impl Default for Camera3D {
             pan_button: MouseButton::Right,
             pitch_range: 0.01..=3.13,
             zoom_sensitivity: 0.8,
-            move_sensitivy: 300.,
+            move_sensitivity: 300.,
         }
     }
 }
@@ -85,36 +85,29 @@ impl Camera3DPlugin {
         mut query: Query<(&mut Camera3D, &mut Transform, &mut Camera)>,
     ) {
         for (mut camera, transform, _) in query.iter_mut() {
+            let delta = camera.move_sensitivity * time.delta_seconds();
+            let mut pan_vector = Vec3::ZERO;
+
             if keys.pressed(KeyCode::Z) {
-                let front_dir = transform.rotation * -Vec3::Z;
-                let pan_vector = front_dir * camera.move_sensitivy * time.delta_seconds();
-                camera.center += pan_vector;
+                pan_vector += transform.rotation * -Vec3::Z;
             }
             if keys.pressed(KeyCode::S) {
-                let front_dir = transform.rotation * Vec3::Z;
-                let pan_vector = front_dir * camera.move_sensitivy * time.delta_seconds();
-                camera.center += pan_vector;
+                pan_vector += transform.rotation * Vec3::Z;
             }
             if keys.pressed(KeyCode::Space) {
-                let up_dir = transform.rotation * Vec3::Y;
-                let pan_vector = up_dir * camera.move_sensitivy * time.delta_seconds();
-                camera.center += pan_vector;
+                pan_vector += transform.rotation * Vec3::Y;
             }
             if keys.pressed(KeyCode::ShiftLeft) {
-                let up_dir = transform.rotation * -Vec3::Y;
-                let pan_vector = up_dir * camera.move_sensitivy * time.delta_seconds();
-                camera.center += pan_vector;
+                pan_vector += transform.rotation * -Vec3::Y;
             }
             if keys.pressed(KeyCode::Q) {
-                let right_dir = transform.rotation * -Vec3::X;
-                let pan_vector = right_dir * camera.move_sensitivy * time.delta_seconds();
-                camera.center += pan_vector;
+                pan_vector += transform.rotation * -Vec3::X;
             }
             if keys.pressed(KeyCode::D) {
-                let right_dir = transform.rotation * Vec3::X;
-                let pan_vector = right_dir * camera.move_sensitivy * time.delta_seconds();
-                camera.center += pan_vector;
+                pan_vector += transform.rotation * Vec3::X;
             }
+
+            camera.center += pan_vector * delta;
         }
     }
 
