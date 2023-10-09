@@ -47,13 +47,10 @@ impl ClientDisplay {
                 ..default()
             }))
             .add_state::<DisplayState>()
-            .add_startup_system(assets::loading_screen::load_assets)
-            .add_startup_system(matchbox_socket::start_matchbox_socket)
-            .add_system(matchbox_socket::check_peers)
-            .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-            .add_plugin(RapierDebugRenderPlugin::default())
-            .add_plugin(scenes::loading_screen::LoadingScreen)
-            .add_plugin(scenes::simulate_screen::SimulateScreen)
+            .add_systems(Startup, (assets::loading_screen::load_assets, matchbox_socket::start_matchbox_socket))
+            .add_systems(Update,matchbox_socket::check_peers)
+            .add_plugins((RapierPhysicsPlugin::<NoUserData>::default(), RapierDebugRenderPlugin::default()))
+            .add_plugins((scenes::loading_screen::LoadingScreen, scenes::simulate_screen::SimulateScreen))
             .insert_resource(self)
             .run();
         close_matchbox_socket(&api);

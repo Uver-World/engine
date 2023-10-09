@@ -8,9 +8,9 @@ pub struct LoadingScreen;
 
 impl Plugin for LoadingScreen {
     fn build(&self, app: &mut App) {
-        app.add_system(construct.in_schedule(OnEnter(DisplayState::LoadingScreen)))
-            .add_system(destroy.in_schedule(OnExit(DisplayState::LoadingScreen)))
-            .add_system(update_status.in_set(OnUpdate(DisplayState::LoadingScreen)));
+        app.add_systems(OnEnter(DisplayState::LoadingScreen),construct)
+            .add_systems(OnExit(DisplayState::LoadingScreen), destroy)
+            .add_systems(Update, update_status.run_if(in_state(DisplayState::LoadingScreen)));
     }
 }
 
@@ -26,7 +26,7 @@ fn update_status(
             } else {
                 loading_bar.val += r;
             }
-            style.size.width = Val::Percent(loading_bar.val);
+            style.width = Val::Percent(loading_bar.val);
         } else {
             app_state.set(DisplayState::SimulateScreen);
         }
@@ -40,7 +40,8 @@ fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
         style: Style {
             display: Display::Flex,
             flex_direction: FlexDirection::Column,
-            size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+            width: Val::Percent(100.0),
+            height: Val::Percent(100.0),
             align_items: AlignItems::Center,
             align_content: AlignContent::Center,
             ..default()

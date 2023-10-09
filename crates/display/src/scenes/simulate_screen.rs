@@ -17,11 +17,10 @@ pub struct SimulateScreen;
 
 impl Plugin for SimulateScreen {
     fn build(&self, app: &mut App) {
-        app.add_system(construct.in_schedule(OnEnter(DisplayState::SimulateScreen)))
-            .add_system(update_status.in_set(OnUpdate(DisplayState::SimulateScreen)))
-            .add_system(apply_velocity.in_set(OnUpdate(DisplayState::SimulateScreen)))
-            .add_system(destroy.in_schedule(OnExit(DisplayState::SimulateScreen)))
-            .add_plugin(Camera3DPlugin);
+        app.add_systems(OnEnter(DisplayState::SimulateScreen), construct)
+            .add_systems(Update, (update_status, apply_velocity).run_if(in_state(DisplayState::SimulateScreen)))
+            .add_systems(OnExit(DisplayState::SimulateScreen), destroy)
+            .add_plugins(Camera3DPlugin);
     }
 }
 
@@ -317,7 +316,7 @@ pub fn keyboard_input(
     mut next_state: ResMut<NextState<DisplayState>>,
 ) {
     if keys.just_pressed(KeyCode::B) {
-        match app_state.0 {
+        match app_state.get() {
             DisplayState::SimulateScreen => {
                 next_state.set(DisplayState::Blueprint);
             }

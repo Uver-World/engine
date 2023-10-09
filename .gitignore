@@ -19,3 +19,5 @@ Cargo.lock
 new_project.json
 
 .env
+
+.idea/
