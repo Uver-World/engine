@@ -8,17 +8,15 @@ pub struct LoadingScreen;
 
 impl Plugin for LoadingScreen {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(DisplayState::LoadingScreen).with_system(construct))
-            .add_system_set(SystemSet::on_exit(DisplayState::LoadingScreen).with_system(destroy))
-            .add_system_set(
-                SystemSet::on_update(DisplayState::LoadingScreen).with_system(update_status),
-            );
+        app.add_systems(OnEnter(DisplayState::LoadingScreen),construct)
+            .add_systems(OnExit(DisplayState::LoadingScreen), destroy)
+            .add_systems(Update, update_status.run_if(in_state(DisplayState::LoadingScreen)));
     }
 }
 
 fn update_status(
     mut query: Query<(&mut Style, &mut loading_screen::LoadingBar)>,
-    mut app_state: ResMut<State<DisplayState>>,
+    mut app_state: ResMut<NextState<DisplayState>>,
 ) {
     for (mut style, mut loading_bar) in query.iter_mut() {
         if loading_bar.val < 100.0 {
@@ -28,9 +26,9 @@ fn update_status(
             } else {
                 loading_bar.val += r;
             }
-            style.size.width = Val::Percent(loading_bar.val);
+            style.width = Val::Percent(loading_bar.val);
         } else {
-            app_state.set(DisplayState::SimulateScreen).unwrap();
+            app_state.set(DisplayState::SimulateScreen);
         }
     }
 }
@@ -42,7 +40,8 @@ fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
         style: Style {
             display: Display::Flex,
             flex_direction: FlexDirection::Column,
-            size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+            width: Val::Percent(100.0),
+            height: Val::Percent(100.0),
             align_items: AlignItems::Center,
             align_content: AlignContent::Center,
             ..default()

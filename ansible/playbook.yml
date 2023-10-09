@@ -1,0 +1,70 @@
+- name: Update the Engine on the server
+  hosts: uverworld-website
+  remote_user: root
+
+  tasks:
+  - name: check if cargo is installed
+    shell: command -v cargo
+    register: cargo_exists
+    ignore_errors: yes
+
+  - name: Download Installer
+    when: cargo_exists is failed
+    get_url:
+      url: https://sh.rustup.rs
+      dest: /tmp/sh.rustup.rs
+      mode: '0755'
+      force: 'yes'
+    tags:
+      - rust
+
+  - name: install rust/cargo
+    when: cargo_exists is failed
+    shell: /tmp/sh.rustup.rs -y
+    tags:
+      - rust
+
+  - name: Write the env file to the server
+    ansible.builtin.template:
+      src: ../.env
+      dest: /engine/.env
+
+  - name: Copy the assets folder to the server
+    ansible.builtin.copy:
+      src: ../assets/
+      dest: /engine/assets
+      mode: '0755'
+      directory_mode: '0755'
+
+  - name: Copy the crates folder to the server
+    ansible.builtin.copy:
+      src: ../crates/
+      dest: /engine/crates
+      directory_mode: '0755'
+      mode: '0755'
+
+  - name: Copy the src folder to the server
+    ansible.builtin.copy:
+      src: ../src/
+      dest: /engine/src
+      directory_mode: '0755'
+      mode: '0755'
+
+  - name: Copy the templates folder to the server
+    ansible.builtin.copy:
+      src: ../templates/
+      dest: /engine/templates
+      directory_mode: '0755'
+      mode: '0755'
+
+  - name: Build the binary
+    ansible.builtin.command:
+      cmd: cargo build --release
+      executable: /bin/bash
+      args:
+        chdir: "/engine"
+
+  - name: Run the binary
+    shell: ./target/release/uverworld
+    args:
+      chdir: "/engine"

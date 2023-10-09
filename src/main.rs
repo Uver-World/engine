@@ -1,7 +1,7 @@
 use std::env::args;
 
 use client_display::*;
-use client_profile::*;
+use client_profile::{api_settings::ApiSettings, *};
 
 fn get_profile() -> Profile {
     match args().nth(1) {
@@ -19,11 +19,12 @@ fn get_profile() -> Profile {
 fn main() {
     let profile = get_profile();
     profile.save();
-    let is_toggled = false;
+    dotenv::dotenv().ok();
 
     ClientDisplay {
         profile,
-        is_toggled,
+        is_toggled: true,
+        api_settings: ApiSettings::from_env(),
     }
     .run_display();
 }

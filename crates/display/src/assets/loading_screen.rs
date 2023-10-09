@@ -3,7 +3,7 @@ use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct LoadingBar {
-    pub val: f32
+    pub val: f32,
 }
 
 #[derive(Resource)]
@@ -25,11 +25,12 @@ pub fn spawn_loading_bar(mut commands: EntityCommands, _assets: &Assets) {
     commands
         .insert(NodeBundle {
             style: Style {
-                size: Size::new(Val::Percent(50.0), Val::Percent(4.0)),
+                width: Val::Percent(50.0),
+                height: Val::Percent(4.0),
                 align_self: AlignSelf::Center,
                 ..default()
             },
-            visibility: Visibility { is_visible: true },
+            visibility: Visibility::Visible,
             background_color: Color::rgb(91., 91., 91.).into(),
             ..default()
         })
@@ -37,22 +38,22 @@ pub fn spawn_loading_bar(mut commands: EntityCommands, _assets: &Assets) {
             parent
                 .spawn(NodeBundle {
                     style: Style {
-                        size: Size::new(Val::Percent(0.0), Val::Percent(94.0)),
+                        width: Val::Percent(0.0),
+                        height: Val::Percent(94.0),
                         align_self: AlignSelf::Center,
                         margin: UiRect {
                             left: Val::Px(3.0),
                             right: Val::Px(3.0),
                             top: Val::Px(3.0),
-                            bottom: Val::Px(3.0)
+                            bottom: Val::Px(3.0),
                         },
                         ..default()
                     },
-                    visibility: Visibility { is_visible: true },
+                    visibility: Visibility::Visible,
                     background_color: Color::rgb(0., 0., 0.).into(),
                     ..default()
-                }).insert(LoadingBar {
-                    val: 0.0,
-                });
+                })
+                .insert(LoadingBar { val: 0.0 });
         });
 }
 

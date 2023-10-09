@@ -17,16 +17,10 @@ pub struct SimulateScreen;
 
 impl Plugin for SimulateScreen {
     fn build(&self, app: &mut App) {
-        app.add_system_set(
-            SystemSet::on_enter(DisplayState::SimulateScreen).with_system(construct),
-        )
-        .add_system_set(SystemSet::on_exit(DisplayState::SimulateScreen).with_system(destroy))
-        .add_system_set(
-            SystemSet::on_update(DisplayState::SimulateScreen)
-                .with_system(update_status)
-                .with_system(apply_velocity),
-        )
-        .add_plugin(Camera3DPlugin);
+        app.add_systems(OnEnter(DisplayState::SimulateScreen), construct)
+            .add_systems(Update, (update_status, apply_velocity).run_if(in_state(DisplayState::SimulateScreen)))
+            .add_systems(OnExit(DisplayState::SimulateScreen), destroy)
+            .add_plugins(Camera3DPlugin);
     }
 }
 
@@ -316,11 +310,15 @@ fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {
     }
 }
 
-pub fn keyboard_input(keys: Res<Input<KeyCode>>, mut app_state: ResMut<State<DisplayState>>) {
+pub fn keyboard_input(
+    keys: Res<Input<KeyCode>>,
+    app_state: ResMut<State<DisplayState>>,
+    mut next_state: ResMut<NextState<DisplayState>>,
+) {
     if keys.just_pressed(KeyCode::B) {
-        match app_state.current() {
+        match app_state.get() {
             DisplayState::SimulateScreen => {
-                app_state.set(DisplayState::Blueprint).unwrap();
+                next_state.set(DisplayState::Blueprint);
             }
             DisplayState::LoadingScreen => {}
             DisplayState::Menu => {}

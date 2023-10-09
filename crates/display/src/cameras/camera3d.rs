@@ -100,7 +100,7 @@ impl Camera3DPlugin {
                 let pan_vector = up_dir * camera.move_sensitivy * time.delta_seconds();
                 camera.center += pan_vector;
             }
-            if keys.pressed(KeyCode::LShift) {
+            if keys.pressed(KeyCode::ShiftLeft) {
                 let up_dir = transform.rotation * -Vec3::Y;
                 let pan_vector = up_dir * camera.move_sensitivy * time.delta_seconds();
                 camera.center += pan_vector;
@@ -134,9 +134,6 @@ impl Camera3DPlugin {
 
 impl Plugin for Camera3DPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(Self::mouse_motion)
-            .add_system(Self::key)
-            .add_system(Self::zoom)
-            .add_system(Self::update_transform);
+        app.add_systems(Update, (Self::mouse_motion, Self::key, Self::zoom, Self::update_transform));
     }
 }

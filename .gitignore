@@ -14,4 +14,10 @@ Cargo.lock
 
 /target
 
-.vscode
+.vscode/
+
+new_project.json
+
+.env
+
+.idea/
