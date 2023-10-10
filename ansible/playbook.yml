@@ -24,47 +24,82 @@
     tags:
       - rust
 
-  - name: Write the env file to the server
-    ansible.builtin.template:
-      src: ../.env
-      dest: /engine/.env
+  - name: Install build essentials
+    ansible.builtin.apt:
+      name: build-essential
+      state: present
+    become: yes
 
-  - name: Copy the assets folder to the server
-    ansible.builtin.copy:
-      src: ../assets/
-      dest: /engine/assets
-      mode: '0755'
-      directory_mode: '0755'
+  - name: Install required packages for Rust compilation
+    ansible.builtin.apt:
+      name:
+        - pkg-config
+        - libasound2-dev
+        - libssl-dev
+        - libudev-dev
+      state: present
+    become: yes
 
-  - name: Copy the crates folder to the server
-    ansible.builtin.copy:
-      src: ../crates/
-      dest: /engine/crates
-      directory_mode: '0755'
-      mode: '0755'
+  - name: Ensure git is installed
+    ansible.builtin.package:
+      name: git
+      state: present
+    become: yes
 
-  - name: Copy the src folder to the server
+  - name: Copy SSH key from controller to target
     ansible.builtin.copy:
-      src: ../src/
-      dest: /engine/src
-      directory_mode: '0755'
-      mode: '0755'
+      src: uverworld_server
+      dest: /tmp/uverworld_server
+      mode: '0600'
 
-  - name: Copy the templates folder to the server
-    ansible.builtin.copy:
-      src: ../templates/
-      dest: /engine/templates
-      directory_mode: '0755'
-      mode: '0755'
+  - name: Check if ~/engine is a git repo
+    ansible.builtin.stat:
+      path: ~/engine/.git
+    register: git_repo_check
+
+  - name: Update the repository if ~/engine is already a git repo
+    ansible.builtin.git:
+      repo: 'git@github.com:Uver-World/server.git'
+      dest: ~/engine
+      accept_hostkey: yes
+      key_file: /tmp/uverworld_server
+      update: yes
+    when: git_repo_check.stat.exists
+
+  - name: Remove the directory if ~/engine is not a git repo
+    ansible.builtin.file:
+      path: ~/engine
+      state: absent
+    when: not git_repo_check.stat.exists
+
+  - name: Clone the repository
+    ansible.builtin.git:
+      repo: 'git@github.com:Uver-World/server.git'
+      dest: ~/engine
+      accept_hostkey: yes
+      key_file: /tmp/uverworld_server
+      force: yes
+    when: not git_repo_check.stat.exists
+
+  - name: Remove SSH key from target
+    ansible.builtin.file:
+      path: /tmp/uverworld_server
+      state: absent
 
   - name: Build the binary
-    ansible.builtin.command:
-      cmd: cargo build --release
+    ansible.builtin.shell:
+      cmd: ~/.cargo/bin/cargo build --release
       executable: /bin/bash
-      args:
-        chdir: "/engine"
+      chdir: "~/engine"
+
+  - name: Copy .env file to remote host
+    ansible.builtin.copy:
+      src: ../.env
+      dest: ~/engine/.env
+      mode: '0644'
 
   - name: Run the binary
-    shell: ./target/release/uverworld
-    args:
-      chdir: "/engine"
+    ansible.builtin.shell:
+      cmd: ./target/release/uverworld
+      executable: /bin/bash
+      chdir: "~/engine"
