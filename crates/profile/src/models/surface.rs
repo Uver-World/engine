@@ -15,7 +15,7 @@ pub struct Surface {
 
 impl Surface {
     pub fn new(group: SurfaceGroup) -> Self {
-        Self { group: group }
+        Self { group }
     }
 
     pub fn deserialize(map: Option<Vec<Value>>, groups: Vec<SurfaceGroup>) -> Option<Vec<Self>> {

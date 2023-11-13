@@ -233,7 +233,7 @@ fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
 }
 
 fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
-    let entities = retrieve_entities(client.profile.get_entities());
+    let entities = retrieve_entities(client.settings.profile.get_entities());
     let mut id = 0;
 
     commands
