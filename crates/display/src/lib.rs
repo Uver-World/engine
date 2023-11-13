@@ -17,9 +17,8 @@ pub mod states;
 
 #[derive(Resource)]
 pub struct ClientDisplay {
-    pub profile: Profile,
+    pub settings: Settings,
     pub is_toggled: bool,
-    pub api_settings: ApiSettings,
 }
 
 impl ClientDisplay {
@@ -33,26 +32,35 @@ impl ClientDisplay {
 
     pub fn run_display(self) {
         // todo, authenticate the server to the api.
-        let api = Api::from(&self.api_settings);
+        let api = Api::from(&self.settings.api_settings);
+        let is_offline = self.settings.is_offline;
 
-        App::new()
+        let mut app = App::new();
+            app
             .insert_resource(WinitSettings {
                 return_from_run: true,
                 ..default()
             })
             .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-            .insert_resource(Api::from(&self.api_settings))
+            .insert_resource(Api::from(&self.settings.api_settings))
             .add_plugins(DefaultPlugins.set(WindowPlugin {
                 primary_window: Some(self.get_window()),
                 ..default()
             }))
             .add_state::<DisplayState>()
-            .add_systems(Startup, (assets::loading_screen::load_assets, matchbox_socket::start_matchbox_socket))
-            .add_systems(Update,matchbox_socket::check_peers)
+            .add_systems(Startup, assets::loading_screen::load_assets)
             .add_plugins((RapierPhysicsPlugin::<NoUserData>::default(), RapierDebugRenderPlugin::default()))
-            .add_plugins((scenes::loading_screen::LoadingScreen, scenes::simulate_screen::SimulateScreen))
-            .insert_resource(self)
-            .run();
-        close_matchbox_socket(&api);
+            .add_plugins((scenes::loading_screen::LoadingScreen, scenes::simulate_screen::SimulateScreen));
+
+        if !is_offline {
+            app.add_systems(Startup, matchbox_socket::start_matchbox_socket)
+                .add_systems(Update,matchbox_socket::check_peers);
+        }
+
+        app.insert_resource(self).run();
+
+        if !is_offline {
+            close_matchbox_socket(&api);
+        }
     }
 }
