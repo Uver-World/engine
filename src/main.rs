@@ -2,7 +2,7 @@ use std::path::Path;
 use clap::{Arg, ArgMatches, Command};
 
 use client_display::*;
-use client_profile::{api_settings::ApiSettings, *};
+use client_profile::*;
 
 fn get_profile(matches: &ArgMatches) -> Result<Profile, String> {
     let file_path: Option<&String> = matches.get_one("profile");
@@ -61,6 +61,7 @@ fn get_settings() -> Result<Settings, String> {
     Ok(Settings {
         profile,
         api_settings: ApiSettings::from_env(),
+        tracer_settings: TracerSettings::from_env(),
         is_offline: matches.get_count("offline") != 0,
         is_logging: matches.get_count("log") != 0,
     })
@@ -72,8 +73,8 @@ fn main() {
         Err(error) => panic!("An error occurred whilst starting the app: [{}]", error)
     };
 
-    eprintln!("Settings is offline = {}", settings.is_offline);
-    eprintln!("Settings is logging = {}", settings.is_logging);
+    eprintln!("Offline mode = {}", settings.is_offline);
+    eprintln!("Tracer mode = {}", settings.is_logging);
 
     ClientDisplay {
         settings,

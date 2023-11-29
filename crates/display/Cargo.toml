@@ -6,9 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+client-profile = { path = "../profile" }
+client-api = { path = "../api" }
+client-tracer = { path = "../tracer" }
+
 bevy = "0.11.2"
-client-profile = { path = "../profile/" }
-api = { path = "../api/" }
 rand = "0.8.5"
 nalgebra = "0.32.2"
 bevy_rapier3d = "0.22.0"

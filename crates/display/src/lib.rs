@@ -1,7 +1,7 @@
 use bevy::{prelude::*, window::WindowResolution, winit::WinitSettings};
 use bevy_rapier3d::prelude::*;
 
-use client_profile::{api_settings::ApiSettings, *};
+use client_profile::*;
 use matchbox_socket::close_matchbox_socket;
 use states::DisplayState;
 
