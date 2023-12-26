@@ -1,22 +1,25 @@
-use std::sync::mpsc::Receiver;
+use std::sync::Arc;
 use std::thread;
 use opentelemetry::trace::{TraceError, TraceResult};
-use opentelemetry_sdk::export::trace::SpanData;
+use opentelemetry_sdk::metrics::data::ResourceMetrics;
+use opentelemetry_sdk::metrics::ManualReader;
+use opentelemetry_sdk::metrics::reader::MetricReader;
+use opentelemetry_sdk::Resource;
 use reqwest::Client;
 use tokio::runtime::Runtime;
 use crate::provider::SigNozExportError;
 
-pub struct TraceWorker {
-    receiver: Receiver<Vec<SpanData>>,
+pub struct MeterWorker {
+    reader: Arc<ManualReader>,
     endpoint: String,
-    client: Client
+    client: Client,
 }
 
-impl TraceWorker {
+impl MeterWorker {
 
-    pub fn new(receiver: Receiver<Vec<SpanData>>, endpoint: String) -> Self {
+    pub fn new(reader: Arc<ManualReader>, endpoint: String) -> Self {
         Self {
-            receiver,
+            reader,
             endpoint,
             client: Client::new()
         }
@@ -27,16 +30,20 @@ impl TraceWorker {
             let rt = Runtime::new().unwrap();
 
             rt.block_on(async {
-                while let Ok(batch) = self.receiver.recv() {
-                    self.process_batch(batch).await;
+                let mut metrics = ResourceMetrics {
+                    resource: Resource::default(),
+                    scope_metrics: Vec::new()
+                };
+                while let Ok(_) = self.reader.collect(&mut metrics) {
+                    self.process(&mut metrics).await;
                 }
             });
         });
     }
 
-    async fn process_batch(&self, batch: Vec<SpanData>) {
-        println!("data {:?}", batch);
-        if let Ok(data) = Self::build_body(batch) {
+    async fn process(&self, metrics: &mut ResourceMetrics) {
+        println!("metrics {:?}", metrics);
+        if let Ok(data) = Self::build_body(metrics) {
             self.send_request(data).await;
         }
     }
@@ -44,7 +51,7 @@ impl TraceWorker {
     // Send the serialized data to SigNoz
     async fn send_request(&self, (data, content_type): (Vec<u8>, &'static str)) {
         let endpoint = &self.endpoint;
-        let res = self.client.post(format!("{endpoint}/v1/traces"))
+        let res = self.client.post(format!("{endpoint}/v1/metrics"))
             .header("Content-Type", content_type)
             .body(data)
             .send()
@@ -60,13 +67,11 @@ impl TraceWorker {
         }
     }
 
-    fn build_body(spans: Vec<SpanData>) -> TraceResult<(Vec<u8>, &'static str)> {
-        use opentelemetry_proto::tonic::collector::trace::v1::ExportTraceServiceRequest;
+    fn build_body(metrics: &mut ResourceMetrics) -> TraceResult<(Vec<u8>, &'static str)> {
         use prost::Message;
 
-        let req = ExportTraceServiceRequest {
-            resource_spans: spans.into_iter().map(Into::into).collect(),
-        };
+        let req: opentelemetry_proto::tonic::collector::metrics::v1::ExportMetricsServiceRequest =
+            (&*metrics).into();
         let mut buf = vec![];
         req.encode(&mut buf).map_err(|err| TraceError::ExportFailed(Box::new(SigNozExportError::new(&err.to_string()))))?;
 

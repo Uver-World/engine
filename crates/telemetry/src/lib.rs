@@ -1,5 +1,12 @@
-mod exporter;
-mod telemetry;
+mod provider;
 mod worker;
 
-pub use telemetry::*;
+use crate::provider::{SigNozMeter, SigNozTracer};
+use crate::worker::TelemetryWorker;
+
+pub fn start_telemetry(endpoint: String)  {
+    let trace_worker = SigNozTracer::setup(endpoint.clone());
+    let meter_worker = SigNozMeter::setup(endpoint.clone());
+
+    TelemetryWorker::new(trace_worker, meter_worker).launch();
+}

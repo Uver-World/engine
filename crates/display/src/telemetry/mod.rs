@@ -45,7 +45,24 @@ pub fn refresh(frame_time: Res<FrameTime>) {
 
 fn fps_telemetry(fps: f64) {
     let tracer = global::tracer("engine");
+    let meter = global::meter("engine");
+
     let mut span = tracer.start("frame_info");
     span.set_attribute(KeyValue::new("fps", fps));
+
+    // Extract the span context as a string or another suitable format
+    let span_context = format!("{}", span.span_context().trace_id());
+
+    let histogram = meter.f64_observable_counter("fps")
+        .with_description("Frames per second")
+        .init();
+
+    // Include the span context as a label in the histogram observation
+    //histogram.observe(fps, [KeyValue::new("span_context", span_context)].as_ref());
+    histogram.observe(fps, [].as_ref());
+
     span.end();
+
+
+
 }
