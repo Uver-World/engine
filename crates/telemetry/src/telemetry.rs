@@ -7,7 +7,7 @@ use opentelemetry_sdk::{Resource, trace as sdktrace};
 use opentelemetry_sdk::trace::Config;
 
 use crate::exporter::SigNozExporter;
-use crate::worker::TelemetryWorker;
+use crate::worker::{TelemetryWorker, TraceWorker};
 
 pub fn start_telemetry(endpoint: String)  {
     // Create the channel
@@ -20,7 +20,8 @@ pub fn start_telemetry(endpoint: String)  {
     let _ = init_telemetry(span_exporter);
 
     // Start the telemetry worker thread
-    TelemetryWorker::new(span_receiver, endpoint).launch();
+    let trace_worker = TraceWorker::new(span_receiver, endpoint);
+    TelemetryWorker::new(trace_worker).launch();
 }
 
 fn init_telemetry(span_exporter: impl SpanExporter + 'static) -> GlobalTracerProvider {

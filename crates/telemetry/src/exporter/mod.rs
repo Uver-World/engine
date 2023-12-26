@@ -1,9 +1,12 @@
+pub mod exporter_error;
+
+use crate::exporter::exporter_error::SigNozExportError;
+
 use std::fmt::{Debug, Formatter};
 use std::sync::mpsc::Sender;
 use futures_core::future::BoxFuture;
 use opentelemetry::trace::TraceError;
 use opentelemetry_sdk::export::trace::{ExportResult, SpanData, SpanExporter};
-use crate::exporter_error::SigNozExportError;
 
 #[derive(Clone)]
 pub struct SigNozExporter {

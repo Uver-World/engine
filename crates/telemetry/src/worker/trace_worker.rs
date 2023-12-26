@@ -4,15 +4,15 @@ use opentelemetry::trace::{TraceError, TraceResult};
 use opentelemetry_sdk::export::trace::SpanData;
 use reqwest::Client;
 use tokio::runtime::Runtime;
-use crate::exporter_error::SigNozExportError;
+use crate::exporter::exporter_error::SigNozExportError;
 
-pub struct TelemetryWorker {
+pub struct TraceWorker {
     receiver: Receiver<Vec<SpanData>>,
     endpoint: String,
     client: Client
 }
 
-impl TelemetryWorker {
+impl TraceWorker {
 
     pub fn new(receiver: Receiver<Vec<SpanData>>, endpoint: String) -> Self {
         Self {
@@ -72,5 +72,4 @@ impl TelemetryWorker {
 
         Ok((buf, "application/x-protobuf"))
     }
-
 }
