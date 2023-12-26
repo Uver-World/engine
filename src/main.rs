@@ -41,11 +41,11 @@ fn get_settings() -> Result<Settings, String> {
         Arg::new("offline")
             .help("Runs the app in offline mode.")
             .short('o')
-            .action(clap::ArgAction::Count),
-        Arg::new("log")
-            .help("Enables the logger.")
-            .short('l')
-            .action(clap::ArgAction::Count),
+            .action(clap::ArgAction::SetTrue),
+        Arg::new("no_telemetry")
+            .help("Disables the telemetry.")
+            .short('t')
+            .action(clap::ArgAction::SetFalse),
         Arg::new("profile")
             .help("Sets the profile")
             .index(1)],
@@ -61,9 +61,9 @@ fn get_settings() -> Result<Settings, String> {
     Ok(Settings {
         profile,
         api_settings: ApiSettings::from_env(),
-        tracer_settings: TracerSettings::from_env(),
-        is_offline: matches.get_count("offline") != 0,
-        is_logging: matches.get_count("log") != 0,
+        telemetry_settings: TelemetrySettings::from_env(),
+        is_offline: matches.get_flag("offline"),
+        has_telemetry: matches.get_flag("no_telemetry"),
     })
 }
 
@@ -74,7 +74,7 @@ fn main() {
     };
 
     eprintln!("Offline mode = {}", settings.is_offline);
-    eprintln!("Tracer mode = {}", settings.is_logging);
+    eprintln!("Telemetry mode = {}", settings.has_telemetry);
 
     ClientDisplay {
         settings,

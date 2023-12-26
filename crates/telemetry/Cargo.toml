@@ -1,0 +1,17 @@
+[package]
+name = "client-telemetry"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+opentelemetry = "0.21.0"
+opentelemetry_sdk = "0.21.0"
+opentelemetry-proto = { version = "0.4.0", default-features = false, features = ["gen-tonic-messages", "trace"] }
+serde_json = { version = "1.0.107", features = [] }
+reqwest = "0.11.23"
+futures-core = "0.3.28"
+prost = "0.11.9"
+tonic = "0.10.2"
+tokio = "1.35.1"

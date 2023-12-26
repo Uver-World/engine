@@ -5,6 +5,7 @@ use client_profile::*;
 use matchbox_socket::close_matchbox_socket;
 use states::DisplayState;
 
+use crate::telemetry::TelemetryEndpoint;
 use crate::api::Api;
 
 pub mod api;
@@ -14,6 +15,7 @@ pub mod entities;
 pub mod matchbox_socket;
 pub mod scenes;
 pub mod states;
+mod telemetry;
 
 #[derive(Resource)]
 pub struct ClientDisplay {
@@ -34,6 +36,8 @@ impl ClientDisplay {
         // todo, authenticate the server to the api.
         let api = Api::from(&self.settings.api_settings);
         let is_offline = self.settings.is_offline;
+        let has_telemetry = self.settings.has_telemetry;
+        let telemetry_endpoint = TelemetryEndpoint::new(&self.settings.telemetry_settings.hostname);
 
         let mut app = App::new();
             app
@@ -55,6 +59,10 @@ impl ClientDisplay {
         if !is_offline {
             app.add_systems(Startup, matchbox_socket::start_matchbox_socket)
                 .add_systems(Update,matchbox_socket::check_peers);
+        }
+
+        if has_telemetry {
+            app.add_plugins(telemetry::TelemetryPlugin::new(TelemetryEndpoint::from(telemetry_endpoint)));
         }
 
         app.insert_resource(self).run();

@@ -1,11 +1,11 @@
 use std::env;
 
-pub struct TracerSettings {
+pub struct TelemetrySettings {
     pub hostname: String,
     pub attributes: String,
 }
 
-impl TracerSettings {
+impl TelemetrySettings {
     pub fn from_env() -> Self {
         let hostname = env::var_os("OTEL_EXPORTER_OTLP_ENDPOINT")
             .unwrap()
