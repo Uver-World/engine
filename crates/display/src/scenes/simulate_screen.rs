@@ -12,6 +12,8 @@ use crate::entities::ui_entity::DisplayEntity;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
 
+use opentelemetry::global;
+
 #[derive(Component)]
 pub struct SimulateScreen;
 
@@ -234,6 +236,14 @@ fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
 
 fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
     let entities = retrieve_entities(client.settings.profile.get_entities());
+    
+    // TODO switch other place the number of entities recorded.
+    let meter = global::meter("engine");
+    let ram_gauge = meter.u64_observable_gauge("entities")
+        .with_description("Number of entities")
+        .init();
+    ram_gauge.observe(entities.len() as u64, [].as_ref());
+    
     let mut id = 0;
 
     commands
