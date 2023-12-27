@@ -5,8 +5,7 @@ pub use frame_time::*;
 
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy::prelude::Res;
-use opentelemetry::{global, KeyValue};
-use opentelemetry::trace::{Span, Tracer};
+use opentelemetry::global;
 
 pub use endpoint::TelemetryEndpoint;
 
@@ -30,7 +29,7 @@ impl Plugin for TelemetryPlugin {
         app.insert_resource(self.endpoint.clone());
         app.insert_resource(FrameTime::new(60)); // Average of FPS over last 60 frames
         app.add_systems(Startup, start)
-            .add_systems(Update, (refresh, fps_calculation_system));
+            .add_systems(Update, (fps_calculation_system, fps_telemetry));
     }
 
 }
@@ -39,30 +38,21 @@ fn start(endpoint: Res<TelemetryEndpoint>) {
     client_telemetry::start_telemetry((&endpoint).0.clone())
 }
 
-pub fn refresh(frame_time: Res<FrameTime>) {
-    fps_telemetry(frame_time.average_fps());
-}
+fn fps_telemetry(frame_time: Res<FrameTime>) {
+    let fps = frame_time.average_fps();
 
-fn fps_telemetry(fps: f64) {
-    let tracer = global::tracer("engine");
+    //let tracer = global::tracer("engine");
     let meter = global::meter("engine");
 
-    let mut span = tracer.start("frame_info");
-    span.set_attribute(KeyValue::new("fps", fps));
+    //let mut span = tracer.start("frame_info");
+    //span.set_attribute(KeyValue::new("fps", fps));
 
-    // Extract the span context as a string or another suitable format
-    let span_context = format!("{}", span.span_context().trace_id());
-
-    let histogram = meter.f64_observable_counter("fps")
+    let histogram = meter.f64_observable_gauge("fps")
         .with_description("Frames per second")
         .init();
 
     // Include the span context as a label in the histogram observation
-    //histogram.observe(fps, [KeyValue::new("span_context", span_context)].as_ref());
     histogram.observe(fps, [].as_ref());
 
-    span.end();
-
-
-
+    //span.end();
 }

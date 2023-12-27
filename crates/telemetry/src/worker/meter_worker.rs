@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use std::thread;
+use std::time::Duration;
 use opentelemetry::trace::{TraceError, TraceResult};
 use opentelemetry_sdk::metrics::data::ResourceMetrics;
 use opentelemetry_sdk::metrics::ManualReader;
@@ -36,6 +37,7 @@ impl MeterWorker {
                 };
                 while let Ok(_) = self.reader.collect(&mut metrics) {
                     self.process(&mut metrics).await;
+                    tokio::time::sleep(Duration::from_secs(1)).await;
                 }
             });
         });
