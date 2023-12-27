@@ -9,11 +9,11 @@ use crate::worker::MeterWorker;
 pub struct SigNozMeter;
 
 impl SigNozMeter {
-    pub fn setup(endpoint: String) -> MeterWorker {
+    pub fn setup(endpoint: String, token: Option<String>) -> MeterWorker {
         // Initialize the provider
         let reader = Self::setup_meter_provider();
 
-        MeterWorker::new(reader, endpoint)
+        MeterWorker::new(reader, endpoint, token)
     }
 
     fn setup_meter_provider() -> Arc<ManualReader> {

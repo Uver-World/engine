@@ -16,3 +16,4 @@ nalgebra = "0.32.2"
 bevy_rapier3d = "0.22.0"
 bevy_matchbox = { version = "0.7.0", features = ["ggrs"] }
 opentelemetry = "0.21.0"
+sys-info = "0.9.1"

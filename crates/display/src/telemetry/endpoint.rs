@@ -1,12 +1,18 @@
 use bevy::prelude::Resource;
 
 #[derive(Clone, Resource)]
-pub struct TelemetryEndpoint(pub String);
+pub struct TelemetrySettings {
+    pub endpoint: String,
+    pub token: Option<String>,
+}
 
-impl TelemetryEndpoint {
+impl TelemetrySettings {
 
-    pub fn new<T: Into<String>>(endpoint: T) -> Self {
-        Self(endpoint.into())
+    pub fn new<T: Into<String>>(endpoint: T, token: Option<String>) -> Self {
+        Self {
+            endpoint: endpoint.into(),
+            token
+        }
     }
 
 }

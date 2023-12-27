@@ -1,24 +1,26 @@
 mod frame_time;
 mod endpoint;
+mod system_usage;
 
-pub use frame_time::*;
+use frame_time::*;
+use system_usage::*;
 
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy::prelude::Res;
 use opentelemetry::global;
 
-pub use endpoint::TelemetryEndpoint;
+pub use endpoint::TelemetrySettings;
 
 
 pub struct TelemetryPlugin {
-    endpoint: TelemetryEndpoint
+    settings: TelemetrySettings
 }
 
 impl TelemetryPlugin {
 
-    pub fn new(endpoint: TelemetryEndpoint) -> Self {
+    pub fn new(settings: TelemetrySettings) -> Self {
         Self {
-            endpoint
+            settings,
         }
     }
 
@@ -26,16 +28,35 @@ impl TelemetryPlugin {
 
 impl Plugin for TelemetryPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(self.endpoint.clone());
+        app.insert_resource(self.settings.clone());
         app.insert_resource(FrameTime::new(60)); // Average of FPS over last 60 frames
         app.add_systems(Startup, start)
-            .add_systems(Update, (fps_calculation_system, fps_telemetry));
+            .add_systems(Update, (fps_calculation_system, fps_telemetry))
+            .add_systems(Update, (cpu_telemetry, ram_telemetry));
     }
 
 }
 
-fn start(endpoint: Res<TelemetryEndpoint>) {
-    client_telemetry::start_telemetry((&endpoint).0.clone())
+fn start(settings: Res<TelemetrySettings>) {
+    client_telemetry::start_telemetry((&settings).endpoint.clone(), (&settings).token.clone());
+}
+
+fn cpu_telemetry() {
+    let cpu_usage = get_cpu_usage();
+    let meter = global::meter("engine");
+    let cpu_gauge = meter.f64_observable_gauge("cpu_usage")
+        .with_description("CPU usage percentage")
+        .init();
+    cpu_gauge.observe(cpu_usage, [].as_ref());
+}
+
+fn ram_telemetry() {
+    let ram_usage = get_ram_usage();
+    let meter = global::meter("engine");
+    let ram_gauge = meter.f64_observable_gauge("ram_usage")
+        .with_description("RAM usage in megabytes")
+        .init();
+    ram_gauge.observe(ram_usage, [].as_ref());
 }
 
 fn fps_telemetry(frame_time: Res<FrameTime>) {

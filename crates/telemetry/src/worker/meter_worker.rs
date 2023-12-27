@@ -6,7 +6,7 @@ use opentelemetry_sdk::metrics::data::ResourceMetrics;
 use opentelemetry_sdk::metrics::ManualReader;
 use opentelemetry_sdk::metrics::reader::MetricReader;
 use opentelemetry_sdk::Resource;
-use reqwest::Client;
+use reqwest::{Client, ClientBuilder, header::HeaderMap, header::HeaderValue};
 use tokio::runtime::Runtime;
 use crate::provider::SigNozExportError;
 
@@ -18,11 +18,22 @@ pub struct MeterWorker {
 
 impl MeterWorker {
 
-    pub fn new(reader: Arc<ManualReader>, endpoint: String) -> Self {
+    pub fn new(reader: Arc<ManualReader>, endpoint: String, token: Option<String>) -> Self {
+        
+        let mut client = ClientBuilder::new();
+        
+        if let Some(token) = token {
+            let mut headers = HeaderMap::new();
+            headers.insert("signoz-access-token", HeaderValue::from_str(&token).unwrap());
+            client = client.default_headers(headers);
+        }
+        
+        let client = client.build().unwrap();
+        
         Self {
             reader,
             endpoint,
-            client: Client::new()
+            client
         }
     }
 
@@ -53,6 +64,7 @@ impl MeterWorker {
     // Send the serialized data to SigNoz
     async fn send_request(&self, (data, content_type): (Vec<u8>, &'static str)) {
         let endpoint = &self.endpoint;
+        
         let res = self.client.post(format!("{endpoint}/v1/metrics"))
             .header("Content-Type", content_type)
             .body(data)
