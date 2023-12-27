@@ -11,8 +11,9 @@ members = [
 ]
 
 [dependencies]
-client-display = { path = "crates/display/" }
-client-profile = { path  = "crates/profile/" }
+client-display = { path = "crates/display" }
+client-profile = { path  = "crates/profile" }
+
 dotenv = "0.15.0"
 clap = "4.4.8"
 

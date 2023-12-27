@@ -1,6 +1,6 @@
-use api::models::Peer;
+use client_api::models::Peer;
 use bevy::prelude::Resource;
-use client_profile::api_settings::ApiSettings;
+use client_profile::ApiSettings;
 
 #[derive(Resource)]
 pub struct Api {
@@ -11,11 +11,11 @@ pub struct Api {
 
 impl Api {
     pub fn authenticate(&self) -> Result<Peer, String> {
-        api::server_auth(&self.hostname, self.port, &self.token)
+        client_api::server_auth(&self.hostname, self.port, &self.token)
     }
 
     pub fn server_disconnect(&self) -> Result<bool, String> {
-        api::server_disconnect(&self.hostname, self.port, &self.token)
+        client_api::server_disconnect(&self.hostname, self.port, &self.token)
     }
 }
 
