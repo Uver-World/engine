@@ -1,7 +1,7 @@
 use std::path::Path;
 use clap::{Arg, ArgMatches, Command};
 
-use client_display::*;
+use client_display::{*, filters::Filter};
 use client_profile::*;
 
 fn get_profile(matches: &ArgMatches) -> Result<Profile, String> {
@@ -77,6 +77,7 @@ fn main() {
     eprintln!("Telemetry mode = {}", settings.has_telemetry);
 
     ClientDisplay {
+        filter: Filter::new(),
         settings,
         is_toggled: true,
     }

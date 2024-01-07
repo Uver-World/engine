@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::direction::Direction;
+use client_profile::models::color::Color as ClientColor;
 use client_profile::models::location::Location;
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
@@ -20,7 +21,7 @@ pub struct SimulateScreen;
 impl Plugin for SimulateScreen {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(DisplayState::SimulateScreen), construct)
-            .add_systems(Update, (update_status, apply_velocity).run_if(in_state(DisplayState::SimulateScreen)))
+            .add_systems(Update, (update_status, apply_velocity, keyboard_input).run_if(in_state(DisplayState::SimulateScreen)))
             .add_systems(OnExit(DisplayState::SimulateScreen), destroy)
             .add_plugins(Camera3DPlugin);
     }
@@ -234,9 +235,9 @@ fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
     }
 }
 
-fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
+fn construct(mut commands: Commands, client: Res<ClientDisplay>, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
     let entities = retrieve_entities(client.settings.profile.get_entities());
-    
+
     // TODO switch other place the number of entities recorded.
     let meter = global::meter("engine");
     let ram_gauge = meter.u64_observable_gauge("entities")
@@ -295,16 +296,23 @@ fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
         .insert(ColliderDebugColor(Color::rgb_u8(0, 0, 255)))
         .insert(TransformBundle::from(Transform::from_xyz(1000., 998., 0.)));
 
-    for (entity, shape) in entities {
-        commands
-            .spawn(shape)
-            .insert(RigidBody::Dynamic)
-            .insert(DisplayEntity::from_entity(entity.clone(), id))
-            .insert(ColliderDebugColor(Color::rgb_u8(
+    for (entity, collider, mesh) in entities {
+        let color = Color::rgb_u8(
                 entity.group.color.red(),
                 entity.group.color.green(),
                 entity.group.color.blue(),
-            )))
+            );
+
+        commands
+            .spawn(PbrBundle {
+                mesh: meshes.add(mesh),
+                material: materials.add(color.into()), ..Default::default()})
+
+            .insert(collider)
+
+            .insert(RigidBody::Dynamic)
+            .insert(DisplayEntity::from_entity(entity.clone(), id))
+            .insert(ColliderDebugColor(color))
             .insert(TransformBundle::from(Transform::from_xyz(
                 entity.location.x,
                 entity.location.y,
@@ -322,17 +330,10 @@ fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {
 
 pub fn keyboard_input(
     keys: Res<Input<KeyCode>>,
-    app_state: ResMut<State<DisplayState>>,
-    mut next_state: ResMut<NextState<DisplayState>>,
+    mut client: ResMut<ClientDisplay>,
+    entities: Query<(&DisplayEntity, &mut Visibility)>
 ) {
     if keys.just_pressed(KeyCode::B) {
-        match app_state.get() {
-            DisplayState::SimulateScreen => {
-                next_state.set(DisplayState::Blueprint);
-            }
-            DisplayState::LoadingScreen => {}
-            DisplayState::Menu => {}
-            DisplayState::Blueprint => {}
-        }
+        client.filter.toggle_color_filter(ClientColor::Red, entities);
     }
 }
