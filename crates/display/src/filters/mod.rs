@@ -6,7 +6,7 @@ use client_profile::models::color::Color;
 use crate::entities::ui_entity::DisplayEntity;
 
 pub struct Filter {
-    color_filters: HashSet<Color>,
+    pub color_filters: HashSet<Color>,
 }
 
 impl Filter {
@@ -17,13 +17,13 @@ impl Filter {
         }
     }
 
-    fn make_all_entities_visible(mut entities: Query<(&DisplayEntity, &mut Visibility)>) {
-        for (_, mut visibility) in &mut entities {
+    fn make_all_entities_visible(entities: &mut Query<(&DisplayEntity, &mut Visibility)>) {
+        for (_, mut visibility) in entities {
                 *visibility = Visibility::Visible;
         }
     }
 
-    pub fn toggle_color_filter(&mut self, color_filter: Color, entities: Query<(&DisplayEntity, &mut Visibility)>) {
+    pub fn toggle_color_filter(&mut self, color_filter: Color, entities: &mut Query<(&DisplayEntity, &mut Visibility)>) {
         self.toggle_color(color_filter);
         
         if self.color_filters.is_empty() {
@@ -39,8 +39,8 @@ impl Filter {
         }
     }
     
-    fn update_filter(&self, mut entities: Query<(&DisplayEntity, &mut Visibility)>) {
-        for (display_entity, mut visibility) in &mut entities {
+    fn update_filter(&self, entities: &mut Query<(&DisplayEntity, &mut Visibility)>) {
+        for (display_entity, mut visibility) in entities {
             if self.color_filters.contains(&display_entity.settings.group.color) {
                 *visibility = Visibility::Visible
             } else {
