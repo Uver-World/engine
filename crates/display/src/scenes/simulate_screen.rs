@@ -22,7 +22,7 @@ pub struct SimulateScreen;
 impl Plugin for SimulateScreen {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(DisplayState::SimulateScreen), construct)
-            .add_systems(Update, (update_status, apply_velocity, keyboard_input, filter_system).run_if(in_state(DisplayState::SimulateScreen)))
+            .add_systems(Update, (update_status, apply_velocity, filter_system).run_if(in_state(DisplayState::SimulateScreen)))
             .add_systems(OnExit(DisplayState::SimulateScreen), destroy)
             .add_plugins(Camera3DPlugin);
     }
@@ -326,16 +326,6 @@ fn construct(mut commands: Commands, client: Res<ClientDisplay>, mut meshes: Res
 fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();
-    }
-}
-
-pub fn keyboard_input(
-    keys: Res<Input<KeyCode>>,
-    mut client: ResMut<ClientDisplay>,
-    mut entities: Query<(&DisplayEntity, &mut Visibility)>
-) {
-    if keys.just_pressed(KeyCode::B) {
-        client.filter.toggle_color_filter(ClientColor::Red, &mut entities);
     }
 }
 
