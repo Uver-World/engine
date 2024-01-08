@@ -1,7 +1,9 @@
 use bevy::{prelude::*, window::WindowResolution, winit::WinitSettings};
+use bevy_egui::EguiPlugin;
 use bevy_rapier3d::prelude::*;
 
 use client_profile::*;
+use filters::Filter;
 use matchbox_socket::close_matchbox_socket;
 use states::DisplayState;
 
@@ -14,10 +16,12 @@ pub mod entities;
 pub mod matchbox_socket;
 pub mod scenes;
 pub mod states;
+pub mod filters;
 mod telemetry;
 
 #[derive(Resource)]
 pub struct ClientDisplay {
+    pub filter: Filter,
     pub settings: Settings,
     pub is_toggled: bool,
 }
@@ -52,6 +56,7 @@ impl ClientDisplay {
             }))
             .add_state::<DisplayState>()
             .add_systems(Startup, assets::loading_screen::load_assets)
+            .add_plugins(EguiPlugin)
             .add_plugins((RapierPhysicsPlugin::<NoUserData>::default(), RapierDebugRenderPlugin::default()))
             .add_plugins((scenes::loading_screen::LoadingScreen, scenes::simulate_screen::SimulateScreen));
 

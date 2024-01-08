@@ -9,6 +9,7 @@ use rand::prelude::Distribution;
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
 use crate::entities::ui_entity::DisplayEntity;
+use crate::filters::scene_filter::filter_system;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
 
@@ -20,7 +21,7 @@ pub struct SimulateScreen;
 impl Plugin for SimulateScreen {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(DisplayState::SimulateScreen), construct)
-            .add_systems(Update, (update_status, apply_velocity).run_if(in_state(DisplayState::SimulateScreen)))
+            .add_systems(Update, (update_status, apply_velocity, filter_system).run_if(in_state(DisplayState::SimulateScreen)))
             .add_systems(OnExit(DisplayState::SimulateScreen), destroy)
             .add_plugins(Camera3DPlugin);
     }
@@ -234,9 +235,9 @@ fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
     }
 }
 
-fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
+fn construct(mut commands: Commands, mut client: ResMut<ClientDisplay>, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
     let entities = retrieve_entities(client.settings.profile.get_entities());
-    
+
     // TODO switch other place the number of entities recorded.
     let meter = global::meter("engine");
     let ram_gauge = meter.u64_observable_gauge("entities")
@@ -295,44 +296,40 @@ fn construct(mut commands: Commands, client: Res<ClientDisplay>) {
         .insert(ColliderDebugColor(Color::rgb_u8(0, 0, 255)))
         .insert(TransformBundle::from(Transform::from_xyz(1000., 998., 0.)));
 
-    for (entity, shape) in entities {
-        commands
-            .spawn(shape)
-            .insert(RigidBody::Dynamic)
-            .insert(DisplayEntity::from_entity(entity.clone(), id))
-            .insert(ColliderDebugColor(Color::rgb_u8(
+    for (entity, collider, mesh) in entities {
+        let color = Color::rgb_u8(
                 entity.group.color.red(),
                 entity.group.color.green(),
                 entity.group.color.blue(),
-            )))
+            );
+
+        commands
+            .spawn(PbrBundle {
+                mesh: meshes.add(mesh),
+                material: materials.add(color.into()), ..Default::default()})
+
+            .insert(collider)
+
+            .insert(RigidBody::Dynamic)
+            .insert(DisplayEntity::from_entity(entity.clone(), id))
+            .insert(ColliderDebugColor(color))
             .insert(TransformBundle::from(Transform::from_xyz(
                 entity.location.x,
                 entity.location.y,
                 entity.location.z,
             )));
         id += 1;
+        client.filter.color_filters.insert(entity.group.color);
+        client.filter.group_filters.insert(entity.group.group);
+        client.filter.shape_filters.insert(entity.group.shape);
+        for direction in entity.group.directions {
+            client.filter.add_direction_filter(direction);
+        }
     }
 }
 
 fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();
-    }
-}
-
-pub fn keyboard_input(
-    keys: Res<Input<KeyCode>>,
-    app_state: ResMut<State<DisplayState>>,
-    mut next_state: ResMut<NextState<DisplayState>>,
-) {
-    if keys.just_pressed(KeyCode::B) {
-        match app_state.get() {
-            DisplayState::SimulateScreen => {
-                next_state.set(DisplayState::Blueprint);
-            }
-            DisplayState::LoadingScreen => {}
-            DisplayState::Menu => {}
-            DisplayState::Blueprint => {}
-        }
     }
 }
