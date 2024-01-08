@@ -1,9 +1,7 @@
 use bevy::prelude::*;
-use bevy_egui::{egui,  EguiContext, EguiContexts};
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::direction::Direction;
-use client_profile::models::color::Color as ClientColor;
 use client_profile::models::location::Location;
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
@@ -11,6 +9,7 @@ use rand::prelude::Distribution;
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
 use crate::entities::ui_entity::DisplayEntity;
+use crate::filters::scene_filter::filter_system;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
 
@@ -236,7 +235,7 @@ fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
     }
 }
 
-fn construct(mut commands: Commands, client: Res<ClientDisplay>, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
+fn construct(mut commands: Commands, mut client: ResMut<ClientDisplay>, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
     let entities = retrieve_entities(client.settings.profile.get_entities());
 
     // TODO switch other place the number of entities recorded.
@@ -320,6 +319,12 @@ fn construct(mut commands: Commands, client: Res<ClientDisplay>, mut meshes: Res
                 entity.location.z,
             )));
         id += 1;
+        client.filter.color_filters.insert(entity.group.color);
+        client.filter.group_filters.insert(entity.group.group);
+        client.filter.shape_filters.insert(entity.group.shape);
+        for direction in entity.group.directions {
+            client.filter.add_direction_filter(direction);
+        }
     }
 }
 
@@ -328,25 +333,3 @@ fn destroy(mut commands: Commands, query: Query<Entity, With<SimulateScreen>>) {
         commands.entity(entity).despawn_recursive();
     }
 }
-
-fn filter_system(
-    mut egui_context: EguiContexts,
-    mut client_display: ResMut<ClientDisplay>,
-    mut entities: Query<(&DisplayEntity, &mut Visibility)>    
-    // ... other parameters if needed
-) {
-    let colors = vec![ClientColor::Red, ClientColor::Green, ClientColor::Blue, ClientColor::Cyan, ClientColor::Pink, ClientColor::Purple, ClientColor::Magenta, ClientColor::Brown, ClientColor::Gray, ClientColor::Lime];
-    egui::Window::new("Enum Selector").show(egui_context.ctx_mut(), |ui| {
-        ui.heading("Choose Options");
-
-        for color in colors {
-            let mut is_selected = client_display.filter.color_filters.contains(&color);
-
-            if ui.checkbox(&mut is_selected, format!("{:?}", &color)).clicked() {
-                client_display.filter.toggle_color_filter(color, &mut entities);
-            }
-        }
-
-    });
-}
-
