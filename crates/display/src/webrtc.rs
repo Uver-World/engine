@@ -1,0 +1,85 @@
+use std::{
+    collections::VecDeque,
+    sync::{Arc, Mutex},
+};
+
+use bevy::{prelude::*, render::view::screenshot::ScreenshotManager, window::PrimaryWindow};
+use bevy_matchbox::{matchbox_socket::SingleChannel, MatchboxSocket};
+
+use crate::api::Api;
+
+#[derive(Resource, Clone)]
+pub struct Images {
+    image: Arc<Mutex<VecDeque<Image>>>,
+}
+
+impl Images {
+    pub fn new() -> Self {
+        let image = Arc::new(Mutex::new(VecDeque::new()));
+        Self { image }
+    }
+}
+
+pub struct WebRtc;
+
+impl Plugin for WebRtc {
+    fn build(&self, app: &mut App) {
+        app.insert_resource(Images::new());
+        app.add_systems(Startup, start_matchbox_socket)
+            .add_systems(Update, (take_screenshot, check_peers));
+    }
+}
+
+fn start_matchbox_socket(mut commands: Commands, api: Res<Api>) {
+    let peer = api.authenticate().unwrap();
+    eprintln!("POST server_auth sent!");
+    let room_url = format!(
+        "ws://{hostname}:{port}/{id}",
+        hostname = peer.signaling_hostname,
+        port = peer.signaling_port,
+        id = peer.room_id
+    );
+    eprintln!("connecting to matchbox server: {:?}", peer);
+    let socket = MatchboxSocket::new_ggrs(room_url);
+    commands.insert_resource(socket);
+}
+
+fn take_screenshot(
+    main_window: Query<Entity, With<PrimaryWindow>>,
+    mut screenshot_manager: ResMut<ScreenshotManager>,
+    images: Res<Images>,
+) {
+    let image_manager = images.clone();
+    let _ = screenshot_manager.take_screenshot(main_window.single(), move |image| {
+        image_manager.image.lock().unwrap().push_back(image);
+        println!("screenshot saved into images")
+    });
+}
+
+fn check_peers(mut socket: ResMut<MatchboxSocket<SingleChannel>>, images: Res<Images>) {
+    if socket.get_channel(0).is_err() {
+        return; // we've already started
+    }
+
+    // Check for new connections
+    socket.update_peers();
+    eprintln!("peers connected = {}", socket.players().len());
+    let mut images = images.image.lock().unwrap();
+    while !images.is_empty() {
+        let image = images.pop_front().unwrap();
+        send_screenshot(image, &mut socket);
+    }
+}
+
+fn send_screenshot(image: Image, socket: &mut MatchboxSocket<SingleChannel>) {
+    let peers: Vec<_> = socket.connected_peers().collect();
+    for peer in peers {
+        socket.send(image.data.clone().into(), peer);
+    }
+    println!("screenshot sent to peers");
+}
+
+pub fn close_matchbox_socket(api: &Api) {
+    let _ = api.server_disconnect();
+    eprintln!("POST server_disconnect sent!");
+}

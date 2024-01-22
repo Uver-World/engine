@@ -4,8 +4,8 @@ use bevy_rapier3d::prelude::*;
 
 use client_profile::*;
 use filters::Filter;
-use matchbox_socket::close_matchbox_socket;
 use states::DisplayState;
+use webrtc::{close_matchbox_socket, WebRtc};
 
 use crate::api::Api;
 
@@ -13,10 +13,11 @@ pub mod api;
 pub mod assets;
 pub mod cameras;
 pub mod entities;
-pub mod matchbox_socket;
+pub mod filters;
 pub mod scenes;
 pub mod states;
-pub mod filters;
+pub mod webrtc;
+
 mod telemetry;
 
 #[derive(Resource)]
@@ -40,29 +41,36 @@ impl ClientDisplay {
         let api = Api::from(&self.settings.api_settings);
         let is_offline = self.settings.is_offline;
         let has_telemetry = self.settings.has_telemetry;
-        let telemetry_settings = telemetry::TelemetrySettings::new(&self.settings.telemetry_settings.hostname, self.settings.telemetry_settings.token.clone());
+        let telemetry_settings = telemetry::TelemetrySettings::new(
+            &self.settings.telemetry_settings.hostname,
+            self.settings.telemetry_settings.token.clone(),
+        );
 
         let mut app = App::new();
-            app
-            .insert_resource(WinitSettings {
-                return_from_run: true,
-                ..default()
-            })
-            .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-            .insert_resource(Api::from(&self.settings.api_settings))
-            .add_plugins(DefaultPlugins.set(WindowPlugin {
-                primary_window: Some(self.get_window()),
-                ..default()
-            }))
-            .add_state::<DisplayState>()
-            .add_systems(Startup, assets::loading_screen::load_assets)
-            .add_plugins(EguiPlugin)
-            .add_plugins((RapierPhysicsPlugin::<NoUserData>::default(), RapierDebugRenderPlugin::default()))
-            .add_plugins((scenes::loading_screen::LoadingScreen, scenes::simulate_screen::SimulateScreen));
+        app.insert_resource(WinitSettings {
+            return_from_run: true,
+            ..default()
+        })
+        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(self.get_window()),
+            ..default()
+        }))
+        .add_state::<DisplayState>()
+        .add_systems(Startup, assets::loading_screen::load_assets)
+        .add_plugins(EguiPlugin)
+        .add_plugins((
+            RapierPhysicsPlugin::<NoUserData>::default(),
+            RapierDebugRenderPlugin::default(),
+        ))
+        .add_plugins((
+            scenes::loading_screen::LoadingScreen,
+            scenes::simulate_screen::SimulateScreen,
+        ));
 
         if !is_offline {
-            app.add_systems(Startup, matchbox_socket::start_matchbox_socket)
-                .add_systems(Update,matchbox_socket::check_peers);
+            app.insert_resource(Api::from(&self.settings.api_settings))
+                .add_plugins(WebRtc);
         }
 
         if has_telemetry {
