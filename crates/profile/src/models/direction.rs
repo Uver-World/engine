@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::models::location::Location;
+use crate::models::Location;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 pub enum Direction {

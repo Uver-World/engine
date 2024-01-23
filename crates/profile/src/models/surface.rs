@@ -1,13 +1,7 @@
-use serde::{
-    ser::{self, SerializeStruct, Serializer},
-    Deserialize, Serialize,
-};
+use serde::ser::{self, SerializeStruct, Serializer};
 use serde_json::Value;
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct SurfaceGroup {
-    pub group: String,
-}
+use super::SurfaceGroup;
 
 pub struct Surface {
     pub group: SurfaceGroup,

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use client_profile::models::entity::Entity;
+use client_profile::models::Entity;
 
 #[derive(Component, Clone, PartialEq)]
 pub struct DisplayEntity {

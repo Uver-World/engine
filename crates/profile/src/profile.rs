@@ -6,10 +6,7 @@ use serde::{
 };
 use serde_json::Value;
 
-use crate::models::{
-    entity::{Entity, EntityGroup},
-    surface::{Surface, SurfaceGroup},
-};
+use crate::models::{Entity, EntityGroup, Surface, SurfaceGroup};
 
 #[derive(Serialize)]
 pub struct Profile {
@@ -52,7 +49,7 @@ impl Profile {
             format!("{}.json", self.project_name),
             serde_json::to_string_pretty(self).unwrap(),
         )
-            .unwrap();
+        .unwrap();
     }
 
     pub fn get_entities(&self) -> &Vec<Entity> {
@@ -74,8 +71,8 @@ impl Profile {
 
 impl<'de> de::Deserialize<'de> for Profile {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
@@ -97,8 +94,8 @@ impl<'de> de::Deserialize<'de> for Profile {
             }
 
             fn visit_seq<V>(self, mut seq: V) -> Result<Profile, V::Error>
-                where
-                    V: SeqAccess<'de>,
+            where
+                V: SeqAccess<'de>,
             {
                 let project_name = seq
                     .next_element()?
@@ -114,8 +111,8 @@ impl<'de> de::Deserialize<'de> for Profile {
             }
 
             fn visit_map<V>(self, mut map: V) -> Result<Profile, V::Error>
-                where
-                    V: MapAccess<'de>,
+            where
+                V: MapAccess<'de>,
             {
                 let mut project_name = None;
                 let mut entity_groups = None;

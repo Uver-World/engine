@@ -2,7 +2,7 @@
   "project_name": "front_collision",
   "entity_groups": [
     {
-      "group": "MagentaSquare",
+      "name": "MagentaSquare",
       "color": "MAGENTA",
       "speed": 5.0,
       "directions": [
@@ -17,7 +17,7 @@
       "shape": "RECTANGLE"
     },
     {
-      "group": "PinkSquare",
+      "name": "PinkSquare",
       "color": "PINK",
       "speed": 0.0,
       "directions": [

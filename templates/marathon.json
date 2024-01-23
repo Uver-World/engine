@@ -2,7 +2,7 @@
   "project_name": "marathon",
   "entity_groups": [
     {
-      "group": "MagentaSquare",
+      "name": "MagentaSquare",
       "color": "MAGENTA",
       "speed": 0.5,
       "direction": {
@@ -15,7 +15,7 @@
       "shape": "RECTANGLE"
     },
     {
-      "group": "PinkSquare",
+      "name": "PinkSquare",
       "color": "PINK",
       "speed": 2.0,
       "direction": {
@@ -28,7 +28,7 @@
       "shape": "TRIANGLE"
     },
     {
-      "group": "CyanSquare",
+      "name": "CyanSquare",
       "color": "CYAN",
       "speed": 10.0,
       "direction": {

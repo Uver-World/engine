@@ -2,7 +2,7 @@
   "project_name": "speedy",
   "entity_groups": [
     {
-      "group": "RedSquare",
+      "name": "RedSquare",
       "color": "RED",
       "speed": 10.0,
       "directions": [
@@ -15,7 +15,7 @@
       "shape": "RECTANGLE"
     },
     {
-      "group": "GreenSquare",
+      "name": "GreenSquare",
       "color": "GREEN",
       "speed": 5.0,
       "directions": [
@@ -28,7 +28,7 @@
       "shape": "CIRCLE"
     },
     {
-      "group": "BlueSquare",
+      "name": "BlueSquare",
       "color": "BLUE",
       "speed": 50.0,
       "directions": [
@@ -37,7 +37,7 @@
       "shape": "RECTANGLE"
     },
     {
-      "group": "PinkSquare",
+      "name": "PinkSquare",
       "color": "PINK",
       "speed": 2.0,
       "directions": [

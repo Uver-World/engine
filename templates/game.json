@@ -2,7 +2,7 @@
   "project_name": "game",
   "entity_groups": [
     {
-      "group": "Fox",
+      "name": "Fox",
       "color": "RED",
       "speed": 1.5,
       "directions": [
@@ -15,7 +15,7 @@
       "shape": "RECTANGLE"
     },
     {
-      "group": "Random",
+      "name": "Random",
       "color": "MAGENTA",
       "speed": 5.0,
       "directions": [
@@ -24,7 +24,7 @@
       "shape": "RECTANGLE"
     },
     {
-      "group": "FollowRandom",
+      "name": "FollowRandom",
       "color": "PINK",
       "speed": 1.5,
       "directions": [
@@ -37,7 +37,7 @@
       "shape": "RECTANGLE"
     },
     {
-      "group": "Snake",
+      "name": "Snake",
       "color": "GREEN",
       "speed": 2.0,
       "directions": [
@@ -50,7 +50,7 @@
       "shape": "BALL"
     },
     {
-      "group": "Chicken",
+      "name": "Chicken",
       "color": "GRAY",
       "speed": 1.0,
       "directions": [

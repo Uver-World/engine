@@ -1,19 +1,7 @@
-use serde::{
-    ser::{self, SerializeStruct, Serializer},
-    Deserialize, Serialize,
-};
+use serde::ser::{self, SerializeStruct, Serializer};
 use serde_json::{from_value, Value};
 
-use crate::models::{color::Color, direction::Direction, location::Location, shape::Shape};
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct EntityGroup {
-    pub group: String,
-    pub color: Color,
-    pub speed: f32,
-    pub directions: Vec<Direction>,
-    pub shape: Shape,
-}
+use super::{EntityGroup, Location};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Entity {
@@ -50,7 +38,7 @@ impl ser::Serialize for Entity {
         S: Serializer,
     {
         let mut state = serializer.serialize_struct("Entity", 2)?;
-        state.serialize_field("group", &self.group.group)?;
+        state.serialize_field("group", &self.group.name)?;
         state.serialize_field("location", &self.location)?;
         state.end()
     }
@@ -58,7 +46,7 @@ impl ser::Serialize for Entity {
 
 fn retrieve_group(target: &str, groups: &Vec<EntityGroup>) -> Option<EntityGroup> {
     for group in groups {
-        if target == group.group {
+        if target == group.name {
             return Some(group.to_owned());
         }
     }

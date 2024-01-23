@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
-use client_profile::models::direction::Direction;
-use client_profile::models::location::Location;
+use client_profile::models::{Direction, Location};
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 
@@ -21,7 +20,11 @@ pub struct SimulateScreen;
 impl Plugin for SimulateScreen {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(DisplayState::SimulateScreen), construct)
-            .add_systems(Update, (update_status, apply_velocity, filter_system).run_if(in_state(DisplayState::SimulateScreen)))
+            .add_systems(
+                Update,
+                (update_status, apply_velocity, filter_system)
+                    .run_if(in_state(DisplayState::SimulateScreen)),
+            )
             .add_systems(OnExit(DisplayState::SimulateScreen), destroy)
             .add_plugins(Camera3DPlugin);
     }
@@ -100,7 +103,7 @@ fn follow_pos(
     let mut location: Option<Location> = None;
     for (entity, ent_transform) in query {
         // We check if the group is not the same, or target != entity
-        if !group_target.contains(&entity.settings.group.group) || target == entity {
+        if !group_target.contains(&entity.settings.group.name) || target == entity {
             continue;
         }
         match location {
@@ -141,7 +144,7 @@ fn escape_pos(
     let mut location: Option<Location> = None;
     for (entity, ent_transform) in query {
         // We check if the group is not the same, or target != entity
-        if !group_target.contains(&entity.settings.group.group) || target == entity {
+        if !group_target.contains(&entity.settings.group.name) || target == entity {
             continue;
         }
 
@@ -235,16 +238,22 @@ fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
     }
 }
 
-fn construct(mut commands: Commands, mut client: ResMut<ClientDisplay>, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
+fn construct(
+    mut commands: Commands,
+    mut client: ResMut<ClientDisplay>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
     let entities = retrieve_entities(client.settings.profile.get_entities());
 
     // TODO switch other place the number of entities recorded.
     let meter = global::meter("engine");
-    let ram_gauge = meter.u64_observable_gauge("entities")
+    let ram_gauge = meter
+        .u64_observable_gauge("entities")
         .with_description("Number of entities")
         .init();
     ram_gauge.observe(entities.len() as u64, [].as_ref());
-    
+
     let mut id = 0;
 
     commands
@@ -298,18 +307,18 @@ fn construct(mut commands: Commands, mut client: ResMut<ClientDisplay>, mut mesh
 
     for (entity, collider, mesh) in entities {
         let color = Color::rgb_u8(
-                entity.group.color.red(),
-                entity.group.color.green(),
-                entity.group.color.blue(),
-            );
+            entity.group.color.red(),
+            entity.group.color.green(),
+            entity.group.color.blue(),
+        );
 
         commands
             .spawn(PbrBundle {
                 mesh: meshes.add(mesh),
-                material: materials.add(color.into()), ..Default::default()})
-
+                material: materials.add(color.into()),
+                ..Default::default()
+            })
             .insert(collider)
-
             .insert(RigidBody::Dynamic)
             .insert(DisplayEntity::from_entity(entity.clone(), id))
             .insert(ColliderDebugColor(color))
@@ -320,7 +329,7 @@ fn construct(mut commands: Commands, mut client: ResMut<ClientDisplay>, mut mesh
             )));
         id += 1;
         client.filter.color_filters.insert(entity.group.color);
-        client.filter.group_filters.insert(entity.group.group);
+        client.filter.group_filters.insert(entity.group.name);
         client.filter.shape_filters.insert(entity.group.shape);
         for direction in entity.group.directions {
             client.filter.add_direction_filter(direction);
