@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
-use client_profile::models::{Direction, Location, Range};
+use client_profile::models::{Direction, Location, Range, SightRadius};
 
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
@@ -89,11 +89,28 @@ fn follow_pos(
     transform: &Transform,
     group_target: Vec<String>,
     query: &Vec<(DisplayEntity, Transform)>,
+    sight_radius: SightRadius,
 ) {
     let mut location: Option<Location> = None;
     for (entity, ent_transform) in query {
-        // We check if the group is not the same, or target != entity
-        if !group_target.contains(&entity.settings.group.name) || target == entity {
+        if target == entity {
+            continue;
+        }
+        if !group_target.contains(&entity.settings.group.name) {
+            continue;
+        }
+        if !sight_radius.is_in_sight(
+            Location::new(
+                transform.translation.x,
+                transform.translation.y,
+                transform.translation.z,
+            ),
+            Location::new(
+                ent_transform.translation.x,
+                ent_transform.translation.y,
+                ent_transform.translation.z,
+            ),
+        ) {
             continue;
         }
         match location {
@@ -121,7 +138,11 @@ fn follow_pos(
     }
     match location {
         Some(location) => destination_pos(target, transform, location),
-        _ => {}
+        _ => {
+            target.velocity.x = 0.0;
+            target.velocity.y = 0.0;
+            target.velocity.z = 0.0;
+        }
     }
 }
 
@@ -130,11 +151,28 @@ fn escape_pos(
     transform: &Transform,
     group_target: Vec<String>,
     query: &Vec<(DisplayEntity, Transform)>,
+    sight_radius: SightRadius,
 ) {
     let mut location: Option<Location> = None;
     for (entity, ent_transform) in query {
-        // We check if the group is not the same, or target != entity
-        if !group_target.contains(&entity.settings.group.name) || target == entity {
+        if target == entity {
+            continue;
+        }
+        if !group_target.contains(&entity.settings.group.name) {
+            continue;
+        }
+        if !sight_radius.is_in_sight(
+            Location::new(
+                transform.translation.x,
+                transform.translation.y,
+                transform.translation.z,
+            ),
+            Location::new(
+                ent_transform.translation.x,
+                ent_transform.translation.y,
+                ent_transform.translation.z,
+            ),
+        ) {
             continue;
         }
 
@@ -199,7 +237,11 @@ fn escape_pos(
             };
             destination_pos(target, transform, Location::new(x, y, z));
         }
-        _ => {}
+        _ => {
+            target.velocity.x = 0.0;
+            target.velocity.y = 0.0;
+            target.velocity.z = 0.0;
+        }
     }
 }
 
@@ -216,12 +258,20 @@ fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
                 Direction::Location(location) => {
                     destination_pos(&mut ui_entity, &transform, location)
                 }
-                Direction::Follow(group_name) => {
-                    follow_pos(&mut ui_entity, &transform, group_name, &entities)
-                }
-                Direction::Escape(group_name) => {
-                    escape_pos(&mut ui_entity, &transform, group_name, &entities)
-                }
+                Direction::Follow(sight_radius, group_name) => follow_pos(
+                    &mut ui_entity,
+                    &transform,
+                    group_name,
+                    &entities,
+                    sight_radius,
+                ),
+                Direction::Escape(sight_radius, group_name) => escape_pos(
+                    &mut ui_entity,
+                    &transform,
+                    group_name,
+                    &entities,
+                    sight_radius,
+                ),
                 Direction::Static => {}
             }
         }

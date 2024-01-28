@@ -5,6 +5,7 @@ mod entity_group;
 mod location;
 mod range;
 mod shape;
+mod sight_radius;
 mod surface;
 mod surface_group;
 
@@ -15,5 +16,6 @@ pub use entity_group::EntityGroup;
 pub use location::Location;
 pub use range::Range;
 pub use shape::Shape;
+pub use sight_radius::SightRadius;
 pub use surface::Surface;
 pub use surface_group::SurfaceGroup;

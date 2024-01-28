@@ -8,7 +8,10 @@
       "directions": [
         {
           "Follow": [
-            "Chicken"
+            30.0,
+            [
+              "Chicken"
+            ]
           ]
         }
       ],
@@ -36,7 +39,10 @@
       "directions": [
         {
           "Follow": [
-            "Random"
+            100.0, 
+            [
+              "Random"
+            ]
           ]
         }
       ],
@@ -49,7 +55,10 @@
       "directions": [
         {
           "Follow": [
-            "Fox"
+            30.0,
+            [
+              "Fox"
+            ]
           ]
         }
       ],
@@ -62,7 +71,10 @@
       "directions": [
         {
           "Follow": [
-            "Snake"
+            30.0,
+            [
+              "Snake"
+            ]
           ]
         }
       ],
