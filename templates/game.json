@@ -17,9 +17,15 @@
     {
       "name": "Random",
       "color": "MAGENTA",
-      "speed": 5.0,
+      "speed": 1.5,
       "directions": [
-        "Random"
+        {
+          "Random": {
+            "x": [-20, 20],
+            "y": [0, 0],
+            "z": [-5, 5]
+          }
+        }
       ],
       "shape": "RECTANGLE"
     },

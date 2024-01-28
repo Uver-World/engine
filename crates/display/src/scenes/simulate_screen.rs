@@ -1,9 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
-use client_profile::models::{Direction, Location};
-use rand::distributions::Uniform;
-use rand::prelude::Distribution;
+use client_profile::models::{Direction, Location, Range};
 
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
@@ -38,29 +36,21 @@ fn apply_velocity(mut query: Query<(&mut Transform, &mut DisplayEntity)>) {
     }
 }
 
-fn random_pos(entity: &mut DisplayEntity, transform: &mut Transform) {
-    let rand = Uniform::from(1..5).sample(&mut rand::thread_rng()); // TOP BOT, RIGHT, LEFT
-    match rand {
-        1 => {
-            if transform.translation.z > -100.0 {
-                entity.velocity.z = -entity.settings.group.speed;
-            }
-        }
-        2 => {
-            if transform.translation.z <= 100.0 {
-                entity.velocity.z = entity.settings.group.speed;
-            }
-        }
-        3 => {
-            if transform.translation.x <= 300.0 {
-                entity.velocity.x = entity.settings.group.speed;
-            }
-        }
-        _ => {
-            if transform.translation.x > 20.0 {
-                entity.velocity.x = -entity.settings.group.speed;
-            }
-        }
+fn random_pos(entity: &mut DisplayEntity, transform: &mut Transform, range: &Range) {
+    let x = range.uniform_x();
+    let y = range.uniform_y();
+    let z = range.uniform_z();
+    entity.velocity.x = x * entity.settings.group.speed;
+    entity.velocity.y = y * entity.settings.group.speed;
+    entity.velocity.z = z * entity.settings.group.speed;
+    if transform.translation.x >= 10. && transform.translation.x <= 10. {
+        entity.velocity.x = 0.;
+    }
+    if transform.translation.y >= 10. && transform.translation.y <= 10. {
+        entity.velocity.y = 0.;
+    }
+    if transform.translation.z >= 10. && transform.translation.z <= 10. {
+        entity.velocity.z = 0.;
     }
 }
 
@@ -222,7 +212,7 @@ fn update_status(mut query: Query<(&mut DisplayEntity, &mut Transform)>) {
     for (mut ui_entity, mut transform) in &mut query {
         for direction in ui_entity.settings.group.directions.clone() {
             match direction {
-                Direction::Random => random_pos(&mut ui_entity, &mut transform),
+                Direction::Random(range) => random_pos(&mut ui_entity, &mut transform, &range),
                 Direction::Location(location) => {
                     destination_pos(&mut ui_entity, &transform, location)
                 }

@@ -12,7 +12,6 @@ client-telemetry = { path = "../telemetry" }
 
 bevy = "0.11.2"
 bevy_egui = "0.22.0"
-rand = "0.8.5"
 nalgebra = "0.32.2"
 bevy_rapier3d = "0.22.0"
 bevy_matchbox = { version = "0.7.0", features = ["ggrs"] }
