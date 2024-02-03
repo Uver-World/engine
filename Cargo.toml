@@ -11,9 +11,34 @@ members = [
 ]
 
 [dependencies]
+client-display.workspace = true
+client-profile.workspace = true
+
+dotenv.workspace = true
+clap.workspace = true
+
+[workspace.dependencies]
+# local crates
 client-display = { path = "crates/display" }
 client-profile = { path  = "crates/profile" }
+client-api = { path  = "crates/api" }
+client-telemetry = { path  = "crates/telemetry" }
 
 dotenv = "0.15.0"
 clap = "4.4.8"
-
+sys-info = "0.9.1"
+bevy = "0.11.2"
+bevy_egui = "0.22.0"
+nalgebra = "0.32.2"
+bevy_rapier3d = "0.22.0"
+bevy_matchbox = { version = "0.7.0", features = ["ggrs"] }
+opentelemetry = "0.21.0"
+reqwest = { version = "0.11.20", features = ["blocking", "json"] }
+serde_json = "1.0.107"
+serde = {version = "1.0.188", features = ["derive"]}
+rand = "0.8.5"
+opentelemetry_sdk = { version = "0.21.0", features = ["rt-async-std"] }
+opentelemetry-proto = { version = "0.4.0", default-features = false, features = ["gen-tonic-messages", "trace", "metrics"] }
+futures-core = "0.3.28"
+prost = "0.11.9"
+tokio = "1.35.1"
