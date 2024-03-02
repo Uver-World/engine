@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+use bevy_rapier3d::dynamics::GravityScale;
+use bevy_rapier3d::geometry::ColliderMassProperties;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::{Direction, Location, Range, SightRadius};
@@ -153,6 +155,11 @@ fn escape_pos(
     query: &Vec<(DisplayEntity, Transform)>,
     sight_radius: SightRadius,
 ) {
+    let entity_location = Location::new(
+        transform.translation.x,
+        transform.translation.y,
+        transform.translation.z,
+    );
     let mut location: Option<Location> = None;
     for (entity, ent_transform) in query {
         if target == entity {
@@ -161,27 +168,19 @@ fn escape_pos(
         if !group_target.contains(&entity.settings.group.name) {
             continue;
         }
-        if !sight_radius.is_in_sight(
-            Location::new(
-                transform.translation.x,
-                transform.translation.y,
-                transform.translation.z,
-            ),
-            Location::new(
-                ent_transform.translation.x,
-                ent_transform.translation.y,
-                ent_transform.translation.z,
-            ),
-        ) {
+        let current_location = Location::new(
+            ent_transform.translation.x,
+            ent_transform.translation.y,
+            ent_transform.translation.z,
+        );
+        if !sight_radius.is_in_sight(entity_location.clone(), current_location.clone()) {
             continue;
         }
 
         match location {
             Some(found_location) => {
-                if found_location.x + found_location.y + found_location.z
-                    > ent_transform.translation.x
-                        + ent_transform.translation.y
-                        + ent_transform.translation.z
+                if SightRadius::compute_distance(&current_location, &entity_location)
+                    < SightRadius::compute_distance(&found_location, &entity_location)
                 {
                     location = Some(Location::new(
                         ent_transform.translation.x,
@@ -359,6 +358,7 @@ fn construct(
                 ..Default::default()
             })
             .insert(collider)
+            .insert(GravityScale(entity.group.gravity))
             .insert(RigidBody::Dynamic)
             .insert(DisplayEntity::from_entity(entity.clone(), id))
             .insert(ColliderDebugColor(color))

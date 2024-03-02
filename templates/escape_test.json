@@ -1,0 +1,57 @@
+{
+  "project_name": "escape_test",
+  "entity_groups": [
+    {
+      "name": "Fox",
+      "color": "RED",
+      "speed": 1.0,
+      "directions": [
+        {
+          "Follow": [
+            200.0,
+            [
+              "Chicken"
+            ]
+          ]
+        }
+      ],
+      "shape": "RECTANGLE"
+    },
+    {
+      "name": "Chicken",
+      "color": "GRAY",
+      "speed": 100.0,
+      "directions": [
+        {
+          "Escape": [
+            50.0,
+            [
+              "Fox"
+            ]
+          ]
+        }
+      ],
+      "shape": "CIRCLE"
+    }
+  ],
+  "entities": [
+    {
+      "group": "Fox",
+      "location": {
+        "x": 0.0,
+        "y": 10.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "Chicken",
+      "location": {
+        "x": 0.0,
+        "y": 10.0,
+        "z": 100.0
+      }
+    }
+  ],
+  "surface_groups": [],
+  "surfaces": []
+}

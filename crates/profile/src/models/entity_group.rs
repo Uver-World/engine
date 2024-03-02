@@ -9,4 +9,5 @@ pub struct EntityGroup {
     pub speed: f32,
     pub directions: Vec<Direction>,
     pub shape: Shape,
+    pub gravity: f32,
 }

@@ -4,7 +4,8 @@
     {
       "name": "MagentaSquare",
       "color": "MAGENTA",
-      "speed": 5.0,
+      "speed": 0.1,
+      "gravity": 500.0,
       "directions": [
         {
           "Location": {
@@ -20,6 +21,7 @@
       "name": "PinkSquare",
       "color": "PINK",
       "speed": 0.0,
+      "gravity": 50.0,
       "directions": [
         "Static"
       ],

@@ -1,0 +1,56 @@
+{
+  "project_name": "follow_test",
+  "entity_groups": [
+    {
+      "name": "Fox",
+      "color": "RED",
+      "speed": 0.5,
+      "directions": [
+        {
+          "Follow": [
+            70.0,
+            [
+              "Chicken"
+            ]
+          ]
+        }
+      ],
+      "shape": "RECTANGLE"
+    },
+    {
+      "name": "Chicken",
+      "color": "GRAY",
+      "speed": 0.7,
+      "directions": [
+        {
+          "Location": {
+            "x": 40,
+            "y": 10,
+            "z": -300
+          }
+        }
+      ],
+      "shape": "CIRCLE"
+    }
+  ],
+  "entities": [
+    {
+      "group": "Fox",
+      "location": {
+        "x": 0.0,
+        "y": 10.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "Chicken",
+      "location": {
+        "x": 40.0,
+        "y": 10.0,
+        "z": 150.0
+      }
+    }
+  ],
+  "surface_groups": [],
+  "surfaces": []
+}
