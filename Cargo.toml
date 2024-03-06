@@ -24,6 +24,8 @@ client-profile = { path  = "crates/profile" }
 client-api = { path  = "crates/api" }
 client-telemetry = { path  = "crates/telemetry" }
 
+uverworld_packet = { path = "../packet/rust/" }
+
 dotenv = "0.15.0"
 clap = "4.4.8"
 sys-info = "0.9.1"

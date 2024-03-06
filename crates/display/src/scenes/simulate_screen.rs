@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use bevy_rapier3d::dynamics::GravityScale;
-use bevy_rapier3d::geometry::ColliderMassProperties;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::{Direction, Location, Range, SightRadius};
@@ -8,6 +7,7 @@ use client_profile::models::{Direction, Location, Range, SightRadius};
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
 use crate::entities::ui_entity::DisplayEntity;
+use crate::events::{reset_simulation_event, ResetSimulation};
 use crate::filters::scene_filter::filter_system;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
@@ -25,7 +25,13 @@ impl Plugin for SimulateScreen {
                 (update_status, apply_velocity, filter_system)
                     .run_if(in_state(DisplayState::SimulateScreen)),
             )
+            .add_systems(
+                Update,
+                (reset_simulation_event, handle_keyboard)
+                    .run_if(in_state(DisplayState::SimulateScreen)),
+            )
             .add_systems(OnExit(DisplayState::SimulateScreen), destroy)
+            .add_event::<ResetSimulation>()
             .add_plugins(Camera3DPlugin);
     }
 }
@@ -296,7 +302,8 @@ fn construct(
     let mut id = 0;
 
     commands
-        .spawn(Camera3dBundle {
+        .spawn(SimulateScreen)
+        .insert(Camera3dBundle {
             transform: Transform::from_xyz(20., 500.0, 20.).looking_at(Vec3::ZERO, Vec3::X),
             ..Default::default()
         })
@@ -309,37 +316,37 @@ fn construct(
         });
 
     commands
-        .spawn_empty()
+        .spawn(SimulateScreen)
         .insert(Collider::cuboid(1000.0, -0.1, 1000.0))
         .insert(ColliderDebugColor(Color::rgb_u8(0, 255, 0)))
         .insert(TransformBundle::from(Transform::from_xyz(0., -2., 0.)));
 
     commands
-        .spawn_empty()
+        .spawn(SimulateScreen)
         .insert(Collider::cuboid(1000.0, -0.1, 1000.0))
         .insert(ColliderDebugColor(Color::rgb_u8(0, 255, 0)))
         .insert(TransformBundle::from(Transform::from_xyz(0., 2000., 0.)));
 
     commands
-        .spawn_empty()
+        .spawn(SimulateScreen)
         .insert(Collider::cuboid(1000.0, 1000.0, -0.1))
         .insert(ColliderDebugColor(Color::rgb_u8(255, 0, 0)))
         .insert(TransformBundle::from(Transform::from_xyz(0., 998., 1000.)));
 
     commands
-        .spawn_empty()
+        .spawn(SimulateScreen)
         .insert(Collider::cuboid(1000.0, 1000.0, -0.1))
         .insert(ColliderDebugColor(Color::rgb_u8(255, 0, 0)))
         .insert(TransformBundle::from(Transform::from_xyz(0., 998., -1000.)));
 
     commands
-        .spawn_empty()
+        .spawn(SimulateScreen)
         .insert(Collider::cuboid(-0.1, 1000.0, 1000.0))
         .insert(ColliderDebugColor(Color::rgb_u8(0, 0, 255)))
         .insert(TransformBundle::from(Transform::from_xyz(-1000., 998., 0.)));
 
     commands
-        .spawn_empty()
+        .spawn(SimulateScreen)
         .insert(Collider::cuboid(-0.1, 1000.0, 1000.0))
         .insert(ColliderDebugColor(Color::rgb_u8(0, 0, 255)))
         .insert(TransformBundle::from(Transform::from_xyz(1000., 998., 0.)));
@@ -352,7 +359,8 @@ fn construct(
         );
 
         commands
-            .spawn(PbrBundle {
+            .spawn(SimulateScreen)
+            .insert(PbrBundle {
                 mesh: meshes.add(mesh),
                 material: materials.add(color.into()),
                 ..Default::default()
@@ -374,6 +382,12 @@ fn construct(
         for direction in entity.group.directions {
             client.filter.add_direction_filter(direction);
         }
+    }
+}
+
+fn handle_keyboard(mut event_writer: EventWriter<ResetSimulation>, keys: Res<Input<KeyCode>>) {
+    if keys.just_pressed(KeyCode::R) {
+        event_writer.send(ResetSimulation);
     }
 }
 

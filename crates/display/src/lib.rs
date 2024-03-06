@@ -13,6 +13,7 @@ pub mod api;
 pub mod assets;
 pub mod cameras;
 pub mod entities;
+pub mod events;
 pub mod filters;
 pub mod scenes;
 pub mod states;

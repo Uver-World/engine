@@ -5,7 +5,7 @@
       "name": "MagentaSquare",
       "color": "MAGENTA",
       "speed": 0.1,
-      "gravity": 500.0,
+      "gravity": 0.005,
       "directions": [
         {
           "Location": {

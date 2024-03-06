@@ -5,8 +5,9 @@ use std::{
 
 use bevy::{prelude::*, render::view::screenshot::ScreenshotManager, window::PrimaryWindow};
 use bevy_matchbox::{matchbox_socket::SingleChannel, MatchboxSocket};
+use uverworld_packet::packet::PacketType;
 
-use crate::api::Api;
+use crate::{api::Api, events::ResetSimulation};
 
 #[derive(Resource, Clone)]
 pub struct Images {
@@ -26,7 +27,7 @@ impl Plugin for WebRtc {
     fn build(&self, app: &mut App) {
         app.insert_resource(Images::new());
         app.add_systems(Startup, start_matchbox_socket)
-            .add_systems(Update, (take_screenshot, check_peers));
+            .add_systems(Update, (take_screenshot, check_peers, receive));
     }
 }
 
@@ -77,6 +78,35 @@ fn send_screenshot(image: Image, socket: &mut MatchboxSocket<SingleChannel>) {
         socket.send(image.data.clone().into(), peer);
     }
     println!("screenshot sent to peers");
+}
+
+fn receive(
+    mut socket: ResMut<MatchboxSocket<SingleChannel>>,
+    mut event_writer: EventWriter<ResetSimulation>,
+) {
+    if socket.get_channel(0).is_err() {
+        return; // we've already started
+    }
+
+    // Check for new connections
+    socket.update_peers();
+    let queue = socket.receive();
+
+    for (_, packet) in queue {
+        let packet = uverworld_packet::deserialize(&packet);
+        if packet.is_err() {
+            eprintln!(
+                "error happened whilst deserializing packet: {:?}",
+                packet.unwrap_err()
+            );
+            continue;
+        }
+        let packet = packet.unwrap();
+
+        if packet.packet_type() == PacketType::ResetSimulation {
+            event_writer.send(ResetSimulation);
+        }
+    }
 }
 
 pub fn close_matchbox_socket(api: &Api) {

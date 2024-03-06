@@ -8,9 +8,12 @@ pub struct LoadingScreen;
 
 impl Plugin for LoadingScreen {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(DisplayState::LoadingScreen),construct)
+        app.add_systems(OnEnter(DisplayState::LoadingScreen), construct)
             .add_systems(OnExit(DisplayState::LoadingScreen), destroy)
-            .add_systems(Update, update_status.run_if(in_state(DisplayState::LoadingScreen)));
+            .add_systems(
+                Update,
+                update_status.run_if(in_state(DisplayState::LoadingScreen)),
+            );
     }
 }
 
