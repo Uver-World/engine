@@ -7,7 +7,12 @@ use client_profile::models::{Direction, Location, Range, SightRadius};
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
 use crate::entities::ui_entity::DisplayEntity;
-use crate::events::{reset_simulation_event, ResetSimulation};
+use crate::events::templates::SendTemplates;
+use crate::events::{
+    reset_simulation_event,
+    templates::{get_templates_event, GetTemplates},
+    ResetSimulation,
+};
 use crate::filters::scene_filter::filter_system;
 use crate::states::DisplayState;
 use crate::ClientDisplay;
@@ -27,11 +32,13 @@ impl Plugin for SimulateScreen {
             )
             .add_systems(
                 Update,
-                (reset_simulation_event, handle_keyboard)
+                (reset_simulation_event, get_templates_event, handle_keyboard)
                     .run_if(in_state(DisplayState::SimulateScreen)),
             )
             .add_systems(OnExit(DisplayState::SimulateScreen), destroy)
             .add_event::<ResetSimulation>()
+            .add_event::<GetTemplates>()
+            .add_event::<SendTemplates>()
             .add_plugins(Camera3DPlugin);
     }
 }
@@ -385,9 +392,16 @@ fn construct(
     }
 }
 
-fn handle_keyboard(mut event_writer: EventWriter<ResetSimulation>, keys: Res<Input<KeyCode>>) {
+fn handle_keyboard(
+    mut reset_simulation_event: EventWriter<ResetSimulation>,
+    mut get_templates_event: EventWriter<GetTemplates>,
+    keys: Res<Input<KeyCode>>,
+) {
     if keys.just_pressed(KeyCode::R) {
-        event_writer.send(ResetSimulation);
+        reset_simulation_event.send(ResetSimulation);
+    }
+    if keys.just_pressed(KeyCode::T) {
+        get_templates_event.send(GetTemplates);
     }
 }
 

@@ -7,7 +7,13 @@ use bevy::{prelude::*, render::view::screenshot::ScreenshotManager, window::Prim
 use bevy_matchbox::{matchbox_socket::SingleChannel, MatchboxSocket};
 use uverworld_packet::packet::PacketType;
 
-use crate::{api::Api, events::ResetSimulation};
+use crate::{
+    api::Api,
+    events::{
+        templates::{send_templates_event, GetTemplates},
+        ResetSimulation,
+    },
+};
 
 #[derive(Resource, Clone)]
 pub struct Images {
@@ -27,7 +33,8 @@ impl Plugin for WebRtc {
     fn build(&self, app: &mut App) {
         app.insert_resource(Images::new());
         app.add_systems(Startup, start_matchbox_socket)
-            .add_systems(Update, (take_screenshot, check_peers, receive));
+            .add_systems(Update, (take_screenshot, check_peers, receive))
+            .add_systems(Update, send_templates_event);
     }
 }
 
@@ -82,7 +89,8 @@ fn send_screenshot(image: Image, socket: &mut MatchboxSocket<SingleChannel>) {
 
 fn receive(
     mut socket: ResMut<MatchboxSocket<SingleChannel>>,
-    mut event_writer: EventWriter<ResetSimulation>,
+    mut reset_simulation_event: EventWriter<ResetSimulation>,
+    mut get_templates_event: EventWriter<GetTemplates>,
 ) {
     if socket.get_channel(0).is_err() {
         return; // we've already started
@@ -103,8 +111,10 @@ fn receive(
         }
         let packet = packet.unwrap();
 
-        if packet.packet_type() == PacketType::ResetSimulation {
-            event_writer.send(ResetSimulation);
+        match packet.packet_type() {
+            PacketType::ResetSimulation => reset_simulation_event.send(ResetSimulation),
+            PacketType::GetTemplates => get_templates_event.send(GetTemplates),
+            _ => eprintln!("packet not supported"),
         }
     }
 }
