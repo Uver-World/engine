@@ -1,0 +1,139 @@
+{
+  "project_name": "front_collision",
+  "entity_groups": [
+    {
+      "name": "MagentaSquare",
+      "color": "MAGENTA",
+      "speed": 0.1,
+      "gravity": 0.005,
+      "directions": [
+        {
+          "Location": {
+            "x": -2000.0,
+            "y": 20.0,
+            "z": 0.0
+          }
+        }
+      ],
+      "shape": "RECTANGLE"
+    },
+    {
+      "name": "PinkSquare",
+      "color": "PINK",
+      "speed": 0.0,
+      "gravity": 50.0,
+      "directions": [
+        "Static"
+      ],
+      "shape": "RECTANGLE"
+    }
+  ],
+  "entities": [
+    {
+      "group": "MagentaSquare",
+      "location": {
+        "x": 100.0,
+        "y": 20.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 0.0,
+        "y": 10.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 0.0,
+        "y": 10.0,
+        "z": 20.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 0.0,
+        "y": 10.0,
+        "z": -20.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 0.0,
+        "y": 30.0,
+        "z": -10.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 0.0,
+        "y": 30.0,
+        "z": 10.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": 0.0,
+        "y": 50.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 10.0,
+        "z": 0.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 10.0,
+        "z": 20.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 10.0,
+        "z": -20.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 30.0,
+        "z": -10.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 30.0,
+        "z": 10.0
+      }
+    },
+    {
+      "group": "PinkSquare",
+      "location": {
+        "x": -100.0,
+        "y": 50.0,
+        "z": 0.0
+      }
+    }
+  ],
+  "surface_groups": [],
+  "surfaces": []
+}

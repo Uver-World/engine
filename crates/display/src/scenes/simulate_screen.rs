@@ -3,10 +3,12 @@ use bevy_rapier3d::dynamics::GravityScale;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::{Direction, Location, Range, SightRadius};
+use uverworld_packet::templates::Template;
 
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
 use crate::entities::ui_entity::DisplayEntity;
+use crate::events::set_simulation::{set_simulation_event, SetSimulation};
 use crate::events::templates::SendTemplates;
 use crate::events::{
     reset_simulation_event,
@@ -32,13 +34,19 @@ impl Plugin for SimulateScreen {
             )
             .add_systems(
                 Update,
-                (reset_simulation_event, get_templates_event, handle_keyboard)
+                (
+                    reset_simulation_event,
+                    get_templates_event,
+                    set_simulation_event,
+                    handle_keyboard,
+                )
                     .run_if(in_state(DisplayState::SimulateScreen)),
             )
             .add_systems(OnExit(DisplayState::SimulateScreen), destroy)
             .add_event::<ResetSimulation>()
             .add_event::<GetTemplates>()
             .add_event::<SendTemplates>()
+            .add_event::<SetSimulation>()
             .add_plugins(Camera3DPlugin);
     }
 }
@@ -395,6 +403,7 @@ fn construct(
 fn handle_keyboard(
     mut reset_simulation_event: EventWriter<ResetSimulation>,
     mut get_templates_event: EventWriter<GetTemplates>,
+    mut set_simulation_event: EventWriter<SetSimulation>,
     keys: Res<Input<KeyCode>>,
 ) {
     if keys.just_pressed(KeyCode::R) {
@@ -402,6 +411,14 @@ fn handle_keyboard(
     }
     if keys.just_pressed(KeyCode::T) {
         get_templates_event.send(GetTemplates);
+    }
+    if keys.just_pressed(KeyCode::Y) {
+        let template_content = std::fs::read_to_string(r"templates\front_heavy2.json").unwrap();
+        let template = Template {
+            file_name: "test_set_simulation".into(),
+            file_content: template_content,
+        };
+        set_simulation_event.send(SetSimulation(template));
     }
 }
 

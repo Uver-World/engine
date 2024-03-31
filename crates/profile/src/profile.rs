@@ -44,6 +44,14 @@ impl Profile {
         Ok(settings.unwrap())
     }
 
+    pub fn custom_load<S: Into<String>>(file_content: S) -> Result<Self, String> {
+        let settings = serde_json::from_str(&file_content.into());
+        if settings.is_err() {
+            return Err(format!("{:?}", settings.err().unwrap()));
+        }
+        Ok(settings.unwrap())
+    }
+
     pub fn save(&self) {
         std::fs::write(
             format!("{}.json", self.project_name),
