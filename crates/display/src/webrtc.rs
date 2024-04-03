@@ -5,13 +5,14 @@ use std::{
 
 use bevy::{prelude::*, render::view::screenshot::ScreenshotManager, window::PrimaryWindow};
 use bevy_matchbox::{matchbox_socket::SingleChannel, MatchboxSocket};
-use uverworld_packet::{packet::PacketType, set_simulation};
+use uverworld_packet::{packet::PacketType, set_simulation, update_entity};
 
 use crate::{
     api::Api,
     events::{
         set_simulation::{set_simulation_event, SetSimulation},
         templates::{send_templates_event, GetTemplates},
+        update_entity::{update_entity_event, UpdateEntityEvent},
         ResetSimulation,
     },
 };
@@ -36,7 +37,8 @@ impl Plugin for WebRtc {
         app.add_systems(Startup, start_matchbox_socket)
             .add_systems(Update, (take_screenshot, check_peers, receive))
             .add_systems(Update, send_templates_event)
-            .add_systems(Update, set_simulation_event);
+            .add_systems(Update, set_simulation_event)
+            .add_systems(Update, update_entity_event);
     }
 }
 
@@ -94,6 +96,7 @@ fn receive(
     mut reset_simulation_event: EventWriter<ResetSimulation>,
     mut get_templates_event: EventWriter<GetTemplates>,
     mut set_simulation_event: EventWriter<SetSimulation>,
+    mut update_entity_event: EventWriter<UpdateEntityEvent>,
 ) {
     if socket.get_channel(0).is_err() {
         return; // we've already started
@@ -123,6 +126,10 @@ fn receive(
                     .template
                     .unwrap();
                 set_simulation_event.send(SetSimulation(template));
+            }
+            PacketType::UpdateEntity => {
+                let update_entity = update_entity::deserialize(&packet.value).unwrap();
+                update_entity_event.send(UpdateEntityEvent(update_entity));
             }
             _ => eprintln!("packet not supported"),
         }

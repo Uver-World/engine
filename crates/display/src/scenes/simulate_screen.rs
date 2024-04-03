@@ -1,15 +1,18 @@
+use bevy::ecs::system::EntityCommands;
 use bevy::prelude::*;
 use bevy_rapier3d::dynamics::GravityScale;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::{Direction, Location, Range, SightRadius};
 use uverworld_packet::templates::Template;
+use uverworld_packet::update_entity;
 
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
 use crate::entities::ui_entity::DisplayEntity;
 use crate::events::set_simulation::{set_simulation_event, SetSimulation};
 use crate::events::templates::SendTemplates;
+use crate::events::update_entity::{update_entity_event, UpdateEntityEvent};
 use crate::events::{
     reset_simulation_event,
     templates::{get_templates_event, GetTemplates},
@@ -39,6 +42,7 @@ impl Plugin for SimulateScreen {
                     get_templates_event,
                     set_simulation_event,
                     handle_keyboard,
+                    update_entity_event,
                 )
                     .run_if(in_state(DisplayState::SimulateScreen)),
             )
@@ -47,6 +51,7 @@ impl Plugin for SimulateScreen {
             .add_event::<GetTemplates>()
             .add_event::<SendTemplates>()
             .add_event::<SetSimulation>()
+            .add_event::<UpdateEntityEvent>()
             .add_plugins(Camera3DPlugin);
     }
 }
@@ -372,24 +377,17 @@ fn construct(
             entity.group.color.green(),
             entity.group.color.blue(),
         );
-
-        commands
-            .spawn(SimulateScreen)
-            .insert(PbrBundle {
-                mesh: meshes.add(mesh),
-                material: materials.add(color.into()),
-                ..Default::default()
-            })
-            .insert(collider)
-            .insert(GravityScale(entity.group.gravity))
-            .insert(RigidBody::Dynamic)
-            .insert(DisplayEntity::from_entity(entity.clone(), id))
-            .insert(ColliderDebugColor(color))
-            .insert(TransformBundle::from(Transform::from_xyz(
-                entity.location.x,
-                entity.location.y,
-                entity.location.z,
-            )));
+        let mesh = meshes.add(mesh);
+        let material = materials.add(color.into());
+        spawn_entity(
+            commands
+                .spawn(SimulateScreen)
+                .insert(ColliderDebugColor(color)),
+            collider,
+            mesh,
+            material,
+            &DisplayEntity::from_entity(entity.clone(), id),
+        );
         id += 1;
         client.filter.color_filters.insert(entity.group.color);
         client.filter.group_filters.insert(entity.group.name);
@@ -400,10 +398,35 @@ fn construct(
     }
 }
 
+pub fn spawn_entity(
+    commands: &mut EntityCommands,
+    collider: Collider,
+    mesh: Handle<Mesh>,
+    material: Handle<StandardMaterial>,
+    entity: &DisplayEntity,
+) {
+    commands
+        .insert(entity.clone())
+        .insert(PbrBundle {
+            mesh,
+            material,
+            ..Default::default()
+        })
+        .insert(collider)
+        .insert(GravityScale(entity.settings.group.gravity))
+        .insert(RigidBody::Dynamic)
+        .insert(TransformBundle::from(Transform::from_xyz(
+            entity.settings.location.x,
+            entity.settings.location.y,
+            entity.settings.location.z,
+        )));
+}
+
 fn handle_keyboard(
     mut reset_simulation_event: EventWriter<ResetSimulation>,
     mut get_templates_event: EventWriter<GetTemplates>,
     mut set_simulation_event: EventWriter<SetSimulation>,
+    mut update_entity_event: EventWriter<UpdateEntityEvent>,
     keys: Res<Input<KeyCode>>,
 ) {
     if keys.just_pressed(KeyCode::R) {
@@ -419,6 +442,14 @@ fn handle_keyboard(
             file_content: template_content,
         };
         set_simulation_event.send(SetSimulation(template));
+    }
+    if keys.just_pressed(KeyCode::U) {
+        let update_entity = update_entity::create_update_group(0, "PinkSquare");
+        update_entity_event.send(UpdateEntityEvent(update_entity));
+    }
+    if keys.just_pressed(KeyCode::I) {
+        let update_entity = update_entity::create_update_position(0, 100.0, 20.0, 0.0);
+        update_entity_event.send(UpdateEntityEvent(update_entity));
     }
 }
 
