@@ -5,12 +5,15 @@ use std::{
 
 use bevy::{prelude::*, render::view::screenshot::ScreenshotManager, window::PrimaryWindow};
 use bevy_matchbox::{matchbox_socket::SingleChannel, MatchboxSocket};
-use uverworld_packet::{packet::PacketType, set_simulation, update_entity, update_entity_group};
+use uverworld_packet::{
+    packet::PacketType, set_simulation, set_tick_rate, update_entity, update_entity_group,
+};
 
 use crate::{
     api::Api,
     events::{
         set_simulation::{set_simulation_event, SetSimulation},
+        set_tick_rate::{set_tick_rate_event, SetTickRateEvent},
         templates::{send_templates_event, GetTemplates},
         update_entity::{update_entity_event, UpdateEntityEvent},
         update_entity_group::{update_entity_group_event, UpdateEntityGroupEvent},
@@ -40,7 +43,8 @@ impl Plugin for WebRtc {
             .add_systems(Update, send_templates_event)
             .add_systems(Update, set_simulation_event)
             .add_systems(Update, update_entity_event)
-            .add_systems(Update, update_entity_group_event);
+            .add_systems(Update, update_entity_group_event)
+            .add_systems(Update, set_tick_rate_event);
     }
 }
 
@@ -100,6 +104,7 @@ fn receive(
     mut set_simulation_event: EventWriter<SetSimulation>,
     mut update_entity_event: EventWriter<UpdateEntityEvent>,
     mut update_entity_group_event: EventWriter<UpdateEntityGroupEvent>,
+    mut set_tick_rate_event: EventWriter<SetTickRateEvent>,
 ) {
     if socket.get_channel(0).is_err() {
         return; // we've already started
@@ -137,6 +142,10 @@ fn receive(
             PacketType::UpdateEntityGroup => {
                 let update_entity = update_entity_group::deserialize(&packet.value).unwrap();
                 update_entity_group_event.send(UpdateEntityGroupEvent(update_entity));
+            }
+            PacketType::SetTickRate => {
+                let set_tick_rate = set_tick_rate::deserialize(&packet.value).unwrap();
+                set_tick_rate_event.send(SetTickRateEvent(set_tick_rate));
             }
             _ => eprintln!("packet not supported"),
         }

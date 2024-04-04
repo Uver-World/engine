@@ -1,7 +1,7 @@
-use std::path::Path;
 use clap::{Arg, ArgMatches, Command};
+use std::path::Path;
 
-use client_display::{*, filters::Filter};
+use client_display::{filters::Filter, *};
 use client_profile::*;
 
 fn get_profile(matches: &ArgMatches) -> Result<Profile, String> {
@@ -14,7 +14,7 @@ fn get_profile(matches: &ArgMatches) -> Result<Profile, String> {
                 eprintln!("Error whilst loading {}: {}", file_path, err);
                 Ok(Profile::new(file_path.into()))
             }
-        }
+        };
     }
     Ok(Profile::new("new_project".to_string()))
 }
@@ -34,8 +34,8 @@ fn get_env(matches: &ArgMatches) -> Result<String, String> {
 }
 
 fn get_settings() -> Result<Settings, String> {
-    let app = Command::new("Engine settings").args(
-        [Arg::new("env")
+    let app = Command::new("Engine settings").args([
+        Arg::new("env")
             .help("Export the .env file to environment variables before run")
             .short('e'),
         Arg::new("offline")
@@ -46,10 +46,8 @@ fn get_settings() -> Result<Settings, String> {
             .help("Disables the telemetry.")
             .short('t')
             .action(clap::ArgAction::SetFalse),
-        Arg::new("profile")
-            .help("Sets the profile")
-            .index(1)],
-    );
+        Arg::new("profile").help("Sets the profile").index(1),
+    ]);
 
     let matches = app.get_matches();
     let env_file = get_env(&matches)?;
@@ -70,7 +68,7 @@ fn get_settings() -> Result<Settings, String> {
 fn main() {
     let settings = match get_settings() {
         Ok(settings) => settings,
-        Err(error) => panic!("An error occurred whilst starting the app: [{}]", error)
+        Err(error) => panic!("An error occurred whilst starting the app: [{}]", error),
     };
 
     eprintln!("Offline mode = {}", settings.is_offline);
@@ -80,6 +78,7 @@ fn main() {
         filter: Filter::new(),
         settings,
         is_toggled: true,
+        tick_rate: 30.0,
     }
     .run_display();
 }

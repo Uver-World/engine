@@ -26,6 +26,7 @@ pub struct ClientDisplay {
     pub filter: Filter,
     pub settings: Settings,
     pub is_toggled: bool,
+    pub tick_rate: f32,
 }
 
 impl ClientDisplay {

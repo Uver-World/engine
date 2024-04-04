@@ -102,21 +102,21 @@ pub fn update_entity_event(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut entities: Query<(Entity, &DisplayEntity, &mut Transform)>,
 ) {
-    for events in ev.iter() {
-        if events.0.r#type == UpdateType::Group as i32 {
-            let new_group = update_entity::deserialize_update_group(&events.0.value).unwrap();
+    for event in ev.iter() {
+        if event.0.r#type == UpdateType::Group as i32 {
+            let new_group = update_entity::deserialize_update_group(&event.0.value).unwrap();
             handle_update_group_event(
                 &mut commands,
                 &mut client,
-                events.0.target,
+                event.0.target,
                 new_group,
                 &entities,
                 &mut meshes,
                 &mut materials,
             );
-        } else if events.0.r#type == UpdateType::Position as i32 {
-            let new_position = update_entity::deserialize_update_position(&events.0.value).unwrap();
-            handle_update_position_event(events.0.target, new_position, &mut entities)
+        } else if event.0.r#type == UpdateType::Position as i32 {
+            let new_position = update_entity::deserialize_update_position(&event.0.value).unwrap();
+            handle_update_position_event(event.0.target, new_position, &mut entities)
         }
     }
 }

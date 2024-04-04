@@ -1,20 +1,35 @@
 use bevy::prelude::*;
+use bevy_rapier3d::plugin::{RapierConfiguration, TimestepMode};
 
 use crate::assets::loading_screen;
 use crate::states::DisplayState;
+use crate::ClientDisplay;
 
 #[derive(Component)]
 pub struct LoadingScreen;
 
 impl Plugin for LoadingScreen {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(DisplayState::LoadingScreen), construct)
-            .add_systems(OnExit(DisplayState::LoadingScreen), destroy)
-            .add_systems(
-                Update,
-                update_status.run_if(in_state(DisplayState::LoadingScreen)),
-            );
+        app.add_systems(
+            OnEnter(DisplayState::LoadingScreen),
+            (construct, update_rapier),
+        )
+        .add_systems(OnExit(DisplayState::LoadingScreen), destroy)
+        .add_systems(
+            Update,
+            update_status.run_if(in_state(DisplayState::LoadingScreen)),
+        );
     }
+}
+
+fn update_rapier(
+    client_display: Res<ClientDisplay>,
+    mut rapier_config: ResMut<RapierConfiguration>,
+) {
+    rapier_config.timestep_mode = TimestepMode::Fixed {
+        dt: 1.0 / client_display.tick_rate,
+        substeps: 1,
+    };
 }
 
 fn update_status(

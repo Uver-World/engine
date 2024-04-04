@@ -5,12 +5,13 @@ use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::{self, Direction, Location, Range, SightRadius};
 use uverworld_packet::templates::Template;
-use uverworld_packet::{update_entity, update_entity_group};
+use uverworld_packet::{set_tick_rate, update_entity, update_entity_group};
 
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
 use crate::entities::ui_entity::DisplayEntity;
 use crate::events::set_simulation::{set_simulation_event, SetSimulation};
+use crate::events::set_tick_rate::{set_tick_rate_event, SetTickRateEvent};
 use crate::events::templates::SendTemplates;
 use crate::events::update_entity::{update_entity_event, UpdateEntityEvent};
 use crate::events::update_entity_group::{update_entity_group_event, UpdateEntityGroupEvent};
@@ -45,6 +46,7 @@ impl Plugin for SimulateScreen {
                     handle_keyboard,
                     update_entity_event,
                     update_entity_group_event,
+                    set_tick_rate_event,
                 )
                     .run_if(in_state(DisplayState::SimulateScreen)),
             )
@@ -55,15 +57,28 @@ impl Plugin for SimulateScreen {
             .add_event::<SetSimulation>()
             .add_event::<UpdateEntityEvent>()
             .add_event::<UpdateEntityGroupEvent>()
+            .add_event::<SetTickRateEvent>()
             .add_plugins(Camera3DPlugin);
     }
 }
 
-fn apply_velocity(mut query: Query<(&mut Transform, &mut DisplayEntity)>) {
+fn apply_velocity(
+    client_display: Res<ClientDisplay>,
+    time: Res<Time>,
+    mut query: Query<(&mut Transform, &mut DisplayEntity)>,
+) {
+    let tick_rate = client_display.tick_rate;
+
     for (mut transform, entity) in &mut query {
-        transform.translation.x += entity.velocity.x;
-        transform.translation.y += entity.velocity.y;
-        transform.translation.z += entity.velocity.z;
+        let delta_seconds = time.delta_seconds();
+
+        let scaled_velocity_x = entity.velocity.x * tick_rate * delta_seconds;
+        let scaled_velocity_y = entity.velocity.y * tick_rate * delta_seconds;
+        let scaled_velocity_z = entity.velocity.z * tick_rate * delta_seconds;
+
+        transform.translation.x += scaled_velocity_x;
+        transform.translation.y += scaled_velocity_y;
+        transform.translation.z += scaled_velocity_z;
     }
 }
 
@@ -431,6 +446,7 @@ fn handle_keyboard(
     mut set_simulation_event: EventWriter<SetSimulation>,
     mut update_entity_event: EventWriter<UpdateEntityEvent>,
     mut update_entity_group_event: EventWriter<UpdateEntityGroupEvent>,
+    mut set_tick_rate_event: EventWriter<SetTickRateEvent>,
     client: ResMut<ClientDisplay>,
     keys: Res<Input<KeyCode>>,
 ) {
@@ -473,6 +489,14 @@ fn handle_keyboard(
             &magenta_square.to_str().unwrap(),
         );
         update_entity_group_event.send(UpdateEntityGroupEvent(update_entity_group));
+    }
+    if keys.just_pressed(KeyCode::P) {
+        let set_tick_rate = set_tick_rate::create_set_tick_rate(60.0);
+        set_tick_rate_event.send(SetTickRateEvent(set_tick_rate));
+    }
+    if keys.just_pressed(KeyCode::M) {
+        let set_tick_rate = set_tick_rate::create_set_tick_rate(30.0);
+        set_tick_rate_event.send(SetTickRateEvent(set_tick_rate));
     }
 }
 
