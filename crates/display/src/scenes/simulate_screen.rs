@@ -3,9 +3,9 @@ use bevy::prelude::*;
 use bevy_rapier3d::dynamics::GravityScale;
 use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
-use client_profile::models::{Direction, Location, Range, SightRadius};
+use client_profile::models::{self, Direction, Location, Range, SightRadius};
 use uverworld_packet::templates::Template;
-use uverworld_packet::update_entity;
+use uverworld_packet::{update_entity, update_entity_group};
 
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
@@ -13,6 +13,7 @@ use crate::entities::ui_entity::DisplayEntity;
 use crate::events::set_simulation::{set_simulation_event, SetSimulation};
 use crate::events::templates::SendTemplates;
 use crate::events::update_entity::{update_entity_event, UpdateEntityEvent};
+use crate::events::update_entity_group::{update_entity_group_event, UpdateEntityGroupEvent};
 use crate::events::{
     reset_simulation_event,
     templates::{get_templates_event, GetTemplates},
@@ -43,6 +44,7 @@ impl Plugin for SimulateScreen {
                     set_simulation_event,
                     handle_keyboard,
                     update_entity_event,
+                    update_entity_group_event,
                 )
                     .run_if(in_state(DisplayState::SimulateScreen)),
             )
@@ -52,6 +54,7 @@ impl Plugin for SimulateScreen {
             .add_event::<SendTemplates>()
             .add_event::<SetSimulation>()
             .add_event::<UpdateEntityEvent>()
+            .add_event::<UpdateEntityGroupEvent>()
             .add_plugins(Camera3DPlugin);
     }
 }
@@ -427,6 +430,8 @@ fn handle_keyboard(
     mut get_templates_event: EventWriter<GetTemplates>,
     mut set_simulation_event: EventWriter<SetSimulation>,
     mut update_entity_event: EventWriter<UpdateEntityEvent>,
+    mut update_entity_group_event: EventWriter<UpdateEntityGroupEvent>,
+    client: ResMut<ClientDisplay>,
     keys: Res<Input<KeyCode>>,
 ) {
     if keys.just_pressed(KeyCode::R) {
@@ -450,6 +455,24 @@ fn handle_keyboard(
     if keys.just_pressed(KeyCode::I) {
         let update_entity = update_entity::create_update_position(0, 100.0, 20.0, 0.0);
         update_entity_event.send(UpdateEntityEvent(update_entity));
+    }
+    if keys.just_pressed(KeyCode::O) {
+        let mut magenta_square = client
+            .settings
+            .profile
+            .entity_groups
+            .iter()
+            .filter(|group| group.name == "MagentaSquare")
+            .nth(0)
+            .unwrap()
+            .clone();
+        magenta_square.color = models::Color::Lime;
+        magenta_square.name = "YellowSquare".into();
+        let update_entity_group = update_entity_group::create_update_entity_group(
+            "PinkSquare",
+            &magenta_square.to_str().unwrap(),
+        );
+        update_entity_group_event.send(UpdateEntityGroupEvent(update_entity_group));
     }
 }
 

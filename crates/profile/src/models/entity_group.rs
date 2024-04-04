@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Result;
 
 use crate::models::{Color, Direction, Shape};
 
@@ -10,4 +11,14 @@ pub struct EntityGroup {
     pub directions: Vec<Direction>,
     pub shape: Shape,
     pub gravity: f32,
+}
+
+impl EntityGroup {
+    pub fn from_str(value: &str) -> Result<Self> {
+        serde_json::from_str(value)
+    }
+
+    pub fn to_str(&self) -> Result<String> {
+        serde_json::to_string(self)
+    }
 }
