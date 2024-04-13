@@ -30,7 +30,7 @@ pub fn send_templates_event(
     mut ev: EventReader<SendTemplates>,
     mut socket: ResMut<MatchboxSocket<SingleChannel>>,
 ) {
-    for events in ev.iter() {
+    for events in ev.read() {
         let serialized_templates = uverworld_packet::templates::encode(&events.0);
         socket.update_peers();
         let peers: Vec<_> = socket.connected_peers().collect();

@@ -126,8 +126,8 @@ fn receive(
         let packet = packet.unwrap();
 
         match packet.packet_type() {
-            PacketType::ResetSimulation => reset_simulation_event.send(ResetSimulation),
-            PacketType::GetTemplates => get_templates_event.send(GetTemplates),
+            PacketType::ResetSimulation => { reset_simulation_event.send(ResetSimulation); }
+            PacketType::GetTemplates => { get_templates_event.send(GetTemplates); }
             PacketType::SetSimulation => {
                 let template = set_simulation::deserialize(&packet.value)
                     .unwrap()
@@ -148,7 +148,7 @@ fn receive(
                 set_tick_rate_event.send(SetTickRateEvent(set_tick_rate));
             }
             _ => eprintln!("packet not supported"),
-        }
+        };
     }
 }
 

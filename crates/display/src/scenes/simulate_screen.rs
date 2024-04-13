@@ -396,7 +396,7 @@ fn construct(
             entity.group.color.blue(),
         );
         let mesh = meshes.add(mesh);
-        let material = materials.add(color.into());
+        let material = materials.add(color);
         spawn_entity(
             commands
                 .spawn(SimulateScreen)
@@ -448,15 +448,15 @@ fn handle_keyboard(
     mut update_entity_group_event: EventWriter<UpdateEntityGroupEvent>,
     mut set_tick_rate_event: EventWriter<SetTickRateEvent>,
     client: ResMut<ClientDisplay>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
 ) {
-    if keys.just_pressed(KeyCode::R) {
+    if keys.just_pressed(KeyCode::KeyR) {
         reset_simulation_event.send(ResetSimulation);
     }
-    if keys.just_pressed(KeyCode::T) {
+    if keys.just_pressed(KeyCode::KeyT) {
         get_templates_event.send(GetTemplates);
     }
-    if keys.just_pressed(KeyCode::Y) {
+    if keys.just_pressed(KeyCode::KeyY) {
         let template_content = std::fs::read_to_string(r"templates\front_heavy2.json").unwrap();
         let template = Template {
             file_name: "test_set_simulation".into(),
@@ -464,15 +464,15 @@ fn handle_keyboard(
         };
         set_simulation_event.send(SetSimulation(template));
     }
-    if keys.just_pressed(KeyCode::U) {
+    if keys.just_pressed(KeyCode::KeyU) {
         let update_entity = update_entity::create_update_group(0, "PinkSquare");
         update_entity_event.send(UpdateEntityEvent(update_entity));
     }
-    if keys.just_pressed(KeyCode::I) {
+    if keys.just_pressed(KeyCode::KeyI) {
         let update_entity = update_entity::create_update_position(0, 100.0, 20.0, 0.0);
         update_entity_event.send(UpdateEntityEvent(update_entity));
     }
-    if keys.just_pressed(KeyCode::O) {
+    if keys.just_pressed(KeyCode::KeyO) {
         let mut magenta_square = client
             .settings
             .profile
@@ -490,11 +490,11 @@ fn handle_keyboard(
         );
         update_entity_group_event.send(UpdateEntityGroupEvent(update_entity_group));
     }
-    if keys.just_pressed(KeyCode::P) {
+    if keys.just_pressed(KeyCode::KeyP) {
         let set_tick_rate = set_tick_rate::create_set_tick_rate(60.0);
         set_tick_rate_event.send(SetTickRateEvent(set_tick_rate));
     }
-    if keys.just_pressed(KeyCode::M) {
+    if keys.just_pressed(KeyCode::KeyM) {
         let set_tick_rate = set_tick_rate::create_set_tick_rate(30.0);
         set_tick_rate_event.send(SetTickRateEvent(set_tick_rate));
     }

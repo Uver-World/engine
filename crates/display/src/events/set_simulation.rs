@@ -16,7 +16,7 @@ pub fn set_simulation_event(
     mut ev: EventReader<SetSimulation>,
     mut client: ResMut<ClientDisplay>,
 ) {
-    for events in ev.iter() {
+    for events in ev.read() {
         let template = &events.0;
         let new_profile = Profile::custom_load(&template.file_content);
         match new_profile {

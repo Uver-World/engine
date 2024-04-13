@@ -22,7 +22,7 @@ pub fn set_tick_rate_event(
     mut client: ResMut<ClientDisplay>,
     mut rapier_config: ResMut<RapierConfiguration>,
 ) {
-    for event in ev.iter() {
+    for event in ev.read() {
         let new_tick_rate = event.0.tick_rate;
 
         client.tick_rate = new_tick_rate;

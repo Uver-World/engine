@@ -51,7 +51,7 @@ fn update_entities(
         );
         let collider = build_shape(&display_entity.settings.group.shape);
         let mesh = meshes.add(shape_to_mesh(&display_entity.settings.group.shape));
-        let material = materials.add(color.into());
+        let material = materials.add(color);
         spawn_entity(
             commands
                 .spawn(SimulateScreen)
@@ -108,7 +108,7 @@ pub fn update_entity_group_event(
     mut materials: ResMut<Assets<StandardMaterial>>,
     entities: Query<(Entity, &DisplayEntity, &Transform)>,
 ) {
-    for event in ev.iter() {
+    for event in ev.read() {
         let new_group = EntityGroup::from_str(&event.0.value).unwrap();
         handle_update_group_event(
             &mut commands,

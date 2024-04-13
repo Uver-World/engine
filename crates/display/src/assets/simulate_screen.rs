@@ -1,8 +1,9 @@
 use bevy::{
     prelude::Vec3,
-    render::mesh::{shape, Mesh},
+    render::mesh::Mesh,
 };
 use bevy_rapier3d::prelude::*;
+use bevy::math::primitives::{Cuboid, Cylinder, Sphere};
 use client_profile::models::{Entity, Shape};
 
 pub fn retrieve_entities(entities: &Vec<Entity>) -> Vec<(Entity, Collider, Mesh)> {
@@ -32,17 +33,13 @@ pub fn build_shape(shape: &Shape) -> Collider {
 
 pub fn shape_to_mesh(shape: &Shape) -> Mesh {
     match shape {
-        Shape::Rectangle => Mesh::from(shape::Box::new(20.0, 20.0, 20.0)),
-        Shape::Circle => Mesh::from(shape::Cylinder {
-            height: 20.0,
+        Shape::Rectangle => Mesh::from(Cuboid::new(20.0, 20.0, 20.0)),
+        Shape::Circle => Mesh::from(Cylinder {
             radius: 10.0,
-            resolution: 10,
-            segments: 10,
+            half_height: 10.0,
         }),
-        Shape::Ball => Mesh::from(shape::UVSphere {
+        Shape::Ball => Mesh::from(Sphere {
             radius: 10.0,
-            sectors: 32,
-            stacks: 16,
         }),
         _ => todo!("unimplemented!"),
     }

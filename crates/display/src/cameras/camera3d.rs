@@ -51,11 +51,11 @@ impl Camera3DPlugin {
     fn mouse_motion(
         time: Res<Time>,
         mut mouse_motion_events: EventReader<MouseMotion>,
-        mouse_button_input: Res<Input<MouseButton>>,
+        mouse_button_input: Res<ButtonInput<MouseButton>>,
         mut query: Query<(&mut Camera3D, &mut Transform, &mut Camera)>,
     ) {
         let mut delta = Vec2::ZERO;
-        for event in mouse_motion_events.iter() {
+        for event in mouse_motion_events.read() {
             delta += event.delta;
         }
         for (mut camera, transform, _) in query.iter_mut() {
@@ -81,17 +81,17 @@ impl Camera3DPlugin {
 
     fn key(
         time: Res<Time>,
-        keys: Res<Input<KeyCode>>,
+        keys: Res<ButtonInput<KeyCode>>,
         mut query: Query<(&mut Camera3D, &mut Transform, &mut Camera)>,
     ) {
         for (mut camera, transform, _) in query.iter_mut() {
             let delta = camera.move_sensitivity * time.delta_seconds();
             let mut pan_vector = Vec3::ZERO;
 
-            if keys.pressed(KeyCode::Z) {
+            if keys.pressed(KeyCode::KeyW) {
                 pan_vector += transform.rotation * -Vec3::Z;
             }
-            if keys.pressed(KeyCode::S) {
+            if keys.pressed(KeyCode::KeyS) {
                 pan_vector += transform.rotation * Vec3::Z;
             }
             if keys.pressed(KeyCode::Space) {
@@ -100,10 +100,10 @@ impl Camera3DPlugin {
             if keys.pressed(KeyCode::ShiftLeft) {
                 pan_vector += transform.rotation * -Vec3::Y;
             }
-            if keys.pressed(KeyCode::Q) {
+            if keys.pressed(KeyCode::KeyA) {
                 pan_vector += transform.rotation * -Vec3::X;
             }
-            if keys.pressed(KeyCode::D) {
+            if keys.pressed(KeyCode::KeyD) {
                 pan_vector += transform.rotation * Vec3::X;
             }
 
@@ -116,7 +116,7 @@ impl Camera3DPlugin {
         mut query: Query<&mut Camera3D, With<Camera>>,
     ) {
         let mut total = 0.0;
-        for event in mouse_wheel_events.iter() {
+        for event in mouse_wheel_events.read() {
             total += event.y
         }
         for mut camera in query.iter_mut() {

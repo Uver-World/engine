@@ -1,15 +1,9 @@
 use bevy::{
-    asset::Assets,
-    ecs::{
+    asset::Assets, ecs::{
         entity::Entity,
         event::{Event, EventReader},
         system::{Commands, Query, ResMut},
-    },
-    hierarchy::DespawnRecursiveExt,
-    math::Vec3,
-    pbr::StandardMaterial,
-    render::{color::Color, mesh::Mesh},
-    transform::components::Transform,
+    }, hierarchy::DespawnRecursiveExt, math::Vec3, pbr::StandardMaterial, render::{color::Color, mesh::Mesh}, transform::components::Transform
 };
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::Location;
@@ -67,7 +61,7 @@ fn handle_update_group_event(
     );
     let collider = build_shape(&display_entity.settings.group.shape);
     let mesh = meshes.add(shape_to_mesh(&display_entity.settings.group.shape));
-    let material = materials.add(color.into());
+    let material = materials.add(color);
     spawn_entity(
         commands
             .spawn(SimulateScreen)
@@ -102,7 +96,7 @@ pub fn update_entity_event(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut entities: Query<(Entity, &DisplayEntity, &mut Transform)>,
 ) {
-    for event in ev.iter() {
+    for event in ev.read() {
         if event.0.r#type == UpdateType::Group as i32 {
             let new_group = update_entity::deserialize_update_group(&event.0.value).unwrap();
             handle_update_group_event(
