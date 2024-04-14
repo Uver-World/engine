@@ -1,11 +1,11 @@
-use bevy::{prelude::*, window::WindowResolution, winit::WinitSettings};
+use bevy::{app::MainScheduleOrder, prelude::*, window::WindowResolution, winit::WinitSettings};
 use bevy_egui::EguiPlugin;
 use bevy_rapier3d::prelude::*;
 
 use client_profile::*;
 use filters::Filter;
 use states::DisplayState;
-use webrtc::{close_matchbox_socket, WebRtc};
+use webrtc::{close_matchbox_socket, WebRtc, WebRtcSchedule};
 
 use crate::api::Api;
 
@@ -14,6 +14,7 @@ pub mod assets;
 pub mod cameras;
 pub mod entities;
 pub mod events;
+pub mod extensions;
 pub mod filters;
 pub mod scenes;
 pub mod states;
@@ -50,24 +51,28 @@ impl ClientDisplay {
 
         let mut app = App::new();
         app.insert_resource(WinitSettings::default())
-        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(self.get_window()),
-            ..default()
-        }))
-        .init_state::<DisplayState>()
-        .add_systems(Startup, assets::loading_screen::load_assets)
-        .add_plugins(EguiPlugin)
-        .add_plugins((
-            RapierPhysicsPlugin::<NoUserData>::default(),
-            RapierDebugRenderPlugin::default(),
-        ))
-        .add_plugins((
-            scenes::loading_screen::LoadingScreen,
-            scenes::simulate_screen::SimulateScreen,
-        ));
+            .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+            .add_plugins(DefaultPlugins.set(WindowPlugin {
+                primary_window: Some(self.get_window()),
+                ..default()
+            }))
+            .init_state::<DisplayState>()
+            .add_systems(Startup, assets::loading_screen::load_assets)
+            .add_plugins(EguiPlugin)
+            .add_plugins((
+                RapierPhysicsPlugin::<NoUserData>::default(),
+                RapierDebugRenderPlugin::default(),
+            ))
+            .add_plugins((
+                scenes::loading_screen::LoadingScreen,
+                scenes::simulate_screen::SimulateScreen,
+            ));
 
         if !is_offline {
+            app.init_schedule(WebRtcSchedule);
+            app.world
+                .resource_mut::<MainScheduleOrder>()
+                .insert_after(StateTransition, WebRtcSchedule);
             app.insert_resource(Api::from(&self.settings.api_settings))
                 .add_plugins(WebRtc);
         }

@@ -1,9 +1,6 @@
-use std::{
-    collections::VecDeque,
-    sync::{Arc, Mutex},
-};
+use std::sync::mpsc::channel;
 
-use bevy::{prelude::*, render::view::screenshot::ScreenshotManager, window::PrimaryWindow};
+use bevy::{ecs::schedule::ScheduleLabel, prelude::*};
 use bevy_matchbox::{matchbox_socket::SingleChannel, MatchboxSocket};
 use uverworld_packet::{
     packet::PacketType, set_simulation, set_tick_rate, update_entity, update_entity_group,
@@ -12,6 +9,7 @@ use uverworld_packet::{
 use crate::{
     api::Api,
     events::{
+        handle_image::{handle_image, take_screenshot, HandleImage, ImageHandler},
         set_simulation::{set_simulation_event, SetSimulation},
         set_tick_rate::{set_tick_rate_event, SetTickRateEvent},
         templates::{send_templates_event, GetTemplates},
@@ -19,32 +17,28 @@ use crate::{
         update_entity_group::{update_entity_group_event, UpdateEntityGroupEvent},
         ResetSimulation,
     },
+    extensions::AppExtensions,
 };
 
-#[derive(Resource, Clone)]
-pub struct Images {
-    image: Arc<Mutex<VecDeque<Image>>>,
-}
-
-impl Images {
-    pub fn new() -> Self {
-        let image = Arc::new(Mutex::new(VecDeque::new()));
-        Self { image }
-    }
-}
+#[derive(ScheduleLabel, Clone, Debug, Eq, PartialEq, Hash)]
+pub struct WebRtcSchedule;
 
 pub struct WebRtc;
 
 impl Plugin for WebRtc {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Images::new());
         app.add_systems(Startup, start_matchbox_socket)
-            .add_systems(Update, (check_peers, receive))
-            .add_systems(Update, send_templates_event)
-            .add_systems(Update, set_simulation_event)
-            .add_systems(Update, update_entity_event)
-            .add_systems(Update, update_entity_group_event)
-            .add_systems(Update, set_tick_rate_event);
+            .add_systems(WebRtcSchedule, receive)
+            .add_systems(WebRtcSchedule, send_templates_event)
+            .add_systems(WebRtcSchedule, set_simulation_event)
+            .add_systems(WebRtcSchedule, update_entity_event)
+            .add_systems(WebRtcSchedule, update_entity_group_event)
+            .add_systems(WebRtcSchedule, set_tick_rate_event);
+
+        let (handle_image_sender, handle_image_receiver) = channel();
+        app.add_systems(WebRtcSchedule, (handle_image, take_screenshot));
+        app.insert_resource(ImageHandler::new(handle_image_sender));
+        app.add_event_channel::<HandleImage>(handle_image_receiver);
     }
 }
 
@@ -60,39 +54,6 @@ fn start_matchbox_socket(mut commands: Commands, api: Res<Api>) {
     eprintln!("connecting to matchbox server: {:?}", peer);
     let socket = MatchboxSocket::new_reliable(room_url);
     commands.insert_resource(socket);
-}
-
-fn take_screenshot(
-    main_window: Query<Entity, With<PrimaryWindow>>,
-    mut screenshot_manager: ResMut<ScreenshotManager>,
-    images: Res<Images>,
-) {
-    let image_manager = images.clone();
-    let _ = screenshot_manager.take_screenshot(main_window.single(), move |image| {
-        image_manager.image.lock().unwrap().push_back(image);
-        println!("screenshot saved into images")
-    });
-}
-
-fn check_peers(mut socket: ResMut<MatchboxSocket<SingleChannel>>, images: Res<Images>) {
-    // eprintln!("peers connected = {}", socket.players().len());
-    // let peers: Vec<_> = socket.connected_peers().collect();
-    // for peer in peers {
-    //     socket.send("connected".as_bytes().into(), peer);
-    // }
-    let mut images = images.image.lock().unwrap();
-    while !images.is_empty() {
-        let image = images.pop_front().unwrap();
-        send_screenshot(image, &mut socket);
-    }
-}
-
-fn send_screenshot(image: Image, socket: &mut MatchboxSocket<SingleChannel>) {
-    let peers: Vec<_> = socket.connected_peers().collect();
-    for peer in peers {
-        socket.send(image.data.clone().into(), peer);
-    }
-    println!("screenshot sent to peers");
 }
 
 fn receive(
