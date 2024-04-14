@@ -39,7 +39,7 @@ impl Plugin for WebRtc {
     fn build(&self, app: &mut App) {
         app.insert_resource(Images::new());
         app.add_systems(Startup, start_matchbox_socket)
-            .add_systems(Update, (take_screenshot, check_peers, receive))
+            .add_systems(Update, (check_peers, receive))
             .add_systems(Update, send_templates_event)
             .add_systems(Update, set_simulation_event)
             .add_systems(Update, update_entity_event)
@@ -58,7 +58,7 @@ fn start_matchbox_socket(mut commands: Commands, api: Res<Api>) {
         id = peer.room_id
     );
     eprintln!("connecting to matchbox server: {:?}", peer);
-    let socket = MatchboxSocket::new_ggrs(room_url);
+    let socket = MatchboxSocket::new_reliable(room_url);
     commands.insert_resource(socket);
 }
 
@@ -75,13 +75,11 @@ fn take_screenshot(
 }
 
 fn check_peers(mut socket: ResMut<MatchboxSocket<SingleChannel>>, images: Res<Images>) {
-    if socket.get_channel(0).is_err() {
-        return; // we've already started
-    }
-
-    // Check for new connections
-    socket.update_peers();
-    eprintln!("peers connected = {}", socket.players().len());
+    // eprintln!("peers connected = {}", socket.players().len());
+    // let peers: Vec<_> = socket.connected_peers().collect();
+    // for peer in peers {
+    //     socket.send("connected".as_bytes().into(), peer);
+    // }
     let mut images = images.image.lock().unwrap();
     while !images.is_empty() {
         let image = images.pop_front().unwrap();
@@ -106,12 +104,10 @@ fn receive(
     mut update_entity_group_event: EventWriter<UpdateEntityGroupEvent>,
     mut set_tick_rate_event: EventWriter<SetTickRateEvent>,
 ) {
-    if socket.get_channel(0).is_err() {
-        return; // we've already started
-    }
-
     // Check for new connections
-    socket.update_peers();
+    for (peer, state) in socket.update_peers() {
+        info!("{peer}: {state:?}");
+    }
     let queue = socket.receive();
 
     for (_, packet) in queue {
@@ -126,8 +122,12 @@ fn receive(
         let packet = packet.unwrap();
 
         match packet.packet_type() {
-            PacketType::ResetSimulation => { reset_simulation_event.send(ResetSimulation); }
-            PacketType::GetTemplates => { get_templates_event.send(GetTemplates); }
+            PacketType::ResetSimulation => {
+                reset_simulation_event.send(ResetSimulation);
+            }
+            PacketType::GetTemplates => {
+                get_templates_event.send(GetTemplates);
+            }
             PacketType::SetSimulation => {
                 let template = set_simulation::deserialize(&packet.value)
                     .unwrap()
