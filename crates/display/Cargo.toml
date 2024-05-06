@@ -19,3 +19,4 @@ nalgebra.workspace = true
 bevy_rapier3d.workspace = true
 bevy_matchbox.workspace = true
 opentelemetry.workspace = true
+image.workspace = true
