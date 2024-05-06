@@ -9,12 +9,14 @@ use bevy::{
     },
     render::view::screenshot::ScreenshotManager,
     window::PrimaryWindow,
+    log::error,
 };
 use bevy_matchbox::{
     matchbox_socket::{PeerId, SingleChannel},
     MatchboxSocket,
 };
 use uverworld_packet::{packet::PacketType, Packet};
+use image::imageops::FilterType;
 
 #[derive(Event)]
 pub struct HandleImage(pub uverworld_packet::image::Image);
@@ -47,13 +49,19 @@ pub fn take_screenshot(
     let id = image_handler.id;
     image_handler.id += 1;
     let _ = screenshot_manager.take_screenshot(main_window.single(), move |image| {
-        let image =
-            uverworld_packet::image::create_image(id, image.width(), image.height(), &image.data);
-        let _ = sender
-            .lock()
-            .expect("Unable to acquire image_handler sender mutex lock")
-            .send(HandleImage(image))
-            .expect("Unable to send image_handler sender event");
+        match image.try_into_dynamic() {
+            Ok(dyn_img) => {
+                let dyn_img_resized = dyn_img.resize_exact(dyn_img.width() / 7, dyn_img.height() / 7, FilterType::Nearest);
+                let image =
+                    uverworld_packet::image::create_image(id, dyn_img_resized.width(), dyn_img_resized.height(), dyn_img_resized.as_bytes());
+                let _ = sender
+                    .lock()
+                    .expect("Unable to acquire image_handler sender mutex lock")
+                    .send(HandleImage(image))
+                    .expect("Unable to send image_handler sender event");
+            }
+            Err(e) => error!("Cannot save screenshot, screen format cannot be understood: {e}"),
+        }
     });
 }
 
