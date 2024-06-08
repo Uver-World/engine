@@ -4,7 +4,7 @@ use bevy::ecs::{
     event::{Event, EventReader, EventWriter},
     system::ResMut,
 };
-use bevy_matchbox::{matchbox_socket::SingleChannel, MatchboxSocket};
+use bevy_matchbox::{matchbox_socket::MultipleChannels, MatchboxSocket};
 use uverworld_packet::templates::{Template, Templates};
 
 #[derive(Event)]
@@ -28,14 +28,15 @@ pub fn get_templates_event(
 
 pub fn send_templates_event(
     mut ev: EventReader<SendTemplates>,
-    mut socket: ResMut<MatchboxSocket<SingleChannel>>,
+    mut socket: ResMut<MatchboxSocket<MultipleChannels>>,
 ) {
+    let peers: Vec<_> = socket.connected_peers().collect();
+    let reliable = socket.get_channel_mut(0).unwrap();
     for events in ev.read() {
         let serialized_templates = uverworld_packet::templates::encode(&events.0);
-        let peers: Vec<_> = socket.connected_peers().collect();
 
-        for peer in peers {
-            socket.send(serialized_templates.clone().into(), peer);
+        for peer in peers.clone() {
+            reliable.send(serialized_templates.clone().into(), peer);
         }
     }
 }

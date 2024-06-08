@@ -9,34 +9,33 @@ use bevy::{
     },
     render::view::screenshot::ScreenshotManager,
     window::PrimaryWindow,
-    log::error,
 };
 use bevy_matchbox::{
-    matchbox_socket::{PeerId, SingleChannel},
+    matchbox_socket::{MultipleChannels, PeerId, WebRtcChannel},
     MatchboxSocket,
 };
 use uverworld_packet::{packet::PacketType, Packet};
-use image::imageops::FilterType;
 
 #[derive(Event)]
 pub struct HandleImage(pub uverworld_packet::image::Image);
 
 pub fn handle_image(
     mut ev: EventReader<HandleImage>,
-    mut socket: ResMut<MatchboxSocket<SingleChannel>>,
+    mut socket: ResMut<MatchboxSocket<MultipleChannels>>,
 ) {
     let peers: Vec<_> = socket.connected_peers().collect();
+    let mut unreliable = socket.get_channel_mut(1).unwrap();
     for image in ev.read() {
         let packet =
             uverworld_packet::create(PacketType::Image, uverworld_packet::image::encode(&image.0));
-        send_screenshot(packet, peers.clone(), &mut socket);
+        send_screenshot(packet, peers.clone(), &mut unreliable);
     }
 }
 
-fn send_screenshot(packet: Packet, peers: Vec<PeerId>, socket: &mut MatchboxSocket<SingleChannel>) {
+fn send_screenshot(packet: Packet, peers: Vec<PeerId>, unreliable: &mut WebRtcChannel) {
     let serialized: Box<[u8]> = uverworld_packet::serialize(&packet).into();
     for peer in peers {
-        socket.send(serialized.clone(), peer);
+        unreliable.send(serialized.clone(), peer);
     }
 }
 
@@ -49,19 +48,13 @@ pub fn take_screenshot(
     let id = image_handler.id;
     image_handler.id += 1;
     let _ = screenshot_manager.take_screenshot(main_window.single(), move |image| {
-        match image.try_into_dynamic() {
-            Ok(dyn_img) => {
-                let dyn_img_resized = dyn_img.resize_exact(dyn_img.width() / 7, dyn_img.height() / 7, FilterType::Nearest);
-                let image =
-                    uverworld_packet::image::create_image(id, dyn_img_resized.width(), dyn_img_resized.height(), dyn_img_resized.as_bytes());
-                let _ = sender
-                    .lock()
-                    .expect("Unable to acquire image_handler sender mutex lock")
-                    .send(HandleImage(image))
-                    .expect("Unable to send image_handler sender event");
-            }
-            Err(e) => error!("Cannot save screenshot, screen format cannot be understood: {e}"),
-        }
+        let image =
+            uverworld_packet::image::create_image(id, image.width(), image.height(), &image.data);
+        let _ = sender
+            .lock()
+            .expect("Unable to acquire image_handler sender mutex lock")
+            .send(HandleImage(image))
+            .expect("Unable to send image_handler sender event");
     });
 }
 

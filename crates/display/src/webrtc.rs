@@ -1,7 +1,10 @@
 use std::sync::mpsc::channel;
 
 use bevy::{ecs::schedule::ScheduleLabel, prelude::*};
-use bevy_matchbox::{matchbox_socket::SingleChannel, MatchboxSocket};
+use bevy_matchbox::{
+    matchbox_socket::{ChannelConfig, MultipleChannels, WebRtcSocketBuilder},
+    MatchboxSocket,
+};
 use uverworld_packet::{
     packet::PacketType, set_simulation, set_tick_rate, update_entity, update_entity_group,
 };
@@ -52,12 +55,17 @@ fn start_matchbox_socket(mut commands: Commands, api: Res<Api>) {
         id = peer.room_id
     );
     eprintln!("connecting to matchbox server: {:?}", peer);
-    let socket = MatchboxSocket::new_reliable(room_url);
-    commands.insert_resource(socket);
+    let socket = WebRtcSocketBuilder::new(room_url)
+        .add_channel(ChannelConfig::reliable())
+        .add_reliable_channel()
+        .add_unreliable_channel()
+        .build();
+    let matchbox_socket = MatchboxSocket::from(socket);
+    commands.insert_resource(matchbox_socket);
 }
 
 fn receive(
-    mut socket: ResMut<MatchboxSocket<SingleChannel>>,
+    mut socket: ResMut<MatchboxSocket<MultipleChannels>>,
     mut reset_simulation_event: EventWriter<ResetSimulation>,
     mut get_templates_event: EventWriter<GetTemplates>,
     mut set_simulation_event: EventWriter<SetSimulation>,
@@ -69,7 +77,8 @@ fn receive(
     for (peer, state) in socket.update_peers() {
         info!("{peer}: {state:?}");
     }
-    let queue = socket.receive();
+    let reliable = socket.get_channel_mut(0).unwrap();
+    let queue = reliable.receive();
 
     for (_, packet) in queue {
         let packet = uverworld_packet::deserialize(&packet);
