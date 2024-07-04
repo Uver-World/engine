@@ -55,6 +55,7 @@ pub fn take_screenshot(
             .expect("Unable to acquire image_handler sender mutex lock")
             .send(HandleImage(image))
             .expect("Unable to send image_handler sender event");
+        println!("sending image");
     });
 }
 

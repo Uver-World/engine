@@ -6,14 +6,18 @@ use bevy_matchbox::{
     MatchboxSocket,
 };
 use uverworld_packet::{
-    packet::PacketType, set_simulation, set_tick_rate, update_entity, update_entity_group,
+    packet::PacketType, remove_texture, set_simulation, set_texture, set_tick_rate, update_entity,
+    update_entity_group,
 };
 
 use crate::{
     api::Api,
     events::{
+        get_texture::{get_textures_event, GetTextureEvent},
         handle_image::{handle_image, take_screenshot, HandleImage, ImageHandler},
+        remove_texture::{remove_texture_event, RemoveTextureEvent},
         set_simulation::{set_simulation_event, SetSimulation},
+        set_texture::{set_texture_event, SetTextureEvent},
         set_tick_rate::{set_tick_rate_event, SetTickRateEvent},
         templates::{send_templates_event, GetTemplates},
         update_entity::{update_entity_event, UpdateEntityEvent},
@@ -36,7 +40,10 @@ impl Plugin for WebRtc {
             .add_systems(WebRtcSchedule, set_simulation_event)
             .add_systems(WebRtcSchedule, update_entity_event)
             .add_systems(WebRtcSchedule, update_entity_group_event)
-            .add_systems(WebRtcSchedule, set_tick_rate_event);
+            .add_systems(WebRtcSchedule, set_tick_rate_event)
+            .add_systems(WebRtcSchedule, get_textures_event)
+            .add_systems(WebRtcSchedule, set_texture_event)
+            .add_systems(WebRtcSchedule, remove_texture_event);
 
         let (handle_image_sender, handle_image_receiver) = channel();
         app.add_systems(WebRtcSchedule, (handle_image, take_screenshot));
@@ -72,6 +79,9 @@ fn receive(
     mut update_entity_event: EventWriter<UpdateEntityEvent>,
     mut update_entity_group_event: EventWriter<UpdateEntityGroupEvent>,
     mut set_tick_rate_event: EventWriter<SetTickRateEvent>,
+    mut set_texture_event: EventWriter<SetTextureEvent>,
+    mut remove_texture_event: EventWriter<RemoveTextureEvent>,
+    mut get_texture_event: EventWriter<GetTextureEvent>,
 ) {
     // Check for new connections
     for (peer, state) in socket.update_peers() {
@@ -116,6 +126,17 @@ fn receive(
             PacketType::SetTickRate => {
                 let set_tick_rate = set_tick_rate::deserialize(&packet.value).unwrap();
                 set_tick_rate_event.send(SetTickRateEvent(set_tick_rate));
+            }
+            PacketType::SetTexture => {
+                let set_texture = set_texture::deserialize(&packet.value).unwrap();
+                set_texture_event.send(SetTextureEvent(set_texture));
+            }
+            PacketType::RemoveTexture => {
+                let remove_texture = remove_texture::deserialize(&packet.value).unwrap();
+                remove_texture_event.send(RemoveTextureEvent(remove_texture));
+            }
+            PacketType::GetTexture => {
+                get_texture_event.send(GetTextureEvent);
             }
             _ => eprintln!("packet not supported"),
         };

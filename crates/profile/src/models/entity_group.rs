@@ -11,6 +11,7 @@ pub struct EntityGroup {
     pub directions: Vec<Direction>,
     pub shape: Shape,
     pub gravity: f32,
+    pub texture_id: String,
 }
 
 impl EntityGroup {

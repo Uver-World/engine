@@ -5,12 +5,17 @@ use bevy_rapier3d::prelude::{Collider, RigidBody};
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::{self, Direction, Location, Range, SightRadius};
 use uverworld_packet::templates::Template;
-use uverworld_packet::{set_tick_rate, update_entity, update_entity_group};
+use uverworld_packet::{
+    remove_texture, set_texture, set_tick_rate, update_entity, update_entity_group,
+};
 
 use crate::assets::simulate_screen::retrieve_entities;
 use crate::cameras::camera3d::{Camera3D, Camera3DPlugin};
 use crate::entities::ui_entity::DisplayEntity;
+use crate::events::get_texture::{get_textures_event, GetTextureEvent, SendTextures};
+use crate::events::remove_texture::{remove_texture_event, RemoveTextureEvent};
 use crate::events::set_simulation::{set_simulation_event, SetSimulation};
+use crate::events::set_texture::{set_texture_event, SetTextureEvent};
 use crate::events::set_tick_rate::{set_tick_rate_event, SetTickRateEvent};
 use crate::events::templates::SendTemplates;
 use crate::events::update_entity::{update_entity_event, UpdateEntityEvent};
@@ -47,6 +52,9 @@ impl Plugin for SimulateScreen {
                     update_entity_event,
                     update_entity_group_event,
                     set_tick_rate_event,
+                    get_textures_event,
+                    remove_texture_event,
+                    set_texture_event,
                 )
                     .run_if(in_state(DisplayState::SimulateScreen)),
             )
@@ -58,6 +66,10 @@ impl Plugin for SimulateScreen {
             .add_event::<UpdateEntityEvent>()
             .add_event::<UpdateEntityGroupEvent>()
             .add_event::<SetTickRateEvent>()
+            .add_event::<RemoveTextureEvent>()
+            .add_event::<GetTextureEvent>()
+            .add_event::<SendTextures>()
+            .add_event::<SetTextureEvent>()
             .add_plugins(Camera3DPlugin);
     }
 }
@@ -447,6 +459,9 @@ fn handle_keyboard(
     mut update_entity_event: EventWriter<UpdateEntityEvent>,
     mut update_entity_group_event: EventWriter<UpdateEntityGroupEvent>,
     mut set_tick_rate_event: EventWriter<SetTickRateEvent>,
+    mut set_texture_event: EventWriter<SetTextureEvent>,
+    mut remove_texture_event: EventWriter<RemoveTextureEvent>,
+    mut get_texture_event: EventWriter<GetTextureEvent>,
     client: ResMut<ClientDisplay>,
     keys: Res<ButtonInput<KeyCode>>,
 ) {
@@ -497,6 +512,21 @@ fn handle_keyboard(
     if keys.just_pressed(KeyCode::KeyM) {
         let set_tick_rate = set_tick_rate::create_set_tick_rate(30.0);
         set_tick_rate_event.send(SetTickRateEvent(set_tick_rate));
+    }
+    if keys.just_pressed(KeyCode::KeyK) {
+        let set_texture = set_texture::create(
+            "test.obj",
+            set_texture::TargetType::EntityGroup,
+            "MagentaSquare",
+        );
+        set_texture_event.send(SetTextureEvent(set_texture));
+    }
+    if keys.just_pressed(KeyCode::KeyJ) {
+        let remove_texture = remove_texture::create("test.obj");
+        remove_texture_event.send(RemoveTextureEvent(remove_texture));
+    }
+    if keys.just_pressed(KeyCode::KeyL) {
+        get_texture_event.send(GetTextureEvent);
     }
 }
 

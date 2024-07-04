@@ -4,9 +4,7 @@
     {
       "name": "MagentaSquare",
       "color": "MAGENTA",
-      "texture_id": "",
       "speed": 5.0,
-      "gravity": 500.0,
       "directions": [
         {
           "Location": {
@@ -16,18 +14,20 @@
           }
         }
       ],
-      "shape": "RECTANGLE"
+      "shape": "RECTANGLE",
+      "gravity": 500.0,
+      "texture_id": ""
     },
     {
       "name": "PinkSquare",
       "color": "PINK",
-      "texture_id": "test.obj",
       "speed": 0.0,
-      "gravity": 0.005,
       "directions": [
         "Static"
       ],
-      "shape": "RECTANGLE"
+      "shape": "RECTANGLE",
+      "gravity": 0.005,
+      "texture_id": "test.obj"
     }
   ],
   "entities": [
