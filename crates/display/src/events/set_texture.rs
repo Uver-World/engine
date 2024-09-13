@@ -1,5 +1,5 @@
 use bevy::{
-    asset::Assets,
+    asset::{AssetServer, Assets},
     ecs::{
         entity::Entity,
         event::{Event, EventReader},
@@ -31,6 +31,7 @@ fn handle_entity(
     (entity, display_entity, transform): (Entity, &DisplayEntity, &Transform),
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
+    assets: &mut ResMut<AssetServer>,
 ) {
     let mut display_entity = display_entity.clone();
     display_entity.settings.group.texture_id = new_texture.into();
@@ -48,7 +49,8 @@ fn handle_entity(
         display_entity.settings.group.color.blue(),
     );
     let collider = build_shape(&display_entity.settings.group.shape);
-    let mesh = meshes.add(shape_to_mesh(&display_entity.settings.group.shape));
+    let mesh = assets.load(new_texture.to_string());
+    //assets meshes.add(shape_to_mesh(&display_entity.settings.group.shape));
     let material = materials.add(color);
     spawn_entity(
         commands
@@ -73,6 +75,7 @@ fn handle_entity_group_event(
     entities: &Query<(Entity, &DisplayEntity, &Transform)>,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
+    assets: &mut ResMut<AssetServer>,
 ) {
     let entities: Vec<_> = entities
         .iter()
@@ -80,7 +83,7 @@ fn handle_entity_group_event(
         .collect();
 
     for entity in entities {
-        handle_entity(commands, new_texture, entity, meshes, materials)
+        handle_entity(commands, new_texture, entity, meshes, materials, assets)
     }
 }
 
@@ -92,6 +95,7 @@ fn handle_entity_event(
     entities: &Query<(Entity, &DisplayEntity, &Transform)>,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
+    assets: &mut ResMut<AssetServer>,
 ) {
     let entity = entities
         .iter()
@@ -99,7 +103,7 @@ fn handle_entity_event(
         .nth(0);
 
     match entity {
-        Some(entity) => handle_entity(commands, new_texture, entity, meshes, materials),
+        Some(entity) => handle_entity(commands, new_texture, entity, meshes, materials, assets),
         None => println!("entity id: {} could not be found", target),
     }
 }
@@ -111,6 +115,7 @@ pub fn set_texture_event(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     entities: Query<(Entity, &DisplayEntity, &Transform)>,
+    mut assets: ResMut<AssetServer>,
 ) {
     for event in ev.read() {
         if event.0.target_type == TargetType::EntityGroup as i32 {
@@ -122,6 +127,7 @@ pub fn set_texture_event(
                 &entities,
                 &mut meshes,
                 &mut materials,
+                &mut assets,
             );
         } else if event.0.target_type == TargetType::Entity as i32 {
             handle_entity_event(
@@ -132,6 +138,7 @@ pub fn set_texture_event(
                 &entities,
                 &mut meshes,
                 &mut materials,
+                &mut assets,
             );
         }
     }

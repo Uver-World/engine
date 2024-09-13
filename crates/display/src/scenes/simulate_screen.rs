@@ -515,7 +515,7 @@ fn handle_keyboard(
     }
     if keys.just_pressed(KeyCode::KeyK) {
         let set_texture = set_texture::create(
-            "test.obj",
+            "castle.obj",
             set_texture::TargetType::EntityGroup,
             "MagentaSquare",
         );

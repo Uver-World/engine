@@ -52,10 +52,13 @@ impl ClientDisplay {
         let mut app = App::new();
         app.insert_resource(WinitSettings::default())
             .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-            .add_plugins(DefaultPlugins.set(WindowPlugin {
-                primary_window: Some(self.get_window()),
-                ..default()
-            }))
+            .add_plugins((
+                DefaultPlugins.set(WindowPlugin {
+                    primary_window: Some(self.get_window()),
+                    ..default()
+                }),
+                bevy_obj::ObjPlugin,
+            ))
             .init_state::<DisplayState>()
             .add_systems(Startup, assets::loading_screen::load_assets)
             .add_plugins(EguiPlugin)
