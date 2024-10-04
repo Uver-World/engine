@@ -14,6 +14,7 @@ use bevy_matchbox::{
     matchbox_socket::{MultipleChannels, PeerId, WebRtcChannel},
     MatchboxSocket,
 };
+use image::imageops::FilterType;
 use uverworld_packet::{packet::PacketType, Packet};
 
 #[derive(Event)]
@@ -29,6 +30,7 @@ pub fn handle_image(
         let packet =
             uverworld_packet::create(PacketType::Image, uverworld_packet::image::encode(&image.0));
         send_screenshot(packet, peers.clone(), &mut unreliable);
+        println!("screenshot sent!")
     }
 }
 
@@ -36,6 +38,7 @@ fn send_screenshot(packet: Packet, peers: Vec<PeerId>, unreliable: &mut WebRtcCh
     let serialized: Box<[u8]> = uverworld_packet::serialize(&packet).into();
     for peer in peers {
         unreliable.send(serialized.clone(), peer);
+        println!("screenshot sent to peer");
     }
 }
 
@@ -48,14 +51,27 @@ pub fn take_screenshot(
     let id = image_handler.id;
     image_handler.id += 1;
     let _ = screenshot_manager.take_screenshot(main_window.single(), move |image| {
-        let image =
-            uverworld_packet::image::create_image(id, image.width(), image.height(), &image.data);
-        let _ = sender
-            .lock()
-            .expect("Unable to acquire image_handler sender mutex lock")
-            .send(HandleImage(image))
-            .expect("Unable to send image_handler sender event");
-        println!("sending image");
+        match image.try_into_dynamic() {
+            Ok(dyn_image) => {
+                dyn_image.resize(200, 200, FilterType::Nearest);
+
+                let image = uverworld_packet::image::create_image(
+                    id,
+                    dyn_image.width(),
+                    dyn_image.height(),
+                    &dyn_image.as_bytes(),
+                );
+                let _ = sender
+                    .lock()
+                    .expect("Unable to acquire image_handler sender mutex lock")
+                    .send(HandleImage(image))
+                    .expect("Unable to send image_handler sender event");
+                println!("sending image");
+            }
+            Err(e) => {
+                eprintln!("cannot convert image to dyamic image: {e:?}")
+            }
+        }
     });
 }
 

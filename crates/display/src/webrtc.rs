@@ -25,6 +25,7 @@ use crate::{
         ResetSimulation,
     },
     extensions::AppExtensions,
+    states::DisplayState,
 };
 
 #[derive(ScheduleLabel, Clone, Debug, Eq, PartialEq, Hash)]
@@ -46,7 +47,10 @@ impl Plugin for WebRtc {
             .add_systems(WebRtcSchedule, remove_texture_event);
 
         let (handle_image_sender, handle_image_receiver) = channel();
-        app.add_systems(WebRtcSchedule, (handle_image, take_screenshot));
+        app.add_systems(
+            WebRtcSchedule,
+            (handle_image, take_screenshot).run_if(in_state(DisplayState::SimulateScreen)),
+        );
         app.insert_resource(ImageHandler::new(handle_image_sender));
         app.add_event_channel::<HandleImage>(handle_image_receiver);
     }
