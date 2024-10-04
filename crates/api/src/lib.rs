@@ -3,6 +3,7 @@ use models::{Peer, UserId};
 pub mod models;
 
 pub fn server_auth(hostname: &str, port: u16, server_token: &str) -> Result<Peer, String> {
+    let _ = server_disconnect(hostname, port, server_token);
     let path = format!("http://{hostname}:{port}/user/server_authenticate");
     let client = reqwest::blocking::Client::new();
 

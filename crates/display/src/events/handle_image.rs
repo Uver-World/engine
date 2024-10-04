@@ -53,7 +53,7 @@ pub fn take_screenshot(
     let _ = screenshot_manager.take_screenshot(main_window.single(), move |image| {
         match image.try_into_dynamic() {
             Ok(dyn_image) => {
-                dyn_image.resize(200, 200, FilterType::Nearest);
+                dyn_image.resize(4, 4, FilterType::Nearest);
 
                 let image = uverworld_packet::image::create_image(
                     id,
