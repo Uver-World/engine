@@ -2,6 +2,7 @@ use std::fs;
 
 use bevy::{
     asset::Assets,
+    color::Color,
     ecs::{
         entity::Entity,
         event::{Event, EventReader},
@@ -10,7 +11,7 @@ use bevy::{
     hierarchy::DespawnRecursiveExt,
     math::Vec3,
     pbr::StandardMaterial,
-    render::{color::Color, mesh::Mesh},
+    render::mesh::Mesh,
     transform::components::Transform,
 };
 use bevy_rapier3d::render::ColliderDebugColor;
@@ -43,7 +44,7 @@ fn handle_entity(
     display_entity.velocity = Vec3::new(0., 0., 0.);
     commands.entity(entity).despawn_recursive();
 
-    let color = Color::rgb_u8(
+    let color = Color::srgb_u8(
         display_entity.settings.group.color.red(),
         display_entity.settings.group.color.green(),
         display_entity.settings.group.color.blue(),
@@ -54,7 +55,7 @@ fn handle_entity(
     spawn_entity(
         commands
             .spawn(SimulateScreen)
-            .insert(ColliderDebugColor(color)),
+            .insert(ColliderDebugColor(color.into())),
         collider,
         mesh,
         material,

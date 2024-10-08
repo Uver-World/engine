@@ -1,8 +1,8 @@
 use bevy::ecs::{
     event::{Event, EventReader},
-    schedule::NextState,
     system::ResMut,
 };
+use bevy::state::state::NextState;
 use client_profile::Profile;
 use uverworld_packet::templates::Template;
 

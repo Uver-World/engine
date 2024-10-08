@@ -29,12 +29,12 @@ uverworld_packet = { path = "../packet/rust/" }
 dotenv = "0.15.0"
 clap = "4.4.8"
 sys-info = "0.9.1"
-bevy = "0.13.2"
-bevy_obj = "0.13"
-bevy_egui = "0.26.0"
+bevy = "0.14.2"
+bevy_obj = "0.14"
+bevy_egui = "0.30.0"
 nalgebra = "0.32.2"
-bevy_rapier3d = "0.25.0"
-bevy_matchbox = { version = "0.9.0", features = ["ggrs"] }
+bevy_rapier3d = "0.27.0"
+bevy_matchbox = { version = "0.10.0", features = ["ggrs"] }
 opentelemetry = "0.21.0"
 reqwest = { version = "0.11.20", features = ["blocking", "json"] }
 serde_json = "1.0.107"
@@ -45,7 +45,7 @@ opentelemetry-proto = { version = "0.4.0", default-features = false, features = 
 futures-core = "0.3.28"
 prost = "0.11.9"
 tokio = "1.35.1"
-image = "0.24.9"
+image = "0.25.2"
 webrtc = { version = "0.10", default-features = false }
 
 [patch.crates-io]

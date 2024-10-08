@@ -15,7 +15,7 @@ pub trait AppExtensions {
 impl AppExtensions for App {
     fn add_event_channel<T: Event>(&mut self, receiver: Receiver<T>) -> &mut Self {
         assert!(
-            !self.world.contains_resource::<ChannelReceiver<T>>(),
+            !self.world().contains_resource::<ChannelReceiver<T>>(),
             "this event channel is already initialized",
         );
 
