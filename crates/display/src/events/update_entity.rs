@@ -1,9 +1,16 @@
 use bevy::{
-    asset::Assets, ecs::{
+    asset::Assets,
+    color::Color,
+    ecs::{
         entity::Entity,
         event::{Event, EventReader},
         system::{Commands, Query, ResMut},
-    }, hierarchy::DespawnRecursiveExt, math::Vec3, pbr::StandardMaterial, render::{color::Color, mesh::Mesh}, transform::components::Transform
+    },
+    hierarchy::DespawnRecursiveExt,
+    math::Vec3,
+    pbr::StandardMaterial,
+    render::mesh::Mesh,
+    transform::components::Transform,
 };
 use bevy_rapier3d::render::ColliderDebugColor;
 use client_profile::models::Location;
@@ -54,7 +61,7 @@ fn handle_update_group_event(
     display_entity.velocity = Vec3::new(0., 0., 0.);
     commands.entity(entity).despawn_recursive();
 
-    let color = Color::rgb_u8(
+    let color = Color::srgb_u8(
         display_entity.settings.group.color.red(),
         display_entity.settings.group.color.green(),
         display_entity.settings.group.color.blue(),
@@ -65,7 +72,7 @@ fn handle_update_group_event(
     spawn_entity(
         commands
             .spawn(SimulateScreen)
-            .insert(ColliderDebugColor(color)),
+            .insert(ColliderDebugColor(color.into())),
         collider,
         mesh,
         material,

@@ -1,6 +1,8 @@
 use bevy::ecs::system::EntityCommands;
 use bevy::prelude::*;
 
+use crate::states::DisplayState;
+
 #[derive(Component)]
 pub struct LoadingBar {
     pub val: f32,
@@ -10,6 +12,10 @@ pub struct LoadingBar {
 pub struct Assets {
     pub font: Handle<Font>,
     pub icon: Handle<Image>,
+}
+
+pub fn transition(mut app_state: ResMut<NextState<DisplayState>>) {
+    app_state.set(DisplayState::LoadingScreen);
 }
 
 pub fn load_assets(mut commands: Commands, assets: Res<AssetServer>) {
@@ -31,7 +37,7 @@ pub fn spawn_loading_bar(mut commands: EntityCommands, _assets: &Assets) {
                 ..default()
             },
             visibility: Visibility::Visible,
-            background_color: Color::rgb(91., 91., 91.).into(),
+            background_color: Color::srgb(91., 91., 91.).into(),
             ..default()
         })
         .with_children(|parent| {
@@ -50,7 +56,7 @@ pub fn spawn_loading_bar(mut commands: EntityCommands, _assets: &Assets) {
                         ..default()
                     },
                     visibility: Visibility::Visible,
-                    background_color: Color::rgb(0., 0., 0.).into(),
+                    background_color: Color::srgb(0., 0., 0.).into(),
                     ..default()
                 })
                 .insert(LoadingBar { val: 0.0 });

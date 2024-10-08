@@ -64,7 +64,7 @@ fn construct(mut commands: Commands, assets: Res<loading_screen::Assets>) {
             align_content: AlignContent::Center,
             ..default()
         },
-        background_color: Color::rgba(0., 0., 0., 0.).into(),
+        background_color: Color::srgba(0., 0., 0., 0.).into(),
         ..default()
     });
     node.with_children(|parent| loading_screen::spawn_icon(parent.spawn_empty(), &assets));

@@ -368,41 +368,41 @@ fn construct(
     commands
         .spawn(SimulateScreen)
         .insert(Collider::cuboid(1000.0, -0.1, 1000.0))
-        .insert(ColliderDebugColor(Color::rgb_u8(0, 255, 0)))
+        .insert(ColliderDebugColor(Color::srgb_u8(0, 255, 0).into()))
         .insert(TransformBundle::from(Transform::from_xyz(0., -2., 0.)));
 
     commands
         .spawn(SimulateScreen)
         .insert(Collider::cuboid(1000.0, -0.1, 1000.0))
-        .insert(ColliderDebugColor(Color::rgb_u8(0, 255, 0)))
+        .insert(ColliderDebugColor(Color::srgb_u8(0, 255, 0).into()))
         .insert(TransformBundle::from(Transform::from_xyz(0., 2000., 0.)));
 
     commands
         .spawn(SimulateScreen)
         .insert(Collider::cuboid(1000.0, 1000.0, -0.1))
-        .insert(ColliderDebugColor(Color::rgb_u8(255, 0, 0)))
+        .insert(ColliderDebugColor(Color::srgb_u8(255, 0, 0).into()))
         .insert(TransformBundle::from(Transform::from_xyz(0., 998., 1000.)));
 
     commands
         .spawn(SimulateScreen)
         .insert(Collider::cuboid(1000.0, 1000.0, -0.1))
-        .insert(ColliderDebugColor(Color::rgb_u8(255, 0, 0)))
+        .insert(ColliderDebugColor(Color::srgb_u8(255, 0, 0).into()))
         .insert(TransformBundle::from(Transform::from_xyz(0., 998., -1000.)));
 
     commands
         .spawn(SimulateScreen)
         .insert(Collider::cuboid(-0.1, 1000.0, 1000.0))
-        .insert(ColliderDebugColor(Color::rgb_u8(0, 0, 255)))
+        .insert(ColliderDebugColor(Color::srgb_u8(0, 0, 255).into()))
         .insert(TransformBundle::from(Transform::from_xyz(-1000., 998., 0.)));
 
     commands
         .spawn(SimulateScreen)
         .insert(Collider::cuboid(-0.1, 1000.0, 1000.0))
-        .insert(ColliderDebugColor(Color::rgb_u8(0, 0, 255)))
+        .insert(ColliderDebugColor(Color::srgb_u8(0, 0, 255).into()))
         .insert(TransformBundle::from(Transform::from_xyz(1000., 998., 0.)));
 
     for (entity, collider, mesh) in entities {
-        let color = Color::rgb_u8(
+        let color = Color::srgb_u8(
             entity.group.color.red(),
             entity.group.color.green(),
             entity.group.color.blue(),
@@ -412,7 +412,7 @@ fn construct(
         spawn_entity(
             commands
                 .spawn(SimulateScreen)
-                .insert(ColliderDebugColor(color)),
+                .insert(ColliderDebugColor(color.into())),
             collider,
             mesh,
             material,
