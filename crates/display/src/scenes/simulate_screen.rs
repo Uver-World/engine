@@ -19,6 +19,7 @@ use crate::events::set_texture::{set_texture_event, SetTextureEvent};
 use crate::events::set_tick_rate::{set_tick_rate_event, SetTickRateEvent};
 use crate::events::templates::SendTemplates;
 use crate::events::update_entity::{update_entity_event, UpdateEntityEvent};
+use crate::events::update_entities::{update_entities_event, UpdateEntitiesEvent};
 use crate::events::update_entity_group::{update_entity_group_event, UpdateEntityGroupEvent};
 use crate::events::{
     reset_simulation_event,
@@ -70,6 +71,7 @@ impl Plugin for SimulateScreen {
             .add_event::<GetTextureEvent>()
             .add_event::<SendTextures>()
             .add_event::<SetTextureEvent>()
+            .add_event::<UpdateEntitiesEvent>()
             .add_plugins(Camera3DPlugin);
     }
 }

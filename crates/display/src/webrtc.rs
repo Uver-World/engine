@@ -7,7 +7,7 @@ use bevy_matchbox::{
 };
 use uverworld_packet::{
     packet::PacketType, remove_texture, set_simulation, set_texture, set_tick_rate, update_entity,
-    update_entity_group,
+    update_entity_group, update_entities
 };
 
 use crate::{
@@ -22,6 +22,7 @@ use crate::{
         templates::{send_templates_event, GetTemplates},
         update_entity::{update_entity_event, UpdateEntityEvent},
         update_entity_group::{update_entity_group_event, UpdateEntityGroupEvent},
+        update_entities::{update_entities_event, UpdateEntitiesEvent},
         ResetSimulation,
     },
     extensions::AppExtensions,
@@ -44,7 +45,8 @@ impl Plugin for WebRtc {
             .add_systems(WebRtcSchedule, set_tick_rate_event)
             .add_systems(WebRtcSchedule, get_textures_event)
             .add_systems(WebRtcSchedule, set_texture_event)
-            .add_systems(WebRtcSchedule, remove_texture_event);
+            .add_systems(WebRtcSchedule, remove_texture_event)
+            .add_systems(WebRtcSchedule, update_entities_event);
 
         let (handle_image_sender, handle_image_receiver) = channel();
         app.add_systems(
@@ -86,6 +88,7 @@ fn receive(
     mut set_texture_event: EventWriter<SetTextureEvent>,
     mut remove_texture_event: EventWriter<RemoveTextureEvent>,
     mut get_texture_event: EventWriter<GetTextureEvent>,
+    mut update_entities_event: EventWriter<UpdateEntitiesEvent>,
 ) {
     // Check for new connections
     for (peer, state) in socket.update_peers() {
@@ -141,6 +144,10 @@ fn receive(
             }
             PacketType::GetTexture => {
                 get_texture_event.send(GetTextureEvent);
+            }
+            PacketType::UpdateEntities => {
+                let entity_batch = update_entities::deserialize(&packet.value).unwrap();
+                update_entities_event.send(UpdateEntitiesEvent(entity_batch));
             }
             _ => eprintln!("packet not supported"),
         };

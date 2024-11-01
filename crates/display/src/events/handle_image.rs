@@ -30,7 +30,7 @@ pub fn handle_image(
         let packet =
             uverworld_packet::create(PacketType::Image, uverworld_packet::image::encode(&image.0));
         send_screenshot(packet, peers.clone(), &mut unreliable);
-        println!("screenshot sent!")
+        // println!("screenshot sent!")
     }
 }
 
@@ -38,7 +38,7 @@ fn send_screenshot(packet: Packet, peers: Vec<PeerId>, unreliable: &mut WebRtcCh
     let serialized: Box<[u8]> = uverworld_packet::serialize(&packet).into();
     for peer in peers {
         unreliable.send(serialized.clone(), peer);
-        println!("screenshot sent to peer");
+        // println!("screenshot sent to peer");
     }
 }
 
@@ -66,7 +66,7 @@ pub fn take_screenshot(
                     .expect("Unable to acquire image_handler sender mutex lock")
                     .send(HandleImage(image))
                     .expect("Unable to send image_handler sender event");
-                println!("sending image");
+                // println!("sending image");
             }
             Err(e) => {
                 eprintln!("cannot convert image to dyamic image: {e:?}")
