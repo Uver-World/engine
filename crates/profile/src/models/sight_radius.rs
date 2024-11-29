@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::Location;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct SightRadius(f32);
+pub struct SightRadius(pub f32);
 
 impl SightRadius {
     pub fn is_in_sight(&self, entity_location: Location, target_location: Location) -> bool {

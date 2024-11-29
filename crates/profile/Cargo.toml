@@ -9,3 +9,4 @@ edition = "2021"
 serde_json.workspace = true
 serde.workspace = true
 rand.workspace = true
+hex_color.workspace = true

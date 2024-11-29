@@ -7,15 +7,14 @@ use bevy::{
         system::{Commands, Query, ResMut},
     },
     hierarchy::DespawnRecursiveExt,
-    math::Vec3,
     pbr::StandardMaterial,
     render::mesh::Mesh,
     transform::components::Transform,
 };
 
 use bevy_rapier3d::render::ColliderDebugColor;
-use client_profile::models::{EntityGroup, Location};
-use uverworld_packet::update_entities::EntityBatch;
+use client_profile::models::{self, Direction, EntityGroup, Location, Range, SightRadius};
+use uverworld_packet::update_entities::{direction, EntityBatch};
 
 use crate::{
     assets::simulate_screen::{build_shape, shape_to_mesh},
@@ -27,31 +26,20 @@ use crate::{
 #[derive(Event)]
 pub struct UpdateEntitiesEvent(pub EntityBatch);
 
-fn update_entities(
+fn set_entities(
     commands: &mut Commands,
-    new_group: EntityGroup,
-    entities: Vec<(Entity, &DisplayEntity, &Transform)>,
+    new_entities: Vec<DisplayEntity>,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
 ) {
-    for (entity, display_entity, transform) in entities {
-        let mut display_entity = display_entity.clone();
-        display_entity.settings.location = Location {
-            x: transform.translation.x,
-            y: transform.translation.y,
-            z: transform.translation.z,
-        };
-        display_entity.settings.group = new_group.clone();
-        display_entity.velocity = Vec3::new(0., 0., 0.);
-        commands.entity(entity).despawn_recursive();
-
+    for new_entity in new_entities {
         let color = Color::srgb_u8(
-            display_entity.settings.group.color.red(),
-            display_entity.settings.group.color.green(),
-            display_entity.settings.group.color.blue(),
+            new_entity.settings.group.color.red(),
+            new_entity.settings.group.color.green(),
+            new_entity.settings.group.color.blue(),
         );
-        let collider = build_shape(&display_entity.settings.group.shape);
-        let mesh = meshes.add(shape_to_mesh(&display_entity.settings.group.shape));
+        let collider = build_shape(&new_entity.settings.group.shape);
+        let mesh = meshes.add(shape_to_mesh(&new_entity.settings.group.shape));
         let material = materials.add(color);
         spawn_entity(
             commands
@@ -60,45 +48,155 @@ fn update_entities(
             collider,
             mesh,
             material,
-            &display_entity,
+            &new_entity,
         );
     }
 }
 
-fn remove_duplicate(target: &str, client: &mut ClientDisplay) {
-    client
-        .settings
-        .profile
-        .entity_groups
-        .retain_mut(|group| group.name != target);
+fn convert_directions(
+    raw_directions: Vec<uverworld_packet::update_entities::Direction>,
+) -> Vec<Direction> {
+    let mut directions = Vec::new();
+
+    for direction in raw_directions {
+        let direction = match direction.direction.unwrap() {
+            direction::Direction::Random(random) => {
+                let range = random.location.unwrap();
+                Direction::Random(Range {
+                    x: [-range.x, range.x],
+                    y: [-range.y, range.y],
+                    z: [-range.z, range.z],
+                })
+            }
+            direction::Direction::Location(position) => {
+                let location = Location {
+                    x: position.x,
+                    y: position.y,
+                    z: position.z,
+                };
+                Direction::Location(location)
+            }
+            direction::Direction::Static(_) => Direction::Static,
+            direction::Direction::Follow(follow) => {
+                let sight_radius = SightRadius(follow.sight_radius);
+                Direction::Follow(sight_radius, follow.entity_group_names)
+            }
+            direction::Direction::Escape(escape) => {
+                let sight_radius = SightRadius(escape.sight_radius);
+                Direction::Escape(sight_radius, escape.entity_group_names)
+            }
+        };
+        directions.push(direction);
+    }
+
+    directions
+}
+
+fn convert_group(new_raw_group: uverworld_packet::update_entities::EntityGroup) -> EntityGroup {
+    let new_group = EntityGroup {
+        name: new_raw_group.name,
+        color: models::Color::Custom(new_raw_group.color),
+        speed: new_raw_group.speed,
+        directions: convert_directions(new_raw_group.direction),
+        shape: models::Shape::Rectangle,
+        // shape: models::Shape::from_str(&new_raw_group.shape),
+        gravity: new_raw_group.gravity,
+        texture_id: new_raw_group.texture_id,
+    };
+
+    println!("new group found: {:#?}", new_group);
+
+    new_group
+}
+
+fn convert_groups(
+    new_raw_groups: Vec<uverworld_packet::update_entities::EntityGroup>,
+) -> Vec<EntityGroup> {
+    let mut new_groups = Vec::new();
+
+    for new_raw_group in new_raw_groups {
+        new_groups.push(convert_group(new_raw_group));
+    }
+
+    new_groups
+}
+
+fn convert_entity(
+    id: usize,
+    entity_group: &EntityGroup,
+    raw_entity: uverworld_packet::update_entities::Entities,
+) -> DisplayEntity {
+    let location = if let Some(position) = raw_entity.location {
+        Location::new(position.x, position.y, position.z)
+    } else {
+        Location::new(100., 100., 100.)
+    };
+    let new_entity = client_profile::models::Entity::new(entity_group.clone(), location);
+
+    DisplayEntity::from_entity(new_entity, id)
+}
+
+fn convert_entities(
+    client: &ClientDisplay,
+    new_raw_entities: Vec<uverworld_packet::update_entities::Entities>,
+) -> Vec<DisplayEntity> {
+    let mut new_entities = Vec::new();
+    let mut id = 0;
+
+    for new_raw_entity in new_raw_entities {
+        let entity_group = client
+            .settings
+            .profile
+            .get_entity_group_by_name(&new_raw_entity.group);
+        match entity_group {
+            Some(entity_group) => {
+                println!("entity with group name: [{}] found", entity_group.name);
+                let new_entity = convert_entity(id, entity_group, new_raw_entity);
+                new_entities.push(new_entity);
+                id += 1;
+            }
+            None => eprintln!(
+                "Cannot find entity_group name: [{:?}]",
+                new_raw_entity.group
+            ),
+        }
+    }
+
+    new_entities
+}
+
+fn set_groups(client: &mut ClientDisplay, new_groups: Vec<EntityGroup>) {
+    client.settings.profile.entity_groups.clear();
+
+    for entity_group in new_groups {
+        client.settings.profile.entity_groups.push(entity_group);
+    }
 }
 
 fn handle_update_entities_event(
     commands: &mut Commands,
     client: &mut ClientDisplay,
-    target: &str,
-    new_group: EntityGroup,
+    entity_batch: EntityBatch,
     entities: &Query<(Entity, &DisplayEntity, &Transform)>,
     meshes: &mut ResMut<Assets<Mesh>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
 ) {
-    let entities = entities
-        .iter()
-        .filter(|(_, display_entity, _)| {
-            display_entity.settings.group.name == target
-                || display_entity.settings.group.name == new_group.name
-        })
-        .collect();
+    for (entity, _, _) in entities {
+        commands.entity(entity).despawn_recursive();
+    }
 
-    remove_duplicate(&new_group.name, client);
+    set_groups(client, convert_groups(entity_batch.entity_groups));
+    println!(
+        "groups set! size: {}",
+        client.settings.profile.entity_groups.len()
+    );
 
-    client
-        .settings
-        .profile
-        .entity_groups
-        .push(new_group.clone());
-
-    update_entities(commands, new_group, entities, meshes, materials);
+    set_entities(
+        commands,
+        convert_entities(client, entity_batch.entities),
+        meshes,
+        materials,
+    );
 }
 
 pub fn update_entities_event(
@@ -111,15 +209,14 @@ pub fn update_entities_event(
 ) {
     for event in ev.read() {
         println!("{:?}", &event.0.entities);
-        // let new_group = EntityGroup::from_str(&event.0.value).unwrap();
-        // handle_update_group_event(
-        //     &mut commands,
-        //     &mut client,
-        //     &event.0.target,
-        //     new_group,
-        //     &entities,
-        //     &mut meshes,
-        //     &mut materials,
-        // );
+        println!("{:?}", &event.0.entity_groups);
+        handle_update_entities_event(
+            &mut commands,
+            &mut client,
+            event.0.clone(), // TODO remove clone and take value instead
+            &entities,
+            &mut meshes,
+            &mut materials,
+        );
     }
 }

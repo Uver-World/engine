@@ -8,3 +8,14 @@ pub enum Shape {
     Triangle,
     Ball,
 }
+
+impl Shape {
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "CIRCLE" => Self::Circle,
+            "TRIANGLE" => Self::Triangle,
+            "BALL" => Self::Ball,
+            _ => Self::Rectangle,
+        }
+    }
+}

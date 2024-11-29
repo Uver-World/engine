@@ -1,3 +1,4 @@
+use hex_color::HexColor;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Debug, Eq, Hash)]
@@ -14,6 +15,7 @@ pub enum Color {
     Brown,
     Gray,
     Lime,
+    Custom(String),
 }
 
 impl Color {
@@ -30,6 +32,10 @@ impl Color {
             Self::Brown => [165, 42, 42],
             Self::Gray => [128, 128, 128],
             Self::Lime => [0, 255, 0],
+            Self::Custom(value) => {
+                let color = HexColor::parse_rgb(value).unwrap_or(HexColor::GRAY);
+                [color.r, color.g, color.b]
+            }
         }
     }
 

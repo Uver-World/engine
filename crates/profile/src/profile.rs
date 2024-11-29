@@ -68,6 +68,16 @@ impl Profile {
         &self.entity_groups
     }
 
+    pub fn get_entity_group_by_name<T: Into<String>>(&self, target: T) -> Option<&EntityGroup> {
+        let target = target.into();
+
+        self.entity_groups
+            .iter()
+            .filter(|group| group.name == target)
+            .next()
+            .take()
+    }
+
     pub fn add_entity(&mut self, entity: Entity) {
         self.entities.push(entity);
     }

@@ -16,8 +16,10 @@ Cargo.lock
 
 .vscode/
 
+.cargo
+
 new_project.json
 
 .env
-
+.direnv
 .idea/
